@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Bienvenido a Mi Proyecto TFG{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Título de la página -->
+    <h1 class="mt-4 mb-4 text-center">Profesor auxiliar utilizando IA generativa</h1>
+    
+    <!-- Imagen grande horizontal -->
+    <div class="mb-4">
+        <img src="{% static 'images/img1.jpg' %}" class="img-fluid" alt="Imagen descriptiva del TFG">
+    </div>
+
+    <!-- Primer párrafo -->
+    <div class="mb-4">
+        <p>
+            Bienvenido a la página web de mi Trabajo de Fin de Grado (TFG). Este proyecto ha sido diseñado para facilitar la interacción entre estudiantes y profesores en un entorno académico virtual. A través de esta plataforma, se pueden gestionar cursos, exámenes y grupos de estudio, así como otras funcionalidades específicas para cada tipo de usuario. Mi objetivo principal es mejorar la organización y la comunicación en el ámbito educativo.
+        </p>
+    </div>
+
+    <!-- Segundo párrafo con imagen a la derecha -->
+    <div class="mb-4 d-flex">
+        <div class="flex-grow-1">
+            <p>
+                En esta plataforma, los estudiantes pueden inscribirse en diferentes cursos, acceder a materiales de estudio, realizar exámenes y unirse a grupos de trabajo. Por otro lado, los profesores tienen la capacidad de gestionar sus cursos, crear exámenes, y monitorear el progreso de sus alumnos. La plataforma está diseñada con una interfaz intuitiva y amigable, que permite a los usuarios aprovechar al máximo las herramientas disponibles.
+            </p>
+        </div>
+        <div class="ml-4">
+            <img src="{% static 'images/img2.jpg' %}" class="img-fluid" alt="Imagen explicativa">
+        </div>
+    </div>
+
+    <!-- Tercer párrafo con imagen a la izquierda -->
+    <div class="mb-4 d-flex">
+        <div class="mr-4">
+            <img src="{% static 'images/img3.jpg' %}" class="img-fluid" alt="Imagen ilustrativa">
+        </div>
+        <div class="flex-grow-1">
+            <p>
+                Este TFG tiene como meta principal no solo la creación de una herramienta útil y funcional, sino también la exploración de tecnologías web modernas, como el framework Django. A lo largo de la realización de este proyecto, he aprendido a manejar aspectos cruciales de la programación web, desde el diseño de bases de datos hasta la implementación de funcionalidades complejas. Estoy emocionado de compartir este trabajo con la comunidad académica y espero que sea de gran utilidad para futuros desarrollos.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

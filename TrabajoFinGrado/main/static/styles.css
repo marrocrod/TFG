@@ -1,0 +1,91 @@
+/* Estilo base */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #F8F9FA; /* Un tono claro para el fondo */
+    color: #aaf6d5; /* Color verde para el texto */
+    margin: 0;
+    padding: 0;
+}
+
+/* Barra de navegación */
+.navbar {
+    background-color: #aaf6d5; /* Nuevo verde */
+}
+
+.navbar-brand, .nav-link {
+    color: #FFFFFF !important; /* Texto blanco en la barra de navegación */
+}
+
+.nav-link:hover {
+    background-color: #8ad3b4; /* Un tono más oscuro del nuevo verde al pasar el ratón */
+    color: #FFFFFF !important;
+}
+
+.navbar-toggler {
+    border-color: #FFFFFF; /* Blanco para el borde del botón de navegación en pantallas pequeñas */
+}
+
+/* Botón de navegación cuando está colapsado */
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba%28255, 255, 255, 1%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+/* Encabezados */
+h1, h2, h3, h4, h5, h6 {
+    color: #aaf6d5; /* Nuevo verde para los encabezados */
+}
+
+/* Botones */
+.btn-primary {
+    background-color: #aaf6d5; /* Nuevo verde */
+    border-color: #aaf6d5;
+    color: #FFFFFF;
+}
+
+.btn-primary:hover {
+    background-color: #8ad3b4; /* Un tono más oscuro del nuevo verde para el hover */
+    border-color: #8ad3b4;
+}
+
+/* Enlaces */
+a {
+    color: #aaf6d5;
+}
+
+a:hover {
+    color: #8ad3b4;
+}
+
+/* Footer */
+footer {
+    background-color: #aaf6d5; /* Fondo verde para el footer */
+    color: #FFFFFF; /* Texto blanco en el footer */
+    padding: 1rem;
+    text-align: center;
+}
+
+footer a {
+    color: #FFFFFF; /* Enlaces blancos en el footer */
+}
+
+footer a:hover {
+    color: #B5E0CC; /* Un tono verde claro al pasar el ratón */
+}
+
+/* Imágenes */
+img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px; /* Bordes ligeramente redondeados */
+}
+
+/* Contenedor principal */
+.container {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+/* Márgenes en los párrafos */
+p {
+    margin-bottom: 1.5rem;
+}
