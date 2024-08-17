@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Registro{% endblock %}
+
+{% block content %}
+<div class="container text-center">
+    <h1 class="mt-4 mb-4">Registro</h1>
+    <p>Selecciona cómo deseas registrarte:</p>
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-4">
+            <a href="{% url 'register_teacher' %}" class="btn btn-primary btn-lg btn-block">Registrarse como Profesor</a>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'register_student' %}" class="btn btn-secondary btn-lg btn-block">Registrarse como Estudiante</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
