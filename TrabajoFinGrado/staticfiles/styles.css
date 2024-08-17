@@ -89,3 +89,22 @@ img {
 p {
     margin-bottom: 1.5rem;
 }
+
+
+/* REGISTER HINTS & ERRORS*/
+
+/* Estilo para los mensajes de ayuda (hints) */
+.form-text, .helptext {
+    display: block; /* Asegura que se muestren como un bloque debajo del campo */
+    font-size: 0.875rem; /* Reduce el tamaño de la fuente */
+    color: #6c757d; /* Un tono gris más claro */
+    margin-top: 0.25rem; /* Añade un pequeño margen arriba para separar del campo */
+}
+
+/* Estilo para los mensajes de error y advertencia */
+.invalid-feedback, .form-control.is-invalid ~ .form-text {
+    font-size: 0.875rem; /* Reduce el tamaño de la fuente */
+    color: #dc3545; /* Color rojo para errores */
+    display: block;
+    margin-top: 0.25rem;
+}
