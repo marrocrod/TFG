@@ -1,43 +1,64 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login
-from .forms import UserRegistrationForm, TeacherRegistrationForm, StudentRegistrationForm
+from django.contrib.auth.forms import UserCreationForm
+from .models import User
+from django.contrib.auth.views import LoginView
 
-def home (request):
-    return render(request, 'home.html')
 
-def register_view(request):
+def home(request):
+    if request.user.is_authenticated:
+        user = request.user
+        if User.user_type == "Teacher":
+            context = {
+                'message': "Bienvenido, Profesor.",
+                'user_type': "Teacher"
+            }
+        elif User.user_type == "Student":
+            context = {
+                'message': "Bienvenido, Estudiante.",
+                'user_type': "Student"
+            }
+        else:
+            context = {
+                'message': "Bienvenido.",
+                'user_type': "Other"
+            }
+    else:
+        context = {
+            'message': "Bienvenido a la plataforma.",
+            'user_type': "Guest"
+        }
+
+    return render(request, 'home.html', context)
+
+
+
+def register(request):
     return render(request, 'register.html')
 
-def register_teacher(request):
-    if request.method == 'POST':
-        user_form = UserRegistrationForm(request.POST)
-        teacher_form = TeacherRegistrationForm(request.POST)
-        if user_form.is_valid() and teacher_form.is_valid():
-            user = user_form.save()
-            teacher = teacher_form.save(commit=False)
-            teacher.user = user
-            teacher.save()
-            login(request, user)
-            return redirect('home')  # Redirigir al dashboard de profesores
-    else:
-        user_form = UserRegistrationForm()
-        teacher_form = TeacherRegistrationForm()
-
-    return render(request, 'register_teacher.html', {'user_form': user_form, 'teacher_form': teacher_form})
 
 def register_student(request):
     if request.method == 'POST':
-        user_form = UserRegistrationForm(request.POST)
-        student_form = StudentRegistrationForm(request.POST)
-        if user_form.is_valid() and student_form.is_valid():
-            user = user_form.save()
-            student = student_form.save(commit=False)
-            student.user = user
-            student.save()
-            login(request, user)
-            return redirect('home')  # Redirigir al dashboard de estudiantes
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.user_type = User.UserTypeChoices.STUDENT
+            user.save()
+            return redirect('home')  # Redirige al login tras el registro exitoso
     else:
-        user_form = UserRegistrationForm()
-        student_form = StudentRegistrationForm()
+        form = UserCreationForm()
+    return render(request, 'register_student.html', {'form': form, 'user_type': 'Estudiante'})
 
-    return render(request, 'register_student.html', {'user_form': user_form, 'student_form': student_form})
+def register_teacher(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.user_type = User.UserTypeChoices.TEACHER
+            user.save()
+            return redirect('home')  # Redirige al login tras el registro exitoso
+    else:
+        form = UserCreationForm()
+    return render(request, 'register_teacher.html', {'form': form, 'user_type': 'Profesor'})
+
+class CustomLoginView(LoginView):
+    template_name = 'login.html'
