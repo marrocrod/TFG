@@ -8,14 +8,14 @@
     <!-- CSS de Bootstrap -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Tus estilos personalizados -->
-    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
     <!-- Barra de navegación -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="{% url 'home' %}">
             <img src="{% static 'images/logo.png' %}" alt="Logo" width="30" height="30" class="d-inline-block align-top">
-            PythonGPT
+            SaymplexFP
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -27,14 +27,14 @@
                         <a class="nav-link" href="{% url 'home' %}">Perfil</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}">Cerrar sesión</a>
+                        <a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a>
                     </li>
                 {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}">Iniciar sesión</a>
+                        <a class="nav-link" href="{% url 'login' %}">Iniciar sesión</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}">Registrarse</a>
+                        <a class="nav-link" href="{% url 'register' %}">Registrarse</a>
                     </li>
                 {% endif %}
             </ul>
@@ -51,13 +51,13 @@
     <!-- Footer -->
     <footer class="bg-light text-center text-lg-start mt-5">
         <div class="container p-4">
-            <p>&copy; 2024 PythonGPT</p>
+            <p>&copy; 2024 SaymplexFP</p>
         </div>
     </footer>
 
     <!-- Scripts de Bootstrap -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" defer></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" defer></script>
 </body>
 </html>
