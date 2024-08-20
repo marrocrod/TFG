@@ -12,6 +12,8 @@ urlpatterns = [
     path('register/student/', register_student, name='register_student'),
     path('login/', CustomLoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
+    path('user_profile/', user_profile, name='user_profile'),
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)

@@ -10,7 +10,7 @@
     <!-- Tus estilos personalizados -->
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
     <!-- Barra de navegación -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="{% url 'home' %}">
@@ -24,7 +24,7 @@
             <ul class="navbar-nav ml-auto">
                 {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}">Perfil</a>
+                        <a class="nav-link" href="{% url 'user_profile' %}">Perfil</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a>
@@ -42,7 +42,7 @@
     </nav>
 
     <!-- Contenido principal -->
-    <div class="container mt-4">
+    <div class="container mt-4 flex-grow-1">
         {% block content %}
         <!-- Aquí va el contenido específico de cada página -->
         {% endblock %}
