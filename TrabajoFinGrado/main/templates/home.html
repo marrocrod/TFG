@@ -5,63 +5,25 @@
 {% block content %}
 <div class="container">
     <!-- Título de la página -->
-    <h1 class="mt-4 mb-4 text-center">{{ message }}</h1>
+    <h1 class="mt-4 mb-4 text-center">Profesor auxiliar utilizando IA generativa</h1>
     
-
-    {% if user.user_type == "Teacher" %}
-    <!-- Contenido específico para profesores -->
-    <div class="mb-4">
-        <h2>Listado de Alumnos</h2>
-        <p>Aquí se implementará en el futuro un listado de alumnos.</p>
-    </div>
-
-    {% elif user.user_type == "Student" %}
-    <!-- Contenido específico para estudiantes -->
-    <div class="mb-4">
-        <h2>Temas</h2>
-        <ul>
-            <li>Tema 1</li>
-            <li>Tema 2</li>
-            <li>Tema 3</li>
-        </ul>
-    </div>
-
-    <div class="mb-4">
-        <h2>Exámenes</h2>
-        <ul>
-            <li>Examen 1</li>
-            <li>Examen 2</li>
-            <li>Examen 3</li>
-        </ul>
-    </div>
-
-    <div class="mb-4">
-        <h2>Generar Examen</h2>
-        <button class="btn btn-primary">Generar</button>
-    </div>
-
-    {% elif not user.is_authenticated%}
     <!-- Imagen grande horizontal -->
     <div class="mb-4">
         <img src="{% static 'images/img1.jpg' %}" class="img-fluid" alt="Imagen descriptiva del TFG">
     </div>
-    <!-- Contenido específico para usuarios no logueados (invitados) -->
+
+    <!-- Primer párrafo -->
     <div class="mb-4">
         <p>
-            Bienvenido a nuestra plataforma educativa. Por favor, regístrate o inicia sesión para acceder a todas las funcionalidades de la plataforma.
+            Bienvenido a la página web de mi Trabajo de Fin de Grado (TFG). Este proyecto ha sido diseñado para facilitar la interacción entre estudiantes y profesores en un entorno académico virtual. A través de esta plataforma, se pueden gestionar cursos, exámenes y grupos de estudio, así como otras funcionalidades específicas para cada tipo de usuario. Mi objetivo principal es mejorar la organización y la comunicación en el ámbito educativo.
         </p>
     </div>
 
-    <div class="mb-4">
-        <p>
-            Bienvenido a la página web de mi Trabajo de Fin de Grado (TFG). Este proyecto ha sido diseñado para facilitar la interacción entre estudiantes y profesores en un entorno académico virtual.
-        </p>
-    </div>
-
+    <!-- Segundo párrafo con imagen a la derecha -->
     <div class="mb-4 d-flex">
         <div class="flex-grow-1">
             <p>
-                En esta plataforma, los estudiantes pueden inscribirse en diferentes cursos, acceder a materiales de estudio, realizar exámenes y unirse a grupos de trabajo.
+                En esta plataforma, los estudiantes pueden inscribirse en diferentes cursos, acceder a materiales de estudio, realizar exámenes y unirse a grupos de trabajo. Por otro lado, los profesores tienen la capacidad de gestionar sus cursos, crear exámenes, y monitorear el progreso de sus alumnos. La plataforma está diseñada con una interfaz intuitiva y amigable, que permite a los usuarios aprovechar al máximo las herramientas disponibles.
             </p>
         </div>
         <div class="ml-4">
@@ -76,11 +38,9 @@
         </div>
         <div class="flex-grow-1">
             <p>
-                Este TFG tiene como meta principal la creación de una herramienta útil y funcional.
+                Este TFG tiene como meta principal no solo la creación de una herramienta útil y funcional, sino también la exploración de tecnologías web modernas, como el framework Django. A lo largo de la realización de este proyecto, he aprendido a manejar aspectos cruciales de la programación web, desde el diseño de bases de datos hasta la implementación de funcionalidades complejas. Estoy emocionado de compartir este trabajo con la comunidad académica y espero que sea de gran utilidad para futuros desarrollos.
             </p>
         </div>
     </div>
-
-    {% endif %}
 </div>
 {% endblock %}

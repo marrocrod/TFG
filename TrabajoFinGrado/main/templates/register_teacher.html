@@ -1,3 +1,4 @@
+<!-- main/templates/register_teacher.html -->
 {% extends "base.html" %}
 
 {% block title %}Registro Profesor{% endblock %}
@@ -9,7 +10,8 @@
             <h1 class="mt-4 mb-4 text-center">Registro como Profesor</h1>
             <form method="post">
                 {% csrf_token %}
-                {{ form.as_p }}
+                {{ user_form.as_p }}
+                {{ teacher_form.as_p }}
                 <button type="submit" class="btn btn-primary btn-block">Registrarse</button>
             </form>
         </div>
