@@ -35,11 +35,11 @@ class User(AbstractUser):
 
     @property
     def is_teacher(self):
-        return self.user_type == self.UserTypeChoices.TEACHER
+        return self.user_type == "Teacher"
 
     @property
     def is_student(self):
-        return self.user_type == self.UserTypeChoices.STUDENT
+        return self.user_type == "Student"
 
 class Course(models.Model):
     course_id = models.AutoField(primary_key=True)

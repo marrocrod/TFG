@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Perfil del Usuario{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-4">Perfil del Usuario</h1>
+    <p><strong>Nombre de usuario:</strong> {{ user.username }}</p>
+    <p><strong>Correo electrónico:</strong> {{ user.email }}</p>
+    <p><strong>Teléfono:</strong> {{ user.phone }}</p>
+    <p><strong>Tipo de usuario:</strong> {{ user_type }}</p>
+    <p><strong>Grado:</strong> {{ user.degree }}</p>
+
+</div>
+{% endblock %}

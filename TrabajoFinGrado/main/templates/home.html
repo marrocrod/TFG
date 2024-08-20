@@ -7,44 +7,57 @@
     <!-- Título de la página -->
     <h1 class="mt-4 mb-4 text-center">{{ message }}</h1>
     
+
+    {% if user.user_type == "Teacher" %}
+    <!-- Contenido específico para profesores -->
+    <div class="mb-4">
+        <h2>Listado de Alumnos</h2>
+        <p>Aquí se implementará en el futuro un listado de alumnos.</p>
+    </div>
+
+    {% elif user.user_type == "Student" %}
+    <!-- Contenido específico para estudiantes -->
+    <div class="mb-4">
+        <h2>Temas</h2>
+        <ul>
+            <li>Tema 1</li>
+            <li>Tema 2</li>
+            <li>Tema 3</li>
+        </ul>
+    </div>
+
+    <div class="mb-4">
+        <h2>Exámenes</h2>
+        <ul>
+            <li>Examen 1</li>
+            <li>Examen 2</li>
+            <li>Examen 3</li>
+        </ul>
+    </div>
+
+    <div class="mb-4">
+        <h2>Generar Examen</h2>
+        <button class="btn btn-primary">Generar</button>
+    </div>
+
+    {% elif not user.is_authenticated%}
     <!-- Imagen grande horizontal -->
     <div class="mb-4">
         <img src="{% static 'images/img1.jpg' %}" class="img-fluid" alt="Imagen descriptiva del TFG">
     </div>
-
-    {% if user_type == "Teacher" %}
-    <!-- Contenido específico para profesores -->
-    <div class="mb-4">
-        <p>
-            Esta sección es específica para profesores. Aquí puedes gestionar tus cursos, crear exámenes y monitorear el progreso de tus estudiantes.
-        </p>
-    </div>
-
-    {% elif user_type == "Student" %}
-    <!-- Contenido específico para estudiantes -->
-    <div class="mb-4">
-        <p>
-            Esta sección es específica para estudiantes. Aquí puedes inscribirte en cursos, acceder a materiales de estudio y realizar exámenes.
-        </p>
-    </div>
-
-    {% elif user_type == "Guest" %}
     <!-- Contenido específico para usuarios no logueados (invitados) -->
     <div class="mb-4">
         <p>
             Bienvenido a nuestra plataforma educativa. Por favor, regístrate o inicia sesión para acceder a todas las funcionalidades de la plataforma.
         </p>
     </div>
-    {% endif %}
 
-    <!-- Contenido común -->
     <div class="mb-4">
         <p>
             Bienvenido a la página web de mi Trabajo de Fin de Grado (TFG). Este proyecto ha sido diseñado para facilitar la interacción entre estudiantes y profesores en un entorno académico virtual.
         </p>
     </div>
 
-    <!-- Segundo párrafo con imagen a la derecha -->
     <div class="mb-4 d-flex">
         <div class="flex-grow-1">
             <p>
@@ -67,5 +80,7 @@
             </p>
         </div>
     </div>
+
+    {% endif %}
 </div>
 {% endblock %}
