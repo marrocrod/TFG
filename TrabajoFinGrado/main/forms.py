@@ -5,14 +5,9 @@ from .models import User, Teacher, Student
 class UserRegistrationForm(UserCreationForm):
     class Meta:
         model = User
-        fields = ['username', 'email', 'degree', 'phone', 'password1', 'password2']
+        fields = ['username', 'email', 'password1', 'password2']  # Añade otros campos según sea necesario
 
-class TeacherRegistrationForm(forms.ModelForm):
+class UserProfileForm(forms.ModelForm):
     class Meta:
-        model = Teacher
-        fields = []
-
-class StudentRegistrationForm(forms.ModelForm):
-    class Meta:
-        model = Student
-        fields = []
+        model = User
+        fields = ['username', 'email', 'phone', 'degree']  # Añade otros campos que quieras que el usuario pueda editar
