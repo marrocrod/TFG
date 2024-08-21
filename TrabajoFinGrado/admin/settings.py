@@ -132,10 +132,13 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = 'home'  # O la vista que quieras usar como destino tras el login
+LOGIN_REDIRECT_URL = 'home'  
 LOGOUT_REDIRECT_URL = 'home'
 LOGIN_URL = 'login'
 
 AUTH_USER_MODEL = 'main.User'
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "tu_clave_api_aqui")
+
 
 

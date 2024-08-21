@@ -13,6 +13,8 @@ urlpatterns = [
     path('login/', CustomLoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
     path('user_profile/', user_profile, name='user_profile'),
+    path('profile/edit/', edit_profile, name='edit_profile'),
+
 
 ]
 if settings.DEBUG:

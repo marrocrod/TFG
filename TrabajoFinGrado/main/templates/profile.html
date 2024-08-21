@@ -11,5 +11,7 @@
     <p><strong>Tipo de usuario:</strong> {{ user_type }}</p>
     <p><strong>Grado:</strong> {{ user.degree }}</p>
 
+    <a href="{% url 'edit_profile' %}" class="btn btn-secondary mt-3">Editar Perfil</a>
+
 </div>
 {% endblock %}

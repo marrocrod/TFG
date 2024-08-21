@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegistrationForm
+from .forms import UserRegistrationForm, UserProfileForm
 from django.contrib.auth.views import LoginView
 
 
@@ -84,3 +84,17 @@ def user_profile(request):
     }
 
     return render(request, 'profile.html', context)
+
+@login_required
+def edit_profile(request):
+    user = request.user
+
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')  # Redirige al perfil del usuario tras guardar los cambios
+    else:
+        form = UserProfileForm(instance=user)
+
+    return render(request, 'edit_profile.html', {'form': form})
