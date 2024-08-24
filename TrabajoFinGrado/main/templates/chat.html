@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Chat{% endblock %}
+
+{% block content %}
+<h1>Chat</h1>
+
+<!-- Contenedor para la conversación con scroll si es necesario -->
+<div style="max-height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 20px;">
+    {% for message in chat.get_conversation %}
+        <p><strong>{{ message.role }}:</strong> {{ message.content }}</p>
+    {% endfor %}
+</div>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Enviar</button>
+</form>
+
+{% if not chat.is_archived %}
+    <!-- Botón para archivar el chat -->
+    <form method="post" action="{% url 'archive_chat' chat.chat_id %}">
+        {% csrf_token %}
+        <button type="submit">Archivar Chat</button>
+    </form>
+{% endif %}
+
+<!-- Enlace al historial de chats archivados -->
+<div style="margin-top: 20px;">
+    <a href="{% url 'archived_chats_list' %}">Ver Historial de Chats Archivados</a>
+</div>
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Chats Archivados{% endblock %}
+
+{% block content %}
+<h1>Chats Archivados</h1>
+
+<ul>
+    {% for chat in chats %}
+        <li>
+            <a href="{% url 'archived_chat' chat.chat_id %}">Chat con {{ chat.student.username }} - ID {{ chat.chat_id }}</a>
+        </li>
+    {% empty %}
+        <li>No hay chats archivados disponibles.</li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'chat_default' %}">Volver al chat en vivo</a>
+
+{% endblock %}

@@ -1,6 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.db.models import Q
+import json
+from datetime import datetime
+
+
 
 class User(AbstractUser):
     phone = models.CharField(max_length=15, blank=True, null=True)
@@ -107,6 +111,39 @@ class Chat(models.Model):
     chat_id = models.AutoField(primary_key=True)
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chats', limit_choices_to=Q(user_type='Student'))
     url = models.URLField()
+    conversation = models.TextField(default="")
+    is_archived = models.BooleanField(default=False)
+    last_activity = models.DateTimeField(auto_now=True)  # Se actualiza con cada mensaje nuevo
+
+    def add_message(self, role, content):
+        # Cargar la conversación existente
+        if self.conversation:
+            convo = json.loads(self.conversation)
+        else:
+            convo = []
+    
+        # Imprimir la conversación antes de agregar el nuevo mensaje
+        print(f"Conversation before adding new message: {convo}")
+    
+        convo.append({"role": role, "content": content})
+    
+        # Convertir de nuevo la lista a JSON y guardar en la conversación
+        self.conversation = json.dumps(convo)
+    
+        # Imprimir la conversación después de agregar el nuevo mensaje
+        print(f"Updated conversation: {self.conversation}")
+    
+        # Actualizar la última actividad
+        self.last_activity = datetime.now()
+    
+        # Guardar el modelo para persistir los cambios
+        self.save()
+
+
+    def get_conversation(self):
+        if self.conversation:
+            return json.loads(self.conversation)
+        return []
 
     def __str__(self):
         return f"Chat with {self.student.username}"

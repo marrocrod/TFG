@@ -11,3 +11,7 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'phone', 'degree']  # Añade otros campos que quieras que el usuario pueda editar
+
+
+class ChatForm(forms.Form):
+    user_input = forms.CharField(widget=forms.Textarea(attrs={'rows': 4}), label='Escribe tu mensaje')

@@ -22,6 +22,14 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
+                {% if user.is_authenticated and user.user_type == "Student" %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'chat_default' %}">Chat</a>
+                </li>
+
+
+                {% endif %}
+
                 {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'user_profile' %}">Perfil</a>

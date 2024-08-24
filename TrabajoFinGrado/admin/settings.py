@@ -138,7 +138,7 @@ LOGIN_URL = 'login'
 
 AUTH_USER_MODEL = 'main.User'
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "tu_clave_api_aqui")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "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")
 
 
 

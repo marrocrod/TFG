@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Chat Archivado{% endblock %}
+
+{% block content %}
+<h1>Chat Archivado</h1>
+
+<div>
+    {% for message in chat.get_conversation %}
+        <p><strong>{{ message.role }}:</strong> {{ message.content }}</p>
+    {% endfor %}
+</div>
+
+<a href="{% url 'chat_default' %}">Volver al chat en vivo</a>
+
+{% endblock %}
