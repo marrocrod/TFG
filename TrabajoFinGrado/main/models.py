@@ -2,7 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.db.models import Q
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
+
 
 
 
@@ -64,15 +65,16 @@ class Subgroup(models.Model):
     teachers = models.ManyToManyField(User, related_name='teaching_subgroups', limit_choices_to=Q(user_type='Teacher'))
     students = models.ManyToManyField(User, related_name='student_subgroups', limit_choices_to=Q(user_type='Student'))
 
-class Exam(models.Model):
-    exam_id = models.AutoField(primary_key=True)
-    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='exams', limit_choices_to=Q(user_type='Student'))
-    completion_time = models.DurationField()
-    exercises = models.ManyToManyField('Exercise', related_name='exams')
 
-    @property
-    def grade(self):
-        return sum(exercise.score for exercise in self.exercises.all() if exercise.is_correct)
+class ExerciseSet(models.Model):
+    set_id = models.AutoField(primary_key=True)
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='exercise_sets')
+    created_at = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=100, default="Conjunto de Ejercicios")  # Nuevo campo para el nombre
+
+    def __str__(self):
+        return f"{self.name} - {self.student.username} - {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
+
 
 class Exercise(models.Model):
     DIFFICULTY_CHOICES = [
@@ -82,11 +84,46 @@ class Exercise(models.Model):
     ]
     
     exercise_id = models.AutoField(primary_key=True)
+    exercise_set = models.ForeignKey(ExerciseSet, on_delete=models.CASCADE, related_name='exercises')  # Relación con ExerciseSet
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='exercises', limit_choices_to=Q(user_type='Student'))
     statement = models.TextField()
     solution = models.TextField()
+    difficulty = models.CharField(max_length=10, choices=DIFFICULTY_CHOICES)
+    topic = models.IntegerField(choices=[(i, f'Tema {i}') for i in range(1, 8)])
+    html_content = models.TextField(blank=True, null=True)
     is_correct = models.BooleanField(default=False)
-    score = models.FloatField()
+    score = models.FloatField(default=0.0)
+    
+    def generate_html_content(self):
+        self.html_content = f"""
+        <div class="exercise">
+            <h3>Ejercicio {self.exercise_id}</h3>
+            <p>{self.statement}</p>
+            <button onclick="toggleSolution({self.exercise_id})">Mostrar solución</button>
+            <div id="solution_{self.exercise_id}" style="display:none;">
+                <pre>{self.solution}</pre>
+            </div>
+            <div class="code-editor">
+                <textarea id="editor_{self.exercise_id}"></textarea>
+                <button onclick="runCode({self.exercise_id})">Ejecutar código</button>
+                <div id="output_{self.exercise_id}"></div>
+            </div>
+        </div>
+        """
+        self.save()
+
+    def __str__(self):
+        return f"Exercise {self.exercise_id} - {self.difficulty} - Tema {self.topic}"
+
+class Exam(models.Model):
+    exam_id = models.AutoField(primary_key=True)
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='exams', limit_choices_to=Q(user_type='Student'))
+    completion_time = models.DurationField(default=timedelta(hours=1))  # Puedes cambiar el tiempo predeterminado
+    exercises = models.ManyToManyField('Exercise', related_name='exams')
+
+    @property
+    def grade(self):
+        return sum(exercise.score for exercise in self.exercises.all() if exercise.is_correct)
 
 class RequestStateChoices(models.TextChoices):
     ON_HOLD = 'ON_HOLD', 'On hold'

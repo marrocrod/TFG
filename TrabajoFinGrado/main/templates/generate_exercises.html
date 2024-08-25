@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Generar Ejercicios</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        {{ form.set_name.label_tag }}
+        {{ form.set_name }}
+    </div>
+    <div class="form-group">
+        {{ form.topic.label_tag }}
+        {{ form.topic }}
+    </div>
+    <div class="form-group">
+        {{ form.difficulty.label_tag }}
+        {{ form.difficulty }}
+    </div>
+    <div class="form-group">
+        {{ form.number_of_exercises.label_tag }}
+        {{ form.number_of_exercises }}
+    </div>
+    <button type="submit" class="btn btn-primary">Generar Ejercicios</button>
+</form>
+
+{% endblock %}

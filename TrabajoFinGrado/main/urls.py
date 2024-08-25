@@ -19,6 +19,8 @@ urlpatterns = [
     path('chat/archived/<int:chat_id>/', archived_chat_view, name='archived_chat'),
     path('chat/archive/<int:chat_id>/', archive_chat, name='archive_chat'),
     path('chats/archived/', archived_chats_list, name='archived_chats_list'),  # Lista de chats archivados
+    path('generate-exercises/', generate_exercises, name='generate_exercises'),
+    path('exercise-set/<int:set_id>/', exercise_set_detail, name='exercise_set_detail'),
 ]
 
 
