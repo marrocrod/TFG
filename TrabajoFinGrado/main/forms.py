@@ -24,3 +24,16 @@ class ExerciseGenerationForm(forms.Form):
     set_name = forms.CharField(max_length=100, required=True, label="Nombre del Conjunto de Ejercicios")  # Campo para el nombre
 
 
+class ExamGenerationForm(forms.Form):
+    exam_name = forms.CharField(max_length=100, required=True, label="Nombre del Examen")
+    topic_1 = forms.ChoiceField(choices=[(1, 'Tema 1'), (2, 'Tema 2'), (3, 'Tema 3'), (4, 'Tema 4'), (5, 'Tema 5'), (6, 'Tema 6'), (7, 'Tema 7')], label="Tema del Ejercicio 1")
+    topic_2 = forms.ChoiceField(choices=[(1, 'Tema 1'), (2, 'Tema 2'), (3, 'Tema 3'), (4, 'Tema 4'), (5, 'Tema 5'), (6, 'Tema 6'), (7, 'Tema 7')], label="Tema del Ejercicio 2")
+    topic_3 = forms.ChoiceField(choices=[(1, 'Tema 1'), (2, 'Tema 2'), (3, 'Tema 3'), (4, 'Tema 4'), (5, 'Tema 5'), (6, 'Tema 6'), (7, 'Tema 7')], label="Tema del Ejercicio 3")
+    topic_4 = forms.ChoiceField(choices=[(1, 'Tema 1'), (2, 'Tema 2'), (3, 'Tema 3'), (4, 'Tema 4'), (5, 'Tema 5'), (6, 'Tema 6'), (7, 'Tema 7')], label="Tema del Ejercicio 4")
+
+
+class StudentSolutionForm(forms.Form):
+    exercise_id = forms.IntegerField(widget=forms.HiddenInput())
+    student_solution = forms.CharField(widget=forms.Textarea, required=False)
+
+

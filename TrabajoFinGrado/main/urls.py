@@ -21,6 +21,10 @@ urlpatterns = [
     path('chats/archived/', archived_chats_list, name='archived_chats_list'),  # Lista de chats archivados
     path('generate-exercises/', generate_exercises, name='generate_exercises'),
     path('exercise-set/<int:set_id>/', exercise_set_detail, name='exercise_set_detail'),
+    path('generate-exam/', generate_exam, name='generate_exam'),
+    path('exam/<int:exam_id>/', exam_detail, name='exam_detail'),
+    path('exam/<int:exam_id>/submit/', submit_exam, name='submit_exam'),
+    path('exam/<int:exam_id>/archived/', archived_exam, name='archived_exam'),
 ]
 
 

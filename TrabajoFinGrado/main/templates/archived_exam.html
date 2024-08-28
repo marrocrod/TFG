@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ exam.name }} (Examen Archivado)</h2>
+
+<p><strong>Nota Total:</strong> {{ total_score }} / 10</p>
+
+<div>
+    {% for exercise in exam.exercises.all %}
+        <div class="exercise">
+            <h3>Ejercicio {{ forloop.counter }}</h3>
+            <p>{{ exercise.statement }}</p>
+            <div id="solution_{{ exercise.exercise_id }}">
+                <h4>Solución del Alumno:</h4>
+                <pre>{{ exercise.student_solution }}</pre>
+                <h4>Solución Correcta:</h4>
+                <pre>{{ exercise.solution }}</pre>
+                <p><strong>Comentario:</strong> {% if exercise.is_correct %} <span class="text-success">Correcto</span> {% else %} <span class="text-danger">Incorrecto</span> {% endif %}</p>
+                <p><strong>Puntuación:</strong> {{ exercise.score }} puntos</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<a href="{% url 'home' %}" class="btn btn-primary">Volver al Inicio</a>
+
+{% endblock %}

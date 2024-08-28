@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db.models import Q
 import json
 from datetime import datetime, timedelta
+from django.utils import timezone
 
 
 
@@ -82,18 +83,19 @@ class Exercise(models.Model):
         ('Medium', 'Medium'),
         ('Hard', 'Hard'),
     ]
-    
+
     exercise_id = models.AutoField(primary_key=True)
-    exercise_set = models.ForeignKey(ExerciseSet, on_delete=models.CASCADE, related_name='exercises')  # Relación con ExerciseSet
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='exercises', limit_choices_to=Q(user_type='Student'))
     statement = models.TextField()
     solution = models.TextField()
+    student_solution = models.TextField(blank=True, null=True)  # Solución proporcionada por el alumno
     difficulty = models.CharField(max_length=10, choices=DIFFICULTY_CHOICES)
     topic = models.IntegerField(choices=[(i, f'Tema {i}') for i in range(1, 8)])
     html_content = models.TextField(blank=True, null=True)
     is_correct = models.BooleanField(default=False)
     score = models.FloatField(default=0.0)
-    
+    exercise_set = models.ForeignKey(ExerciseSet, on_delete=models.CASCADE, related_name='exercises')  # Asegúrate de que este campo está definido si es necesario
+
     def generate_html_content(self):
         self.html_content = f"""
         <div class="exercise">
@@ -118,12 +120,20 @@ class Exercise(models.Model):
 class Exam(models.Model):
     exam_id = models.AutoField(primary_key=True)
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='exams', limit_choices_to=Q(user_type='Student'))
-    completion_time = models.DurationField(default=timedelta(hours=1))  # Puedes cambiar el tiempo predeterminado
+    name = models.CharField(max_length=100)
+    start_time = models.DateTimeField(default=timezone.now)
+    submission_time = models.DateTimeField(null=True, blank=True)
+    is_submitted = models.BooleanField(default=False)
     exercises = models.ManyToManyField('Exercise', related_name='exams')
+    created_at = models.DateTimeField(auto_now_add=True)  # Campo para la fecha de creación
 
     @property
     def grade(self):
         return sum(exercise.score for exercise in self.exercises.all() if exercise.is_correct)
+
+    @property
+    def is_time_over(self):
+        return timezone.now() > self.start_time + timezone.timedelta(minutes=90)
 
 class RequestStateChoices(models.TextChoices):
     ON_HOLD = 'ON_HOLD', 'On hold'
