@@ -194,3 +194,15 @@ class Chat(models.Model):
 
     def __str__(self):
         return f"Chat with {self.student.username}"
+    
+
+class Event(models.Model):
+    title = models.CharField(max_length=200)
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    color = models.CharField(max_length=7, default='#000000')  # Campo para el color del evento
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='events')  # Relación con el usuario
+
+    def __str__(self):
+        return self.title
+

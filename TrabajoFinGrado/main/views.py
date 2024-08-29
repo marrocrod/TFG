@@ -1,14 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse
 from django.contrib.auth.views import LoginView
 from django.conf import settings
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
 from django.utils import timezone
 from django.db import models
+from django.views.decorators.csrf import csrf_exempt
+
+from datetime import datetime
 
 from .forms import UserRegistrationForm, UserProfileForm, ChatForm, ExerciseGenerationForm, ExamGenerationForm, StudentSolutionForm
-from .models import Chat, Exam, Exercise, ExerciseSet
+from .models import Chat, Exam, Exercise, ExerciseSet, Event
 
 import openai
 import json
@@ -482,9 +484,58 @@ def archived_exam(request, exam_id):
     return render(request, 'archived_exam.html', {'exam': exam, 'total_score': total_score})
 
 
+def calendar_view(request):
+    return render(request, 'calendar.html')
+
+
+@login_required
+def calendar_events(request):
+    events = Event.objects.filter(user=request.user)  # Filtrar por usuario
+    events_list = []
+    for event in events:
+        events_list.append({
+            'title': event.title,
+            'start': event.start_time.isoformat(),
+            'end': event.end_time.isoformat(),
+            'color': event.color,  # Añadir color al evento
+        })
+    return JsonResponse(events_list, safe=False)
+
+@csrf_exempt
+def create_event(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        event = Event.objects.create(
+            title=data['title'],
+            start_time=data['start'],
+            end_time=data['end']
+        )
+        return JsonResponse({'status': 'Event Created'}, status=201)
 
 
 
+@login_required
+def day_view(request, date):
+    # Convertir la fecha de la URL en un objeto datetime
+    date_obj = datetime.strptime(date, '%Y-%m-%d').date()
+    
+    # Filtrar los eventos del usuario que ha iniciado sesión y la fecha específica
+    events = Event.objects.filter(start_time__date=date_obj, user=request.user)
+    
+    if request.method == 'POST':
+        # Manejar la creación de un nuevo evento
+        title = request.POST.get('title')
+        start_time = f"{date} {request.POST.get('start_time')}"
+        end_time = f"{date} {request.POST.get('end_time')}"
+        color = request.POST.get('color')
 
+        Event.objects.create(
+            title=title,
+            start_time=start_time,
+            end_time=end_time,
+            color=color,
+            user=request.user  # Asignar el evento al usuario actual
+        )
 
+    return render(request, 'day_view.html', {'date': date, 'events': events})
 
