@@ -22,6 +22,10 @@
     {% endfor %}
 </div>
 
-<a href="{% url 'home' %}" class="btn btn-primary">Volver al Inicio</a>
+{% if request.user.is_teacher %}
+    <a href="{% url 'student_detail' exam.student.id %}" class="btn btn-primary">Volver al perfil del estudiante</a>
+{% elif request.user.is_student %}
+    <a href="{% url 'home' %}" class="btn btn-primary">Volver al Inicio</a>
+{% endif %}
 
 {% endblock %}

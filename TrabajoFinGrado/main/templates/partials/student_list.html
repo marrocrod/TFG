@@ -1,0 +1,22 @@
+<table class="table mt-4">
+    <thead>
+        <tr>
+            <th>Nombre de Usuario</th>
+            <th>Nombre</th>
+            <th>Apellidos</th>
+            <th>Correo Electrónico</th>
+            <th>Grado</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for student in students %}
+            <tr>
+                <td><a href="{% url 'student_detail' student.id %}">{{ student.username }}</a></td>
+                <td>{{ student.first_name }}</td>
+                <td>{{ student.last_name }}</td>
+                <td>{{ student.email }}</td>
+                <td>{{ student.degree }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

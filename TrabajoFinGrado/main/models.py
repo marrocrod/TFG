@@ -71,10 +71,12 @@ class ExerciseSet(models.Model):
     set_id = models.AutoField(primary_key=True)
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='exercise_sets')
     created_at = models.DateTimeField(auto_now_add=True)
-    name = models.CharField(max_length=100, default="Conjunto de Ejercicios")  # Nuevo campo para el nombre
+    name = models.CharField(max_length=100, default="Conjunto de Ejercicios")
+    is_archived = models.BooleanField(default=False)  # Nuevo campo para archivado
 
     def __str__(self):
         return f"{self.name} - {self.student.username} - {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
+
 
 
 class Exercise(models.Model):

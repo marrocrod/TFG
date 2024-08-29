@@ -7,13 +7,37 @@
     <!-- Título de la página -->
     <h1 class="mt-4 mb-4 text-center">{{ message }}</h1>
     
-
     {% if user.user_type == "Teacher" %}
-    <!-- Contenido específico para profesores -->
     <div class="mb-4">
         <h2>Listado de Alumnos</h2>
-        <p>Aquí se implementará en el futuro un listado de alumnos.</p>
+        
+        <!-- Barra de búsqueda y filtros -->
+        <form method="GET" id="filterForm" class="form-inline mb-4">
+            <div class="form-group mb-2" style="flex-grow: 1;">
+                <input type="text" name="search" id="searchInput" class="form-control" placeholder="Buscar por nombre de usuario, nombre, apellidos o correo" value="{{ search_query }}" style="width: 100%;">
+            </div>
+            <div class="form-group mb-2 ml-2">
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownDegrees" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Filtrar por Grado
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownDegrees">
+                        {% for degree_code, degree_name in degrees %}
+                            <a class="dropdown-item degree-option" href="#" data-value="{{ degree_code }}">
+                                <input type="checkbox" {% if degree_code in selected_degrees %}checked{% endif %}> {{ degree_name }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Contenedor para la tabla de alumnos -->
+        <div id="studentListContainer">
+            {% include 'partials/student_list.html' %}
+        </div>
     </div>
+
 
     {% elif user.user_type == "Student" %}
     <!-- Contenido específico para estudiantes -->
@@ -33,52 +57,6 @@
             <li>Examen 2</li>
             <li>Examen 3</li>
         </ul>
-    </div>
-
-    <div class="mb-4">
-        <h2>Generar Ejercicios</h2>
-        <a href="{% url 'generate_exercises' %}" class="btn btn-primary mb-3">Generar Nuevos Ejercicios</a>
-    
-        <h3>Tus Conjuntos de Ejercicios Generados</h3>
-        {% if exercise_sets.exists %}
-            <ul>
-            {% for exercise_set in exercise_sets %}
-                <li>
-                    <h4>{{ exercise_set.name }} - Generado: {{ exercise_set.created_at|date:"d M Y H:i" }} - Tema {{ exercise_set.exercises.first.topic }}</h4>
-                    <a href="{% url 'exercise_set_detail' exercise_set.set_id %}">Ver Conjunto de Ejercicios</a>
-                </li>
-            {% endfor %}
-            </ul>
-        {% else %}
-            <p>No has generado ningún conjunto de ejercicios aún.</p>
-        {% endif %}
-    </div>
-    
-    <div class="mb-4">
-        <h2>Generar Exámenes</h2>
-        <a href="{% url 'generate_exam' %}" class="btn btn-primary mb-3">Generar Nuevo Examen</a>
-    
-        <h3>Tus Exámenes Generados</h3>
-        {% if exams.exists %}
-            <ul>
-            {% for exam in exams %}
-                <li>
-                    <h4>{{ exam.name }} - Generado: {{ exam.created_at|date:"d M Y H:i" }}</h4>
-                    <p>
-                        <strong>Ejercicios:</strong>
-                        <ul>
-                            {% for exercise in exam.exercises.all %}
-                                <li>Dificultad: {{ exercise.difficulty }} - Tema: {{ exercise.topic }}</li>
-                            {% endfor %}
-                        </ul>
-                    </p>
-                    <a href="{% url 'exam_detail' exam.exam_id %}">Ver Examen</a>
-                </li>
-            {% endfor %}
-            </ul>
-        {% else %}
-            <p>No has generado ningún examen aún.</p>
-        {% endif %}
     </div>
 
     {% elif not user.is_authenticated%}
@@ -124,4 +102,43 @@
 
     {% endif %}
 </div>
+
+<script>
+    document.querySelectorAll('.degree-option').forEach(function(option) {
+        option.addEventListener('click', function(event) {
+            event.preventDefault();
+            const checkbox = this.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+
+            updateStudentList();
+        });
+    });
+
+    document.getElementById('searchInput').addEventListener('input', updateStudentList);
+
+    function updateStudentList() {
+        const searchQuery = document.getElementById('searchInput').value;
+        const selectedDegrees = Array.from(document.querySelectorAll('.degree-option input:checked'))
+            .map(checkbox => checkbox.closest('.degree-option').getAttribute('data-value'));
+
+        const url = new URL(window.location.href);
+        url.searchParams.set('search', searchQuery);
+        url.searchParams.delete('degrees');
+        selectedDegrees.forEach(degree => {
+            url.searchParams.append('degrees', degree);
+        });
+
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('studentListContainer').innerHTML = data;
+        });
+    }
+</script>
+
+
 {% endblock %}

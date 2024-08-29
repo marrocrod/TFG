@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Detalle del Alumno{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Detalle del Alumno: {{ student.username }}</h2>
+    <p><strong>Nombre:</strong> {{ student.username }}</p>
+    <p><strong>Correo Electrónico:</strong> {{ student.email }}</p>
+    <p><strong>Grado:</strong> {{ student.degree }}</p>
+
+    <!-- Mostrar Chats Archivados -->
+    <h3>Chats Archivados</h3>
+    {% if archived_chats %}
+        <ul>
+            {% for chat in archived_chats %}
+                <li>
+                    <a href="{% url 'archived_chat' chat.chat_id %}">Chat con ID {{ chat.chat_id }} - Última actividad: {{ chat.last_activity|date:"d M Y H:i" }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No hay chats archivados para este alumno.</p>
+    {% endif %}
+
+    <!-- Mostrar Exámenes Archivados -->
+    <h3>Exámenes Archivados</h3>
+    {% if archived_exams %}
+        <ul>
+            {% for exam in archived_exams %}
+                <li>
+                    <a href="{% url 'archived_exam' exam.exam_id %}">Examen: {{ exam.name }} - Entregado: {{ exam.submission_time|date:"d M Y H:i" }}</a>
+                    <p><strong>Nota Obtenida:</strong> {{ exam.grade }} / 10</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No hay exámenes archivados para este alumno.</p>
+    {% endif %}
+</div>
+{% endblock %}
