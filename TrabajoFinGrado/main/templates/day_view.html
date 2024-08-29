@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Eventos del Día: {{ date }}</h2>
+
+<div>
+    <h3>Eventos Programados</h3>
+    <ul>
+        {% for event in events %}
+            <li style="color: {{ event.color }};">
+                {{ event.title }}: {{ event.start_time|date:"H:i" }} - {{ event.end_time|date:"H:i" }}
+            </li>
+        {% empty %}
+            <p>No hay eventos programados para este día.</p>
+        {% endfor %}
+    </ul>
+</div>
+
+<h3>Agregar Nuevo Evento</h3>
+<form method="post">
+    {% csrf_token %}
+    <label for="title">Nombre del Evento:</label>
+    <input type="text" id="title" name="title" required>
+
+    <label for="start_time">Hora de Inicio:</label>
+    <input type="time" id="start_time" name="start_time" required>
+
+    <label for="end_time">Hora de Fin:</label>
+    <input type="time" id="end_time" name="end_time" required>
+
+    <label for="color">Color del Evento:</label>
+    <input type="color" id="color" name="color" required>
+
+    <button type="submit">Agregar Evento</button>
+</form>
+
+<a href="{% url 'calendar' %}">Volver al Calendario</a>
+{% endblock %}

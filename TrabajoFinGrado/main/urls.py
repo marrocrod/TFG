@@ -25,6 +25,10 @@ urlpatterns = [
     path('exam/<int:exam_id>/', exam_detail, name='exam_detail'),
     path('exam/<int:exam_id>/submit/', submit_exam, name='submit_exam'),
     path('exam/<int:exam_id>/archived/', archived_exam, name='archived_exam'),
+    path('calendar/', calendar_view, name='calendar'),
+    path('calendar/day/<str:date>/', day_view, name='day-view'),
+    path('api/calendar-events/', calendar_events, name='calendar-events'),  # API para los eventos
+
 ]
 
 
