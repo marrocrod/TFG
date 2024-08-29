@@ -36,8 +36,49 @@
     </div>
 
     <div class="mb-4">
-        <h2>Generar Examen</h2>
-        <button class="btn btn-primary">Generar</button>
+        <h2>Generar Ejercicios</h2>
+        <a href="{% url 'generate_exercises' %}" class="btn btn-primary mb-3">Generar Nuevos Ejercicios</a>
+    
+        <h3>Tus Conjuntos de Ejercicios Generados</h3>
+        {% if exercise_sets.exists %}
+            <ul>
+            {% for exercise_set in exercise_sets %}
+                <li>
+                    <h4>{{ exercise_set.name }} - Generado: {{ exercise_set.created_at|date:"d M Y H:i" }} - Tema {{ exercise_set.exercises.first.topic }}</h4>
+                    <a href="{% url 'exercise_set_detail' exercise_set.set_id %}">Ver Conjunto de Ejercicios</a>
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>No has generado ningún conjunto de ejercicios aún.</p>
+        {% endif %}
+    </div>
+    
+    <div class="mb-4">
+        <h2>Generar Exámenes</h2>
+        <a href="{% url 'generate_exam' %}" class="btn btn-primary mb-3">Generar Nuevo Examen</a>
+    
+        <h3>Tus Exámenes Generados</h3>
+        {% if exams.exists %}
+            <ul>
+            {% for exam in exams %}
+                <li>
+                    <h4>{{ exam.name }} - Generado: {{ exam.created_at|date:"d M Y H:i" }}</h4>
+                    <p>
+                        <strong>Ejercicios:</strong>
+                        <ul>
+                            {% for exercise in exam.exercises.all %}
+                                <li>Dificultad: {{ exercise.difficulty }} - Tema: {{ exercise.topic }}</li>
+                            {% endfor %}
+                        </ul>
+                    </p>
+                    <a href="{% url 'exam_detail' exam.exam_id %}">Ver Examen</a>
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>No has generado ningún examen aún.</p>
+        {% endif %}
     </div>
 
     {% elif not user.is_authenticated%}

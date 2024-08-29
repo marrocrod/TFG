@@ -4,35 +4,54 @@ from django.urls import reverse
 from django.contrib.auth.views import LoginView
 from django.conf import settings
 from django.http import HttpResponseForbidden
+from django.utils import timezone
+from django.db import models
 
-from .forms import UserRegistrationForm, UserProfileForm, ChatForm
-from .models import Chat
+from .forms import UserRegistrationForm, UserProfileForm, ChatForm, ExerciseGenerationForm, ExamGenerationForm, StudentSolutionForm
+from .models import Chat, Exam, Exercise, ExerciseSet
 
 import openai
 import json
 
 
-
-
-
 def home(request):
+    context = {
+        'message': "Bienvenido a la plataforma.",
+        'user_type': "Guest"
+    }
+    
     if request.user.is_authenticated:
         user = request.user
         if user.user_type == "Teacher":
-            context = {
+            context.update({
                 'message': "Bienvenido, Profesor.",
                 'user_type': "Teacher"
-            }
+            })
         elif user.user_type == "Student":
-            context = {
+            # Obtener todos los exámenes del estudiante
+            exams = user.exams.all().order_by('-start_time')
+            
+            # Obtener todos los ejercicios asociados a los exámenes del estudiante
+            exercises_in_exams = Exercise.objects.filter(exams__in=exams).distinct()
+            
+            # Filtrar conjuntos de ejercicios que no contengan ejercicios en exámenes y que no estén vacíos
+            exercise_sets = user.exercise_sets.annotate(num_exercises=models.Count('exercises'))\
+                .filter(num_exercises__gt=0)\
+                .exclude(exercises__in=exercises_in_exams)\
+                .order_by('-created_at')\
+                .distinct()
+
+            context.update({
                 'message': "Bienvenido, Estudiante.",
-                'user_type': "Student"
-            }
+                'user_type': "Student",
+                'exercise_sets': exercise_sets,
+                'exams': exams
+            })
         else:
-            context = {
+            context.update({
                 'message': "Bienvenido.",
                 'user_type': "Other"
-            }
+            })
     else:
         context = {
             'message': "Bienvenido a la plataforma.",
@@ -40,8 +59,6 @@ def home(request):
         }
 
     return render(request, 'home.html', context)
-
-
 
 
 def register(request):
@@ -160,10 +177,6 @@ def chat_view(request, chat_id=None):
     return render(request, 'chat.html', {'form': form, 'chat': chat})
 
 
-
-
-
-
 @login_required
 def archive_chat(request, chat_id):
     chat = get_object_or_404(Chat, chat_id=chat_id)
@@ -204,5 +217,274 @@ def archived_chats_list(request):
         chats = Chat.objects.filter(is_archived=True, student=request.user)
 
     return render(request, 'archived_chats_list.html', {'chats': chats})
+
+
+@login_required
+def generate_exercises(request):
+    if request.method == "POST":
+        form = ExerciseGenerationForm(request.POST)
+        if form.is_valid():
+            topic = form.cleaned_data['topic']
+            difficulty = form.cleaned_data['difficulty']
+            number_of_exercises = int(form.cleaned_data['number_of_exercises'])
+            set_name = form.cleaned_data['set_name']  # Recoge el nombre del conjunto
+
+            # Crear un nuevo ExerciseSet con el nombre proporcionado
+            exercise_set = ExerciseSet.objects.create(student=request.user, name=set_name)
+
+            for _ in range(number_of_exercises):
+                prompt = generate_prompt(topic, difficulty)
+                
+                # Utiliza el modelo gpt-4o-mini con el endpoint correcto
+                response = openai.ChatCompletion.create(
+                    model="gpt-4o-mini",  # Cambiar el modelo aquí
+                    messages=[
+                        {"role": "system", "content": "You are a helpful assistant."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    max_tokens=500,
+                    temperature=0.7
+                )
+                generated_text = response['choices'][0]['message']['content'].strip()
+                statement, solution = parse_generated_text(generated_text)
+                
+                # Crear y guardar el ejercicio dentro del set
+                exercise = Exercise.objects.create(
+                    exercise_set=exercise_set,
+                    student=request.user,
+                    statement=statement,
+                    solution=solution,
+                    difficulty=difficulty,
+                    topic=topic
+                )
+                exercise.generate_html_content()
+
+            return redirect('exercise_set_detail', set_id=exercise_set.set_id)  # Redirigir a la vista del conjunto de ejercicios
+
+    else:
+        form = ExerciseGenerationForm()
+
+    return render(request, 'generate_exercises.html', {'form': form})
+
+
+
+def generate_prompt(topic, difficulty):
+    # Define la explicación previa sobre los niveles de dificultad
+    difficulty_explanation = {
+        'Easy': "El ejercicio debe ser sencillo, adecuado para principiantes, y no requerir conocimientos avanzados. Como mucho se podrá resolver en 10 minutos.",
+        'Medium': "El ejercicio debe tener un nivel intermedio de dificultad, adecuado para estudiantes con conocimientos básicos de programación. Deberá poder resolverse en 20 minutos máximo.",
+        'Hard': "El ejercicio debe ser desafiante, adecuado para estudiantes avanzados y requerir un entendimiento profundo del tema. Como máximo deberá poder resolverse en alrededor de 30m."
+    }
+    
+    # Define diferentes prompts en función del tema seleccionado
+    topic_prompts = {
+        1: f"Genera un ejercicio de programación en Python sobre estructuras de datos.",
+        2: f"Genera un ejercicio de programación en Python sobre algoritmos de ordenación.",
+        3: f"Genera un ejercicio de programación en Python sobre recursividad.",
+        4: f"Genera un ejercicio de programación en Python sobre estructuras de control.",
+        5: f"Genera un ejercicio de programación en Python sobre manipulación de cadenas.",
+        6: f"Genera un ejercicio de programación en Python sobre manejo de archivos.",
+        7: f"Genera un ejercicio de programación en Python sobre manejo de excepciones."
+    }
+
+    # Combina la explicación del nivel de dificultad con el prompt del tema
+    prompt = f"{difficulty_explanation[difficulty]} {topic_prompts.get(topic, 'Genera un ejercicio de programación en Python.')}"
+    
+    # Añadir la instrucción para incluir "Código de la solución:" antes de la solución
+    prompt += " Después del enunciado, proporcione la solución en formato de código. Asegúrese de incluir 'Solución:' antes del código de la solución, ya que lo necesito en dicho formato"
+
+    return prompt
+
+
+def parse_generated_text(generated_text):
+    # Buscamos el indicador "Código del programa:" para separar el enunciado de la solución
+    solution_split_keyword = "Solución:"
+    if solution_split_keyword in generated_text:
+        parts = generated_text.split(solution_split_keyword)
+        statement = parts[0].strip()
+        solution = parts[1].strip() if len(parts) > 1 else ""
+    else:
+        # Si no se encuentra la palabra clave, asumimos que todo es parte del enunciado
+        statement = generated_text.strip()
+        solution = ""  # No se proporciona solución
+
+    return statement, solution
+
+
+@login_required
+def exercise_set_detail(request, set_id):
+    exercise_set = get_object_or_404(ExerciseSet, set_id=set_id, student=request.user)
+    exercises = exercise_set.exercises.all()
+    return render(request, 'exercise_set_detail.html', {'exercise_set': exercise_set, 'exercises': exercises})
+
+
+@login_required
+def generate_exam(request):
+    if request.method == "POST":
+        form = ExamGenerationForm(request.POST)
+        if form.is_valid():
+            exam_name = form.cleaned_data['exam_name']
+            topic_1 = form.cleaned_data['topic_1']
+            topic_2 = form.cleaned_data['topic_2']
+            topic_3 = form.cleaned_data['topic_3']
+            topic_4 = form.cleaned_data['topic_4']
+
+            # Crear un nuevo examen
+            exam = Exam.objects.create(student=request.user, name=exam_name)
+
+            # Crear un nuevo set de ejercicios para este examen
+            exercise_set = ExerciseSet.objects.create(student=request.user, name=exam_name)
+
+            # Configuración de los ejercicios con los temas y las dificultades
+            exercise_configs = [
+                {'difficulty': 'Easy', 'topic': topic_1},
+                {'difficulty': 'Easy', 'topic': topic_2},
+                {'difficulty': 'Medium', 'topic': topic_3},
+                {'difficulty': 'Hard', 'topic': topic_4}
+            ]
+
+            for config in exercise_configs:
+                prompt = generate_prompt(config['topic'], config['difficulty'])
+
+                response = openai.ChatCompletion.create(
+                    model="gpt-4o-mini",
+                    messages=[
+                        {"role": "system", "content": "You are an assistant that generates educational content."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    max_tokens=500,
+                    temperature=0.7
+                )
+                generated_text = response['choices'][0]['message']['content'].strip()
+                statement, solution = parse_generated_text(generated_text)
+
+                # Crear y guardar el ejercicio dentro del examen y asignar el exercise_set
+                exercise = Exercise.objects.create(
+                    student=request.user,
+                    statement=statement,
+                    solution=solution,
+                    difficulty=config['difficulty'],
+                    topic=config['topic'],
+                    exercise_set=exercise_set  # Asigna el set de ejercicios
+                )
+                exercise.generate_html_content()
+
+                exam.exercises.add(exercise)
+
+            return redirect('exam_detail', exam_id=exam.exam_id)
+
+    else:
+        form = ExamGenerationForm()
+
+    return render(request, 'generate_exam.html', {'form': form})
+
+
+@login_required
+def exam_detail(request, exam_id):
+    exam = get_object_or_404(Exam, exam_id=exam_id, student=request.user)
+    
+    if exam.is_submitted:
+        return redirect('archived_exam', exam_id=exam_id)
+    
+    if request.method == "POST" and 'submit_exam' in request.POST:
+        return redirect('submit_exam', exam_id=exam_id)
+    
+    # Calcular el tiempo restante
+    time_left = (exam.start_time + timezone.timedelta(minutes=90)) - timezone.now()
+    
+    return render(request, 'exam_detail.html', {
+        'exam': exam,
+        'time_left': max(time_left.total_seconds(), 0),
+    })
+
+
+@login_required
+def submit_exam(request, exam_id):
+    print(f"Submit exam triggered for exam_id: {exam_id}")
+    print("request.POST:", request.POST)  # Verifica todo lo que está en POST
+
+    exam = get_object_or_404(Exam, exam_id=exam_id, student=request.user)
+    exam.is_submitted = True
+    exam.submission_time = timezone.now()
+
+    for exercise in exam.exercises.all():
+        student_solution_key = f'student_solution_{exercise.exercise_id}'
+        student_solution_value = request.POST.get(student_solution_key)
+        print(f"Received solution for {student_solution_key}: {student_solution_value}")
+
+        if student_solution_value:
+            # Asegúrate de asignar correctamente el valor antes de guardar
+            exercise.student_solution = student_solution_value
+            
+            prompt = f"""Estoy haciendo ejercicios de un examen y quiero evaluar la solución del siguiente ejercicio:
+
+            Enunciado del ejercicio:
+            {exercise.statement}
+
+            Solución del alumno:
+            {student_solution_value}
+
+            Solución esperada por el profesor:
+            {exercise.solution}
+
+            Responde únicamente con "correcto" o "incorrecto" en función de si el programa que 
+            te he pasado es correcto o no respecto al enunciado y a la solución que se pide y dame
+            una breve explicación si es necesario para señalar los fallos o aciertos del código."""
+
+            print("Sending prompt to OpenAI...")
+            response = openai.ChatCompletion.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": "Eres un asistente educativo."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=150
+            )
+            evaluation = response['choices'][0]['message']['content'].strip().lower()
+            print(f"OpenAI evaluation result: {evaluation}")
+
+            # Solo marcar como correcto si la evaluación empieza con "correcto"
+            if evaluation.startswith("correcto"):
+                exercise.is_correct = True
+                if exercise in exam.exercises.all()[:2]:
+                    exercise.score = 1.5
+                elif exercise == exam.exercises.all()[2]:
+                    exercise.score = 2.75
+                elif exercise == exam.exercises.all()[3]:
+                    exercise.score = 4.25
+            else:
+                exercise.is_correct = False
+                exercise.score = 0.0
+
+        else:
+            print(f"No solution provided for exercise ID: {exercise.exercise_id}. Skipping OpenAI evaluation.")
+            exercise.is_correct = False
+            exercise.score = 0.0
+            exercise.student_solution = ""  # Guarda una cadena vacía si no hay solución
+
+        # Aquí es donde se guarda el ejercicio, asegurémonos de que el valor esté correcto
+        print(f"Saving exercise {exercise.exercise_id} with solution: {exercise.student_solution}")
+        exercise.save()
+
+    exam.save()
+    total_score = exam.grade
+    print(f"Total score calculated: {total_score}")
+
+    return render(request, 'archived_exam.html', {'exam': exam, 'total_score': total_score})
+
+
+
+
+@login_required
+def archived_exam(request, exam_id):
+    exam = get_object_or_404(Exam, exam_id=exam_id, student=request.user, is_submitted=True)
+    total_score = exam.grade
+    return render(request, 'archived_exam.html', {'exam': exam, 'total_score': total_score})
+
+
+
+
+
+
 
 

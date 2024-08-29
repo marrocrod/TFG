@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ exam.name }}</h2>
+
+<div id="timer" data-time-left="{{ time_left }}">90:00</div>
+
+<form method="post" action="{% url 'submit_exam' exam_id=exam.exam_id %}">
+    {% csrf_token %}
+    <div>
+        {% for exercise in exam.exercises.all %}
+            <div class="exercise">
+                <h3>Ejercicio {{ forloop.counter }}</h3>
+                <p>{{ exercise.statement }}</p>
+                <div class="code-editor">
+                    <textarea name="student_solution_{{ exercise.exercise_id }}" id="editor_{{ exercise.exercise_id }}"></textarea>
+                    <input type="hidden" name="student_solution_hidden_{{ exercise.exercise_id }}" id="hidden_{{ exercise.exercise_id }}">
+                </div>
+                <pre id="output_{{ exercise.exercise_id }}"></pre> <!-- Colocado antes del botón -->
+                <button type="button" onclick="runCode({{ exercise.exercise_id }})">Ejecutar código</button>
+            </div>
+        {% endfor %}
+    </div>
+    
+    {% if not exam.is_submitted %}
+        <button type="submit" name="submit_exam" class="btn btn-danger">Entregar Examen</button>
+    {% endif %}
+</form>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.21.3/full/pyodide.js"></script>
+
+<script>
+    let pyodide; // Variable global para almacenar la instancia de Pyodide
+
+    // Función para cargar Pyodide
+    async function initializePyodide() {
+        if (!pyodide) {
+            pyodide = await loadPyodide();
+        }
+    }
+
+    function startTimer(duration, display) {
+        var timer = duration, minutes, seconds;
+        setInterval(function () {
+            minutes = parseInt(timer / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            display.textContent = minutes + ":" + seconds;
+
+            if (--timer < 0) {
+                timer = 0;
+                document.querySelector('form').submit();  // Auto-submit when time is up
+            }
+        }, 1000);
+    }
+
+    window.onload = async function () {
+        var timeLeft = parseInt(document.getElementById('timer').dataset.timeLeft);
+        var display = document.querySelector('#timer');
+        startTimer(timeLeft, display);
+
+        // Inicializa Pyodide al cargar la página
+        await initializePyodide();
+    };
+
+    let editors = {};  // Objeto para almacenar las instancias de CodeMirror
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.querySelector("form");
+        
+        form.addEventListener("submit", function(event) {
+            // Forzar la sincronización antes de enviar el formulario
+            {% for exercise in exam.exercises.all %}
+                editors[{{ exercise.exercise_id }}].save();  // Sincroniza el contenido de CodeMirror con el textarea
+                console.log(`Contenido sincronizado para exercise_id: {{ exercise.exercise_id }}`, document.getElementById("editor_{{ exercise.exercise_id }}").value);
+            {% endfor %}
+        });
+    
+        {% for exercise in exam.exercises.all %}
+            (function() {
+                let editorInstance = CodeMirror.fromTextArea(document.getElementById("editor_{{ exercise.exercise_id }}"), {
+                    lineNumbers: true,
+                    mode: "python",  // Ajusta el modo según el lenguaje de programación que necesites
+                    theme: "default"  // Puedes cambiar el tema si lo prefieres
+                });
+    
+                // Almacena la instancia de CodeMirror en el objeto `editors`
+                editors[{{ exercise.exercise_id }}] = editorInstance;
+    
+                // Asegura que el contenido del editor se sincronice con el textarea original
+                editorInstance.on('change', function() {
+                    editorInstance.save();
+                    console.log(`Cambio detectado y contenido sincronizado para exercise_id: {{ exercise.exercise_id }}`);
+                });
+            })();
+        {% endfor %}
+    });
+    
+    
+
+    async function runCode(exerciseId) {
+        let outputElement = document.getElementById('output_' + exerciseId);
+        let editor = editors[exerciseId];  // Obtén la instancia correcta de CodeMirror
+        let code = editor.getValue();  // Ahora usamos la instancia correcta de CodeMirror
+        
+        outputElement.innerText = "Ejecutando...";
+    
+        try {
+            // Asegúrate de que Pyodide esté cargado antes de ejecutar el código
+            await initializePyodide();
+    
+            // Capturar stdout en un buffer temporal
+            let output = "";
+    
+            // Guardar el print original
+            const originalPrint = pyodide.globals.get('print');
+            
+            // Reemplazar print para capturar la salida
+            pyodide.globals.set('print', (text) => {
+                output += text + "\n";
+            });
+    
+            await pyodide.runPythonAsync(code);
+    
+            // Restaurar la función print original
+            pyodide.globals.set('print', originalPrint);
+    
+            // Mostrar la salida capturada en el elemento <pre>
+            outputElement.innerText = output || "No se generó salida.";
+    
+        } catch (err) {
+            outputElement.innerText = "Error: " + err.message;  // Muestra el error en el elemento <pre>
+        }
+    }
+</script>
+
+{% endblock %}

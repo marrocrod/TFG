@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Conjunto de Ejercicios: {{ exercise_set.name}}</h2>
+
+<div>
+    {% for exercise in exercises %}
+        <div class="exercise">
+            <h3>Ejercicio {{ forloop.counter }}</h3>  <!-- Muestra el número del ejercicio dentro del set -->
+            <p>{{ exercise.statement|safe }}</p>
+            <button onclick="toggleSolution({{ exercise.exercise_id }})">Mostrar solución</button>
+            <div id="solution_{{ exercise.exercise_id }}" style="display:none;">
+                <pre>{{ exercise.solution|safe }}</pre>
+            </div>
+            <div class="code-editor">
+                <textarea id="editor_{{ exercise.exercise_id }}"></textarea>
+                <button onclick="runCode({{ exercise.exercise_id }})">Ejecutar código</button>
+                <pre id="output_{{ exercise.exercise_id }}"></pre> <!-- Asegúrate de que la salida se muestre en un <pre> -->
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.21.3/full/pyodide.js"></script>
+
+<script>
+    let pyodide; // Variable global para almacenar la instancia de Pyodide
+
+    // Función para cargar Pyodide
+    async function initializePyodide() {
+        if (!pyodide) {
+            pyodide = await loadPyodide();
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        let editors = {};  // Objeto para almacenar las instancias de CodeMirror
+
+        {% for exercise in exercises %}
+            (function() {
+                let editorInstance = CodeMirror.fromTextArea(document.getElementById("editor_{{ exercise.exercise_id }}"), {
+                    lineNumbers: true,
+                    mode: "python",  // Ajusta el modo según el lenguaje de programación que necesites
+                    theme: "default"  // Puedes cambiar el tema si lo prefieres
+                });
+
+                // Almacena la instancia de CodeMirror en el objeto `editors`
+                editors[{{ exercise.exercise_id }}] = editorInstance;
+
+                // Asegura que el contenido del editor se sincronice con el textarea original
+                editorInstance.on('change', function() {
+                    editorInstance.save();
+                    console.log(`Cambio detectado y contenido sincronizado para exercise_id: {{ exercise.exercise_id }}`);
+                });
+            })();
+        {% endfor %}
+
+        async function runCode(exerciseId) {
+            let outputElement = document.getElementById('output_' + exerciseId);
+            let editor = editors[exerciseId];  // Obtén la instancia correcta de CodeMirror
+            let code = editor.getValue();  // Ahora usamos la instancia correcta de CodeMirror
+            
+            outputElement.innerText = "Ejecutando...";
+        
+            try {
+                // Asegúrate de que Pyodide esté cargado antes de ejecutar el código
+                await initializePyodide();
+        
+                // Capturar stdout en un buffer temporal
+                let output = "";
+        
+                // Guardar el print original
+                const originalPrint = pyodide.globals.get('print');
+                
+                // Reemplazar print para capturar la salida
+                pyodide.globals.set('print', (text) => {
+                    output += text + "\n";
+                });
+        
+                await pyodide.runPythonAsync(code);
+        
+                // Restaurar la función print original
+                pyodide.globals.set('print', originalPrint);
+        
+                // Mostrar la salida capturada en el elemento <pre>
+                outputElement.innerText = output || "No se generó salida.";
+        
+            } catch (err) {
+                outputElement.innerText = "Error: " + err.message;  // Muestra el error en el elemento <pre>
+            }
+        }
+
+        // Hacer que la función runCode esté disponible globalmente
+        window.runCode = runCode;
+    });
+
+    function toggleSolution(exercise_id) {
+        var solutionDiv = document.getElementById('solution_' + exercise_id);
+        if (solutionDiv.style.display === "none") {
+            solutionDiv.style.display = "block";
+        } else {
+            solutionDiv.style.display = "none";
+        }
+    }
+</script>
+
+{% endblock %}
