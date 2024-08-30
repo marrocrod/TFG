@@ -148,12 +148,24 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "sk-proj-JAqz6H7wylI86V3vce6-8rrS5a
 #EMAIL
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp-mail.outlook.com'
+EMAIL_HOST = 'smtp.office365.com'  # Este es el host SMTP para Hotmail/Outlook
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False  # Asegúrate de que esto esté en False si TLS está en True
-EMAIL_HOST_USER = 'saymplexfp@hotmail.com'  # Reemplaza con tu dirección de correo de Hotmail/Outlook
-EMAIL_HOST_PASSWORD = 'Y&P3WMaiK&7q'  # Reemplaza con tu contraseña de Hotmail/Outlook
-DEFAULT_FROM_EMAIL = 'saymplexfp@hotmail.com'
+EMAIL_HOST_USER = 'saymplexfp@hotmail.com'  # Reemplaza con tu dirección de correo de Hotmail
+EMAIL_HOST_PASSWORD = 'Y&P3WMaiK&7q'  # Reemplaza con tu contraseña correcta
+DEFAULT_FROM_EMAIL = 'saymplexfp@hotmail.com'  # Puede ser el mismo que EMAIL_HOST_USER
 
+
+#CELERY
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Configuración del broker de Celery, puede ser Redis o RabbitMQ
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'delete_unactivated_users_every_hour': {
+        'task': 'main.tasks.delete_unactivated_users',
+        'schedule': crontab(minute=0, hour='*/1'),  # Cada hora
+    },
+}
 

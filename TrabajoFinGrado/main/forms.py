@@ -1,6 +1,7 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from .models import User, Exercise
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth import get_user_model
+from .models import User
 
 class UserRegistrationForm(UserCreationForm):
     class Meta:
@@ -37,3 +38,21 @@ class StudentSolutionForm(forms.Form):
     student_solution = forms.CharField(widget=forms.Textarea, required=False)
 
 
+User = get_user_model()
+
+class CustomAuthenticationForm(AuthenticationForm):
+    def confirm_login_allowed(self, user):
+        if not user.is_active:
+            raise forms.ValidationError(
+                "Esta cuenta no está activada. Revisa tu correo para activar la cuenta.",
+                code='inactive',
+            )
+        
+class EmailUpdateForm(forms.Form):
+    email = forms.EmailField(label='Nuevo Correo Electrónico')
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("Este correo electrónico ya está en uso.")
+        return email

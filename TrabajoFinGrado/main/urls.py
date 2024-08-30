@@ -4,6 +4,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from .views import CustomLoginView
 from django.contrib.auth import views as auth_views
+from django.views.generic import TemplateView
+
 
 urlpatterns = [
     path('', home, name='home'),
@@ -11,6 +13,8 @@ urlpatterns = [
     path('register/teacher/', register_teacher, name='register_teacher'),
     path('register/student/', register_student, name='register_student'),
     path('activate/<uidb64>/<token>/', activate, name='activate'),
+    path('resend_activation_email/', resend_activation_email, name='resend_activation_email'),
+    path('activation_resent/', TemplateView.as_view(template_name='register/activation_resent.html'), name='activation_resent'),  # Nueva ruta
     path('login/', CustomLoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
     path('user_profile/', user_profile, name='user_profile'),

@@ -9,6 +9,7 @@ from django.utils import timezone
 
 
 class User(AbstractUser):
+    email = models.EmailField(unique=True) 
     phone = models.CharField(max_length=15, blank=True, null=True)
 
     class DegreeChoices(models.TextChoices):
