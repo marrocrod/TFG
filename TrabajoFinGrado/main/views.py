@@ -6,42 +6,66 @@ from django.http import HttpResponseForbidden, JsonResponse
 from django.utils import timezone
 from django.db import models
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Count
 
 from datetime import datetime
 
 from .forms import UserRegistrationForm, UserProfileForm, ChatForm, ExerciseGenerationForm, ExamGenerationForm, StudentSolutionForm
-from .models import Chat, Exam, Exercise, ExerciseSet, Event
+from .models import User, Chat, Exam, Exercise, ExerciseSet, Event
 
 import openai
 import json
 
+
+from django.shortcuts import render
+from .models import User
+from django.db.models import Q
 
 def home(request):
     context = {
         'message': "Bienvenido a la plataforma.",
         'user_type': "Guest"
     }
-    
+
     if request.user.is_authenticated:
         user = request.user
         if user.user_type == "Teacher":
+            # Filtros
+            search_query = request.GET.get('search', '')
+            degree_filters = request.GET.getlist('degrees')
+
+            # Filtrar estudiantes por búsqueda
+            students = User.objects.filter(user_type='Student').order_by('username')
+
+            if search_query:
+                students = students.filter(
+                    Q(username__icontains=search_query) |
+                    Q(first_name__icontains=search_query) |
+                    Q(last_name__icontains=search_query) |
+                    Q(email__icontains=search_query)
+                )
+            
+            if degree_filters:
+                students = students.filter(degree__in=degree_filters)
+
             context.update({
                 'message': "Bienvenido, Profesor.",
-                'user_type': "Teacher"
+                'user_type': "Teacher",
+                'students': students,
+                'degrees': User.DegreeChoices.choices,  # Enviar los grados al contexto
+                'selected_degrees': degree_filters,  # Enviar los grados seleccionados al contexto
+                'search_query': search_query  # Enviar el término de búsqueda al contexto
             })
+            
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return render(request, 'partials/student_list.html', {'students': students})
+
         elif user.user_type == "Student":
             # Obtener todos los exámenes del estudiante
-            exams = user.exams.all().order_by('-start_time')
-            
-            # Obtener todos los ejercicios asociados a los exámenes del estudiante
-            exercises_in_exams = Exercise.objects.filter(exams__in=exams).distinct()
-            
-            # Filtrar conjuntos de ejercicios que no contengan ejercicios en exámenes y que no estén vacíos
-            exercise_sets = user.exercise_sets.annotate(num_exercises=models.Count('exercises'))\
-                .filter(num_exercises__gt=0)\
-                .exclude(exercises__in=exercises_in_exams)\
-                .order_by('-created_at')\
-                .distinct()
+            exams = user.exams.all().order_by('-created_at')
+
+            # Obtener todos los conjuntos de ejercicios del estudiante
+            exercise_sets = user.exercise_sets.all().order_by('-created_at')
 
             context.update({
                 'message': "Bienvenido, Estudiante.",
@@ -61,6 +85,7 @@ def home(request):
         }
 
     return render(request, 'home.html', context)
+
 
 
 def register(request):
@@ -128,6 +153,13 @@ def edit_profile(request):
 
     return render(request, 'edit_profile.html', {'form': form})
 
+
+
+#############################################################
+#############################################################
+################# ---- ESTUDIANTES ---- #####################
+#############################################################
+#############################################################
 
 openai.api_key = settings.OPENAI_API_KEY
 
@@ -321,6 +353,34 @@ def exercise_set_detail(request, set_id):
 
 
 @login_required
+def generate_exercises_view(request):
+    user = request.user
+    if user.user_type != 'Student':
+        return redirect('home')
+
+    # Obtener los conjuntos de ejercicios generados por el estudiante
+    exercise_sets = user.exercise_sets.all().order_by('-created_at')
+
+    return render(request, 'exercises.html', {
+        'exercise_sets': exercise_sets
+    })
+
+
+@login_required
+def generate_exam_view(request):
+    user = request.user
+    if user.user_type != 'Student':
+        return redirect('home')
+
+    # Obtener los exámenes generados por el estudiante
+    exams = user.exams.all().order_by('-created_at')
+
+    return render(request, 'exams.html', {
+        'exams': exams
+    })
+
+
+@login_required
 def generate_exam(request):
     if request.method == "POST":
         form = ExamGenerationForm(request.POST)
@@ -479,7 +539,12 @@ def submit_exam(request, exam_id):
 
 @login_required
 def archived_exam(request, exam_id):
-    exam = get_object_or_404(Exam, exam_id=exam_id, student=request.user, is_submitted=True)
+    exam = get_object_or_404(Exam, exam_id=exam_id, is_submitted=True)
+    
+    # Verificar que el usuario es el estudiante propietario del examen o un profesor
+    if request.user != exam.student and not request.user.is_teacher:
+        return HttpResponseForbidden("No tienes permiso para acceder a este examen.")
+    
     total_score = exam.grade
     return render(request, 'archived_exam.html', {'exam': exam, 'total_score': total_score})
 
@@ -538,4 +603,34 @@ def day_view(request, date):
         )
 
     return render(request, 'day_view.html', {'date': date, 'events': events})
+
+
+
+#############################################################
+#############################################################
+################# ---- PROFESORES ---- ######################
+#############################################################
+#############################################################
+
+@login_required
+def student_detail(request, student_id):
+    student = get_object_or_404(User, id=student_id, user_type='Student')
+    
+    if not request.user.is_teacher:
+        return HttpResponseForbidden("No tienes permiso para acceder a este contenido.")
+
+    archived_chats = Chat.objects.filter(student=student, is_archived=True).order_by('-last_activity')
+
+    archived_exams = Exam.objects.filter(student=student, is_submitted=True).order_by('-submission_time')
+
+    context = {
+        'student': student,
+        'archived_chats': archived_chats,
+        'archived_exams': archived_exams,
+    }
+    
+    return render(request, 'student_detail.html', context)
+
+
+
 

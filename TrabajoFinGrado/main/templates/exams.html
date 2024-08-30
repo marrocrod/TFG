@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Generar Exámenes{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Generar Exámenes</h2>
+    <a href="{% url 'generate_exam' %}" class="btn btn-primary mb-3">Generar Nuevo Examen</a>
+
+    <h3>Tus Exámenes Generados</h3>
+    {% if exams.exists %}
+        <ul>
+        {% for exam in exams %}
+            <li>
+                <h4>{{ exam.name }} - Generado: {{ exam.created_at|date:"d M Y H:i" }}</h4>
+                <p>
+                    <strong>Ejercicios:</strong>
+                    <ul>
+                        {% for exercise in exam.exercises.all %}
+                            <li>Dificultad: {{ exercise.difficulty }} - Tema: {{ exercise.topic }}</li>
+                        {% endfor %}
+                    </ul>
+                </p>
+                <a href="{% url 'exam_detail' exam.exam_id %}">Ver Examen</a>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No has generado ningún examen aún.</p>
+    {% endif %}
+</div>
+{% endblock %}

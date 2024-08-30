@@ -11,6 +11,7 @@
     {% endfor %}
 </div>
 
-<a href="{% url 'chat_default' %}">Volver al chat en vivo</a>
+<!-- Enlace para volver al perfil del estudiante -->
+<a href="{% url 'student_detail' chat.student.id %}">Volver al perfil del estudiante</a>
 
 {% endblock %}

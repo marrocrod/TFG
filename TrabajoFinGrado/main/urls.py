@@ -19,6 +19,8 @@ urlpatterns = [
     path('chat/archived/<int:chat_id>/', archived_chat_view, name='archived_chat'),
     path('chat/archive/<int:chat_id>/', archive_chat, name='archive_chat'),
     path('chats/archived/', archived_chats_list, name='archived_chats_list'),  # Lista de chats archivados
+    path('exercises/', generate_exercises_view, name='exercises'),
+    path('exams/', generate_exam_view, name='exams'),
     path('generate-exercises/', generate_exercises, name='generate_exercises'),
     path('exercise-set/<int:set_id>/', exercise_set_detail, name='exercise_set_detail'),
     path('generate-exam/', generate_exam, name='generate_exam'),
@@ -28,6 +30,7 @@ urlpatterns = [
     path('calendar/', calendar_view, name='calendar'),
     path('calendar/day/<str:date>/', day_view, name='day-view'),
     path('api/calendar-events/', calendar_events, name='calendar-events'),  # API para los eventos
+    path('students/<int:student_id>/', student_detail, name='student_detail'),
 
 ]
 
