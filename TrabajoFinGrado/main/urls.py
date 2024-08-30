@@ -10,6 +10,7 @@ urlpatterns = [
     path('register/', register, name='register'),
     path('register/teacher/', register_teacher, name='register_teacher'),
     path('register/student/', register_student, name='register_student'),
+    path('activate/<uidb64>/<token>/', activate, name='activate'),
     path('login/', CustomLoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
     path('user_profile/', user_profile, name='user_profile'),

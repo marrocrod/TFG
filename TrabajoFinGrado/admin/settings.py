@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -132,12 +133,27 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+#LOGIN
 LOGIN_REDIRECT_URL = 'home'  
 LOGOUT_REDIRECT_URL = 'home'
 LOGIN_URL = 'login'
 
+#AUTH USER
 AUTH_USER_MODEL = 'main.User'
 
+
+#API OPENAI
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "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")
+
+#EMAIL
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp-mail.outlook.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False  # Asegúrate de que esto esté en False si TLS está en True
+EMAIL_HOST_USER = 'saymplexfp@hotmail.com'  # Reemplaza con tu dirección de correo de Hotmail/Outlook
+EMAIL_HOST_PASSWORD = 'Y&P3WMaiK&7q'  # Reemplaza con tu contraseña de Hotmail/Outlook
+DEFAULT_FROM_EMAIL = 'saymplexfp@hotmail.com'
 
 

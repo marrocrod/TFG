@@ -1,25 +1,29 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
+from django.contrib.auth import login
 from django.conf import settings
+from django.core.mail import EmailMessage
 from django.http import HttpResponseForbidden, JsonResponse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode  # Corregido
 from django.utils import timezone
-from django.db import models
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Count
+from django.db.models import Q
+from django.contrib.sites.shortcuts import get_current_site
+from django.template.loader import render_to_string
 
 from datetime import datetime
 
-from .forms import UserRegistrationForm, UserProfileForm, ChatForm, ExerciseGenerationForm, ExamGenerationForm, StudentSolutionForm
+from .forms import UserRegistrationForm, UserProfileForm, ChatForm, ExerciseGenerationForm, ExamGenerationForm
 from .models import User, Chat, Exam, Exercise, ExerciseSet, Event
+from .tokens import account_activation_token  
+
 
 import openai
 import json
 
 
-from django.shortcuts import render
-from .models import User
-from django.db.models import Q
 
 def home(request):
     context = {
@@ -98,8 +102,22 @@ def register_student(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.user_type = 'Student'
+            user.is_active = False  # Desactivar la cuenta hasta la verificación
             user.save()
-            return redirect('login')
+            
+            # Enviar correo de activación
+            current_site = get_current_site(request)
+            mail_subject = 'Activate your Student account.'
+            message = render_to_string('register/acc_active_email.html', {
+                'user': user,
+                'domain': current_site.domain,
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                'token': account_activation_token.make_token(user),
+            })
+            email = EmailMessage(mail_subject, message, to=[user.email])
+            email.send()
+            
+            return render(request, 'register/registration_complete.html')  # Página de confirmación
     else:
         form = UserRegistrationForm()
     return render(request, 'register_student.html', {'form': form})
@@ -111,15 +129,44 @@ def register_teacher(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.user_type = 'Teacher'
+            user.is_active = False  # Desactivar la cuenta hasta la verificación
             user.save()
-            return redirect('login')
+            
+            # Enviar correo de activación
+            current_site = get_current_site(request)
+            mail_subject = 'Activate your Teacher account.'
+            message = render_to_string('register/acc_active_email.html', {
+                'user': user,
+                'domain': current_site.domain,
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                'token': account_activation_token.make_token(user),
+            })
+            email = EmailMessage(mail_subject, message, to=[user.email])
+            email.send()
+            
+            return render(request, 'register/registration_complete.html')  # Página de confirmación
     else:
         form = UserRegistrationForm()
     return render(request, 'register_teacher.html', {'form': form})
 
+def activate(request, uidb64, token):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User.objects.get(pk=uid)
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.save()
+        login(request, user)
+        return render(request, 'register/account_activated.html')  # Página de éxito
+    else:
+        return render(request, 'register/activation_invalid.html')  # Página de error
+
 class CustomLoginView(LoginView):
     template_name = 'login.html'
-
+ 
 
 @login_required
 def user_profile(request):
