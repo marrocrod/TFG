@@ -92,5 +92,30 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.6/mode/python/python.min.js"></script>
     <!-- Enlace a FullCalendar JS -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+
+    <script>
+        let inactivityTime = function () {
+            let time;
+            let maxInactivityTime = 30* 60 * 1000; // 30 minutos en milisegundos
+    
+            window.onload = resetTimer;
+            window.onmousemove = resetTimer;
+            window.onmousedown = resetTimer;  // Intercepta clicks
+            window.ontouchstart = resetTimer; // Intercepta toques en dispositivos móviles
+            window.onclick = resetTimer;      // Intercepta clicks
+            window.onkeydown = resetTimer;    // Intercepta pulsaciones de teclas
+    
+            function logout() {
+                window.location.href = "{% url 'session_expired' %}";
+            }
+    
+            function resetTimer() {
+                clearTimeout(time);
+                time = setTimeout(logout, maxInactivityTime);
+            }
+        };
+    
+        inactivityTime(); // Iniciar la detección de inactividad
+    </script>
 </body>
 </html>

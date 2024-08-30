@@ -302,6 +302,13 @@ def user_profile(request):
 
     return render(request, 'profile.html', context)
 
+
+def session_expired(request):
+    return render(request, 'session_expired.html', {
+        'message': 'Tu sesión ha expirado por inactividad. Por favor, inicia sesión nuevamente.',
+    })
+
+
 @login_required
 def edit_profile(request):
     user = request.user
