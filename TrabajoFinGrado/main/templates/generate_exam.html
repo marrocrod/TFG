@@ -1,9 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+<!-- Mensaje de carga -->
+<div id="loadingMessage" style="display: none;" class="alert alert-info mt-3">
+    Generando examen, este proceso puede tardar unos segundos...
+</div>
+
 <h2>Generar Examen</h2>
 
-<form method="post">
+<!-- Formulario para generar exámenes -->
+<form id="generateExamForm" method="post">
     {% csrf_token %}
     <div class="form-group">
         {{ form.exam_name.label_tag }}
@@ -27,5 +34,12 @@
     </div>
     <button type="submit" class="btn btn-primary">Generar Examen</button>
 </form>
+
+<script>
+    document.getElementById('generateExamForm').addEventListener('submit', function() {
+        // Mostrar el mensaje de carga cuando se envía el formulario
+        document.getElementById('loadingMessage').style.display = 'block';
+    });
+</script>
 
 {% endblock %}

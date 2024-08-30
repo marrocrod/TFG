@@ -3,7 +3,10 @@
 {% block content %}
 <h2>{{ exam.name }}</h2>
 
-<div id="timer" data-time-left="{{ time_left }}">90:00</div>
+<!-- El temporizador muestra el tiempo restante -->
+<div id="timer" data-time-left="{{ time_left|floatformat:0 }}">
+    90:00
+</div>
 
 <form method="post" action="{% url 'submit_exam' exam_id=exam.exam_id %}">
     {% csrf_token %}
@@ -16,7 +19,7 @@
                     <textarea name="student_solution_{{ exercise.exercise_id }}" id="editor_{{ exercise.exercise_id }}"></textarea>
                     <input type="hidden" name="student_solution_hidden_{{ exercise.exercise_id }}" id="hidden_{{ exercise.exercise_id }}">
                 </div>
-                <pre id="output_{{ exercise.exercise_id }}"></pre> <!-- Colocado antes del botón -->
+                <pre id="output_{{ exercise.exercise_id }}"></pre>
                 <button type="button" onclick="runCode({{ exercise.exercise_id }})">Ejecutar código</button>
             </div>
         {% endfor %}
@@ -32,7 +35,6 @@
 <script>
     let pyodide; // Variable global para almacenar la instancia de Pyodide
 
-    // Función para cargar Pyodide
     async function initializePyodide() {
         if (!pyodide) {
             pyodide = await loadPyodide();
@@ -57,14 +59,14 @@
         }, 1000);
     }
 
-    window.onload = async function () {
+    document.addEventListener('DOMContentLoaded', async function () {
         var timeLeft = parseInt(document.getElementById('timer').dataset.timeLeft);
         var display = document.querySelector('#timer');
         startTimer(timeLeft, display);
 
         // Inicializa Pyodide al cargar la página
         await initializePyodide();
-    };
+    });
 
     let editors = {};  // Objeto para almacenar las instancias de CodeMirror
 
@@ -75,7 +77,6 @@
             // Forzar la sincronización antes de enviar el formulario
             {% for exercise in exam.exercises.all %}
                 editors[{{ exercise.exercise_id }}].save();  // Sincroniza el contenido de CodeMirror con el textarea
-                console.log(`Contenido sincronizado para exercise_id: {{ exercise.exercise_id }}`, document.getElementById("editor_{{ exercise.exercise_id }}").value);
             {% endfor %}
         });
     
@@ -83,8 +84,8 @@
             (function() {
                 let editorInstance = CodeMirror.fromTextArea(document.getElementById("editor_{{ exercise.exercise_id }}"), {
                     lineNumbers: true,
-                    mode: "python",  // Ajusta el modo según el lenguaje de programación que necesites
-                    theme: "default"  // Puedes cambiar el tema si lo prefieres
+                    mode: "python",  
+                    theme: "default" 
                 });
     
                 // Almacena la instancia de CodeMirror en el objeto `editors`
@@ -93,48 +94,34 @@
                 // Asegura que el contenido del editor se sincronice con el textarea original
                 editorInstance.on('change', function() {
                     editorInstance.save();
-                    console.log(`Cambio detectado y contenido sincronizado para exercise_id: {{ exercise.exercise_id }}`);
                 });
             })();
         {% endfor %}
     });
-    
-    
 
     async function runCode(exerciseId) {
         let outputElement = document.getElementById('output_' + exerciseId);
-        let editor = editors[exerciseId];  // Obtén la instancia correcta de CodeMirror
-        let code = editor.getValue();  // Ahora usamos la instancia correcta de CodeMirror
+        let editor = editors[exerciseId]; 
+        let code = editor.getValue();  
         
         outputElement.innerText = "Ejecutando...";
     
         try {
-            // Asegúrate de que Pyodide esté cargado antes de ejecutar el código
             await initializePyodide();
-    
-            // Capturar stdout en un buffer temporal
             let output = "";
-    
-            // Guardar el print original
             const originalPrint = pyodide.globals.get('print');
-            
-            // Reemplazar print para capturar la salida
             pyodide.globals.set('print', (text) => {
                 output += text + "\n";
             });
-    
             await pyodide.runPythonAsync(code);
-    
-            // Restaurar la función print original
             pyodide.globals.set('print', originalPrint);
-    
-            // Mostrar la salida capturada en el elemento <pre>
             outputElement.innerText = output || "No se generó salida.";
     
         } catch (err) {
-            outputElement.innerText = "Error: " + err.message;  // Muestra el error en el elemento <pre>
+            outputElement.innerText = "Error: " + err.message;
         }
     }
 </script>
+
 
 {% endblock %}

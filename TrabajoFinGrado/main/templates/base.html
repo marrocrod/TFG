@@ -41,11 +41,9 @@
                 </li>
 
                 {% elif user.is_authenticated and user.user_type == "Teacher" %}
-                
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'home' %}">Alumnos</a>
                 </li>
-
                 {% endif %}
 
                 {% if user.is_authenticated %}
@@ -96,14 +94,7 @@
     <script>
         let inactivityTime = function () {
             let time;
-            let maxInactivityTime = 30* 60 * 1000; // 30 minutos en milisegundos
-    
-            window.onload = resetTimer;
-            window.onmousemove = resetTimer;
-            window.onmousedown = resetTimer;  // Intercepta clicks
-            window.ontouchstart = resetTimer; // Intercepta toques en dispositivos móviles
-            window.onclick = resetTimer;      // Intercepta clicks
-            window.onkeydown = resetTimer;    // Intercepta pulsaciones de teclas
+            let maxInactivityTime = 30 * 60 * 1000; // 30 minutos en milisegundos
     
             function logout() {
                 window.location.href = "{% url 'session_expired' %}";
@@ -113,6 +104,15 @@
                 clearTimeout(time);
                 time = setTimeout(logout, maxInactivityTime);
             }
+    
+            document.addEventListener('DOMContentLoaded', function () {
+                resetTimer();
+                window.onmousemove = resetTimer;
+                window.onmousedown = resetTimer;
+                window.ontouchstart = resetTimer;
+                window.onclick = resetTimer;
+                window.onkeydown = resetTimer;
+            });
         };
     
         inactivityTime(); // Iniciar la detección de inactividad

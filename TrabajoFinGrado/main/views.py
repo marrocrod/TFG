@@ -613,21 +613,30 @@ def generate_exam(request):
 
 @login_required
 def exam_detail(request, exam_id):
-    exam = get_object_or_404(Exam, exam_id=exam_id, student=request.user)
+    exam = get_object_or_404(Exam, exam_id=exam_id)
     
+    # Verifica si el usuario es el estudiante dueño del examen o un profesor
+    if exam.student != request.user and not request.user.is_teacher:
+        return HttpResponseForbidden("No tienes permiso para acceder a este examen.")
+
     if exam.is_submitted:
+        print(f"Examen {exam_id} ya fue entregado.")
         return redirect('archived_exam', exam_id=exam_id)
     
     if request.method == "POST" and 'submit_exam' in request.POST:
+        print(f"Examen {exam_id} está siendo entregado.")
         return redirect('submit_exam', exam_id=exam_id)
     
     # Calcular el tiempo restante
     time_left = (exam.start_time + timezone.timedelta(minutes=90)) - timezone.now()
+    time_left_seconds = max(time_left.total_seconds(), 0)
+    print(f"Tiempo restante para el examen {exam_id}: {time_left_seconds} segundos")
     
     return render(request, 'exam_detail.html', {
         'exam': exam,
-        'time_left': max(time_left.total_seconds(), 0),
+        'time_left': time_left_seconds,
     })
+
 
 
 @login_required

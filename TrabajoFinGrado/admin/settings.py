@@ -156,12 +156,11 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 #EMAIL
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.office365.com'  # Este es el host SMTP para Hotmail/Outlook
+EMAIL_HOST = 'smtp.gmail.com'  # Este es el host SMTP para Hotmail/Outlook
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'saymplexfp@hotmail.com'  # Reemplaza con tu dirección de correo de Hotmail
-EMAIL_HOST_PASSWORD = 'Y&P3WMaiK&7q'  # Reemplaza con tu contraseña correcta
-DEFAULT_FROM_EMAIL = 'saymplexfp@hotmail.com'  # Puede ser el mismo que EMAIL_HOST_USER
+EMAIL_HOST_USER = 'saympl3xfp@gmail.com'  # Reemplaza con tu dirección de correo de Hotmail
+EMAIL_HOST_PASSWORD = 'nppp qtoa ifhm gcky'  # Reemplaza con tu contraseña correcta
 
 
 #CELERY
