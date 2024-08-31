@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -51,6 +52,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'main.middleware.SessionTimeoutMiddleware', 
+
 ]
 
 ROOT_URLCONF = 'admin.urls'
@@ -132,12 +135,44 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+#LOGIN
 LOGIN_REDIRECT_URL = 'home'  
 LOGOUT_REDIRECT_URL = 'home'
 LOGIN_URL = 'login'
 
+#AUTH USER
 AUTH_USER_MODEL = 'main.User'
 
+
+#API OPENAI
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "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")
 
+
+#SESION
+
+SESSION_COOKIE_AGE = 1800  # 30 minutos en segundos
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+#EMAIL
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Este es el host SMTP para Hotmail/Outlook
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'saympl3xfp@gmail.com'  # Reemplaza con tu dirección de correo de Hotmail
+EMAIL_HOST_PASSWORD = 'nppp qtoa ifhm gcky'  # Reemplaza con tu contraseña correcta
+
+
+#CELERY
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Configuración del broker de Celery, puede ser Redis o RabbitMQ
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'delete_unactivated_users_every_hour': {
+        'task': 'main.tasks.delete_unactivated_users',
+        'schedule': crontab(minute=0, hour='*/1'),  # Cada hora
+    },
+}
 

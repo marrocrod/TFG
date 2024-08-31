@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block title %}Cuenta Activada{% endblock %}
+
+{% block content %}
+    <h1>Cuenta Activada</h1>
+    <p>Tu cuenta ha sido activada exitosamente. Ya puedes iniciar sesión.</p>
+    <a href="{% url 'login' %}" class="btn btn-primary">Iniciar Sesión</a>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block title %}Enlace de Activación Inválido{% endblock %}
+
+{% block content %}
+    <h1>Enlace de Activación Inválido</h1>
+    <p>El enlace de activación es inválido o ha expirado. Por favor, intenta registrarte nuevamente o contacta con el soporte.</p>
+    <a href="{% url 'register' %}" class="btn btn-primary">Volver a Registrar</a>
+{% endblock %}

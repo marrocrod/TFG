@@ -41,11 +41,9 @@
                 </li>
 
                 {% elif user.is_authenticated and user.user_type == "Teacher" %}
-                
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'home' %}">Alumnos</a>
                 </li>
-
                 {% endif %}
 
                 {% if user.is_authenticated %}
@@ -92,5 +90,32 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.6/mode/python/python.min.js"></script>
     <!-- Enlace a FullCalendar JS -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+
+    <script>
+        let inactivityTime = function () {
+            let time;
+            let maxInactivityTime = 30 * 60 * 1000; // 30 minutos en milisegundos
+    
+            function logout() {
+                window.location.href = "{% url 'session_expired' %}";
+            }
+    
+            function resetTimer() {
+                clearTimeout(time);
+                time = setTimeout(logout, maxInactivityTime);
+            }
+    
+            document.addEventListener('DOMContentLoaded', function () {
+                resetTimer();
+                window.onmousemove = resetTimer;
+                window.onmousedown = resetTimer;
+                window.ontouchstart = resetTimer;
+                window.onclick = resetTimer;
+                window.onkeydown = resetTimer;
+            });
+        };
+    
+        inactivityTime(); // Iniciar la detección de inactividad
+    </script>
 </body>
 </html>

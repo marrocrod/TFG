@@ -1,25 +1,29 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
+from django.contrib.auth import login, get_user_model, authenticate
 from django.conf import settings
+from django.core.mail import EmailMessage
 from django.http import HttpResponseForbidden, JsonResponse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode  # Corregido
 from django.utils import timezone
-from django.db import models
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import Count
+from django.db.models import Q
+from django.contrib.sites.shortcuts import get_current_site
+from django.template.loader import render_to_string
 
 from datetime import datetime
 
-from .forms import UserRegistrationForm, UserProfileForm, ChatForm, ExerciseGenerationForm, ExamGenerationForm, StudentSolutionForm
+from .forms import UserRegistrationForm, UserProfileForm, ChatForm, ExerciseGenerationForm, ExamGenerationForm, CustomAuthenticationForm, EmailUpdateForm  
 from .models import User, Chat, Exam, Exercise, ExerciseSet, Event
+from .tokens import account_activation_token  
+
 
 import openai
 import json
 
 
-from django.shortcuts import render
-from .models import User
-from django.db.models import Q
 
 def home(request):
     context = {
@@ -98,8 +102,22 @@ def register_student(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.user_type = 'Student'
+            user.is_active = False  # Desactivar la cuenta hasta la verificación
             user.save()
-            return redirect('login')
+            
+            # Enviar correo de activación
+            current_site = get_current_site(request)
+            mail_subject = 'Activate your Student account.'
+            message = render_to_string('register/acc_active_email.html', {
+                'user': user,
+                'domain': current_site.domain,
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                'token': account_activation_token.make_token(user),
+            })
+            email = EmailMessage(mail_subject, message, to=[user.email])
+            email.send()
+            
+            return render(request, 'register/registration_complete.html')  # Página de confirmación
     else:
         form = UserRegistrationForm()
     return render(request, 'register_student.html', {'form': form})
@@ -111,14 +129,159 @@ def register_teacher(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.user_type = 'Teacher'
+            user.is_active = False  # Desactivar la cuenta hasta la verificación
             user.save()
-            return redirect('login')
+            
+            # Enviar correo de activación
+            current_site = get_current_site(request)
+            mail_subject = 'Activate your Teacher account.'
+            message = render_to_string('register/acc_active_email.html', {
+                'user': user,
+                'domain': current_site.domain,
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                'token': account_activation_token.make_token(user),
+            })
+            email = EmailMessage(mail_subject, message, to=[user.email])
+            email.send()
+            
+            return render(request, 'register/registration_complete.html')  # Página de confirmación
     else:
         form = UserRegistrationForm()
     return render(request, 'register_teacher.html', {'form': form})
 
+def activate(request, uidb64, token):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User.objects.get(pk=uid)
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.save()
+        login(request, user)
+        return render(request, 'register/account_activated.html')  # Página de éxito
+    else:
+        return render(request, 'register/activation_invalid.html')  # Página de error
+
+
 class CustomLoginView(LoginView):
+    User = get_user_model()
+    form_class = CustomAuthenticationForm
     template_name = 'login.html'
+
+    def post(self, request, *args, **kwargs):
+        print("POST request received")
+        
+        form = self.get_form()
+
+        # Obtener los datos del formulario
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        print(f"Username: {username}")
+
+        try:
+            user = User.objects.get(username=username)
+            print(f"Usuario encontrado: {user.username}, Activo: {user.is_active}")
+            
+            # Si el usuario está inactivo, mostramos el mensaje y no intentamos autenticar
+            if not user.is_active:
+                print("Cuenta inactiva detectada")
+                context = self.get_context_data(form=form)
+                context['inactive'] = True
+                context['user_email'] = user.email
+                return self.render_to_response(context)
+        except User.DoesNotExist:
+            print("Usuario no encontrado")
+            # Continuamos para manejar el error de credenciales incorrectas
+            pass
+
+        # Si llegamos aquí, el usuario o no existe o está activo, intentamos autenticar
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            print("Autenticación exitosa, iniciando sesión")
+            login(request, user)
+            return redirect(self.get_success_url())
+        else:
+            print("Autenticación fallida")
+            form.add_error(None, "Please enter a correct username and password. Note that both fields may be case-sensitive.")
+        
+        print("Formulario inválido, renderizando con errores")
+        return self.form_invalid(form)
+
+    def form_invalid(self, form):
+        print("form_invalid llamado")
+        print("Errores del formulario:", form.errors)
+        return self.render_to_response(self.get_context_data(form=form))
+
+from django.shortcuts import render, redirect
+from django.contrib.auth import get_user_model
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.sites.shortcuts import get_current_site
+from .tokens import account_activation_token
+
+User = get_user_model()
+
+def resend_activation_email(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        user_id = request.session.get('user_id')
+
+        print(f"Reenviar correo POST recibido, email: {email}, user_id: {user_id}")
+
+        if user_id:
+            user = User.objects.get(pk=user_id)
+
+            # Verificar si el nuevo correo ya está en uso
+            if User.objects.filter(email=email).exists():
+                error_message = "Este correo electrónico ya está en uso."
+                print("Correo electrónico ya en uso")
+                return render(request, 'register/resend_activation_email.html', {
+                    'error_message': error_message,
+                    'email': email
+                })
+            else:
+                user.email = email
+                user.save()
+
+                print("Correo electrónico actualizado y guardado")
+
+                current_site = get_current_site(request)
+                mail_subject = 'Activate your account.'
+                message = render_to_string('register/acc_active_email.html', {
+                    'user': user,
+                    'domain': current_site.domain,
+                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                    'token': account_activation_token.make_token(user),
+                })
+                email_message = EmailMessage(mail_subject, message, to=[email])
+                email_message.send()
+
+                print("Correo de activación reenviado, redirigiendo a página de éxito")
+                return redirect('activation_resent')
+        
+        print("No se encontró el user_id en la sesión, redirigiendo a login")
+        return redirect('login')
+
+    else:
+        email = request.GET.get('email')
+        user = User.objects.filter(email=email).first()
+
+        print(f"GET recibido, email: {email}")
+
+        if user and not user.is_active:
+            # Guardar el user_id en la sesión para usarlo después
+            request.session['user_id'] = user.pk
+            print(f"Usuario encontrado y no activo, user_id: {user.pk}")
+            return render(request, 'register/resend_activation_email.html', {'email': email})
+
+    print("Redirigiendo a login desde GET")
+    return redirect('login')
+
+
 
 
 @login_required
@@ -138,6 +301,13 @@ def user_profile(request):
     }
 
     return render(request, 'profile.html', context)
+
+
+def session_expired(request):
+    return render(request, 'session_expired.html', {
+        'message': 'Tu sesión ha expirado por inactividad. Por favor, inicia sesión nuevamente.',
+    })
+
 
 @login_required
 def edit_profile(request):
@@ -443,21 +613,30 @@ def generate_exam(request):
 
 @login_required
 def exam_detail(request, exam_id):
-    exam = get_object_or_404(Exam, exam_id=exam_id, student=request.user)
+    exam = get_object_or_404(Exam, exam_id=exam_id)
     
+    # Verifica si el usuario es el estudiante dueño del examen o un profesor
+    if exam.student != request.user and not request.user.is_teacher:
+        return HttpResponseForbidden("No tienes permiso para acceder a este examen.")
+
     if exam.is_submitted:
+        print(f"Examen {exam_id} ya fue entregado.")
         return redirect('archived_exam', exam_id=exam_id)
     
     if request.method == "POST" and 'submit_exam' in request.POST:
+        print(f"Examen {exam_id} está siendo entregado.")
         return redirect('submit_exam', exam_id=exam_id)
     
     # Calcular el tiempo restante
     time_left = (exam.start_time + timezone.timedelta(minutes=90)) - timezone.now()
+    time_left_seconds = max(time_left.total_seconds(), 0)
+    print(f"Tiempo restante para el examen {exam_id}: {time_left_seconds} segundos")
     
     return render(request, 'exam_detail.html', {
         'exam': exam,
-        'time_left': max(time_left.total_seconds(), 0),
+        'time_left': time_left_seconds,
     })
+
 
 
 @login_required
