@@ -6,17 +6,17 @@ from django.conf import settings
 from django.core.mail import EmailMessage
 from django.http import HttpResponseForbidden, JsonResponse
 from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode  # Corregido
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode  
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
-from .forms import UserRegistrationForm, UserProfileForm, ChatForm, ExerciseGenerationForm, ExamGenerationForm, CustomAuthenticationForm, EmailUpdateForm  
-from .models import User, Chat, Exam, Exercise, ExerciseSet, Event
+from .forms import UserRegistrationForm, UserProfileForm, ChatForm, ExerciseGenerationForm, ExamGenerationForm, CustomAuthenticationForm, EmailUpdateForm, ForumForm, CommentForm  
+from .models import User, Chat, Exam, Exercise, ExerciseSet, Event, Forum, Comment
 from .tokens import account_activation_token  
 
 
@@ -26,6 +26,9 @@ import json
 
 
 def home(request):
+
+    delete_unactivated_users()
+
     context = {
         'message': "Bienvenido a la plataforma.",
         'user_type': "Guest"
@@ -90,7 +93,15 @@ def home(request):
 
     return render(request, 'home.html', context)
 
+def no_permission(request):
+    return render(request, 'no_permission.html', {
+        'message': 'No tienes permiso para acceder a este contenido.'
+    })
 
+def content_for_students_only(request):
+    return render(request, 'content_for_students_only.html', {
+        'message': 'Este contenido es solo para alumnos.'
+    })
 
 def register(request):
     return render(request, 'register.html')
@@ -171,11 +182,10 @@ class CustomLoginView(LoginView):
     template_name = 'login.html'
 
     def post(self, request, *args, **kwargs):
+        delete_unactivated_users()
         print("POST request received")
-        
+    
         form = self.get_form()
-
-        # Obtener los datos del formulario
         username = request.POST.get('username')
         password = request.POST.get('password')
         print(f"Username: {username}")
@@ -183,8 +193,7 @@ class CustomLoginView(LoginView):
         try:
             user = User.objects.get(username=username)
             print(f"Usuario encontrado: {user.username}, Activo: {user.is_active}")
-            
-            # Si el usuario está inactivo, mostramos el mensaje y no intentamos autenticar
+        
             if not user.is_active:
                 print("Cuenta inactiva detectada")
                 context = self.get_context_data(form=form)
@@ -193,10 +202,10 @@ class CustomLoginView(LoginView):
                 return self.render_to_response(context)
         except User.DoesNotExist:
             print("Usuario no encontrado")
-            # Continuamos para manejar el error de credenciales incorrectas
+            # Evita añadir errores aquí. Permite que la autenticación los maneje.
             pass
 
-        # Si llegamos aquí, el usuario o no existe o está activo, intentamos autenticar
+        # Intentar autenticar
         user = authenticate(request, username=username, password=password)
         if user is not None:
             print("Autenticación exitosa, iniciando sesión")
@@ -204,24 +213,12 @@ class CustomLoginView(LoginView):
             return redirect(self.get_success_url())
         else:
             print("Autenticación fallida")
-            form.add_error(None, "Please enter a correct username and password. Note that both fields may be case-sensitive.")
-        
+            # Asegúrate de añadir el error solo una vez aquí
+            if not form.non_field_errors():
+                form.add_error(None, "Please enter a correct username and password. Note that both fields may be case-sensitive.")
+    
         print("Formulario inválido, renderizando con errores")
         return self.form_invalid(form)
-
-    def form_invalid(self, form):
-        print("form_invalid llamado")
-        print("Errores del formulario:", form.errors)
-        return self.render_to_response(self.get_context_data(form=form))
-
-from django.shortcuts import render, redirect
-from django.contrib.auth import get_user_model
-from django.core.mail import EmailMessage
-from django.template.loader import render_to_string
-from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes
-from django.contrib.sites.shortcuts import get_current_site
-from .tokens import account_activation_token
 
 User = get_user_model()
 
@@ -282,8 +279,6 @@ def resend_activation_email(request):
     return redirect('login')
 
 
-
-
 @login_required
 def user_profile(request):
     user = request.user
@@ -323,13 +318,77 @@ def edit_profile(request):
 
     return render(request, 'edit_profile.html', {'form': form})
 
+@login_required
+def forum_home(request):
+    recent_forums = Forum.objects.filter(is_closed=False).order_by('-created_at')[:4]
+    all_forums = Forum.objects.all().order_by('-created_at')
+    context = {
+        'recent_forums': recent_forums,
+        'all_forums': all_forums,
+    }
+    return render(request, 'forum/forum_home.html', context)
 
+@login_required
+def create_forum(request):
+    if request.method == 'POST':
+        form = ForumForm(request.POST, request.FILES)
+        if form.is_valid():
+            forum = form.save(commit=False)
+            forum.created_by = request.user
+            forum.save()
+            return redirect('forum_home')
+    else:
+        form = ForumForm()
+    return render(request, 'forum/create_forum.html', {'form': form})
+
+@login_required
+def view_forum(request, forum_id):
+    forum = get_object_or_404(Forum, pk=forum_id)
+    comments = forum.comments.all().order_by('created_at')
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.forum = forum
+            comment.user = request.user
+            comment.save()
+            return redirect('view_forum', forum_id=forum.id)
+    else:
+        form = CommentForm()
+    context = {
+        'forum': forum,
+        'comments': comments,
+        'form': form,
+    }
+    return render(request, 'forum/view_forum.html', context)
+
+@login_required
+def close_forum(request, forum_id):
+    forum = get_object_or_404(Forum, pk=forum_id, created_by=request.user)
+    forum.is_closed = True
+    forum.save()
+    return redirect('view_forum', forum_id=forum_id)
 
 #############################################################
 #############################################################
 ################# ---- ESTUDIANTES ---- #####################
 #############################################################
 #############################################################
+
+@login_required
+def teacher_list(request):
+    # Verificar si el usuario es un estudiante
+    if not request.user.is_student:
+        return redirect('home')  # O a cualquier otra página apropiada
+    
+    # Filtrar solo los usuarios que son profesores
+    teachers = User.objects.filter(user_type='Teacher')
+
+    context = {
+        'teachers': teachers,
+    }
+
+    return render(request, 'teacher_list.html', context)
 
 openai.api_key = settings.OPENAI_API_KEY
 
@@ -729,7 +788,20 @@ def archived_exam(request, exam_id):
 
 
 def calendar_view(request):
-    return render(request, 'calendar.html')
+    now = timezone.now()
+    thirty_days_from_now = now + timedelta(days=30)
+    
+    upcoming_events = Event.objects.filter(
+        user=request.user,
+        start_time__gte=now,
+        start_time__lte=thirty_days_from_now
+    ).order_by('start_time')
+    
+    context = {
+        'upcoming_events': upcoming_events
+    }
+    return render(request, 'calendar.html', context)
+
 
 
 @login_required
@@ -738,6 +810,7 @@ def calendar_events(request):
     events_list = []
     for event in events:
         events_list.append({
+            'id': event.id,  # Asegúrate de incluir el ID
             'title': event.title,
             'start': event.start_time.isoformat(),
             'end': event.end_time.isoformat(),
@@ -745,17 +818,33 @@ def calendar_events(request):
         })
     return JsonResponse(events_list, safe=False)
 
+from django.http import JsonResponse
+from django.utils.dateparse import parse_datetime
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .models import Event
+
 @csrf_exempt
 def create_event(request):
     if request.method == 'POST':
         data = json.loads(request.body)
+        
+        start_time = parse_datetime(data['start'])
+        end_time = parse_datetime(data['end'])
+        
+        if end_time <= start_time:
+            return JsonResponse({'status': 'error', 'message': 'La hora de finalización debe ser posterior a la hora de inicio.'}, status=400)
+        
         event = Event.objects.create(
             title=data['title'],
-            start_time=data['start'],
-            end_time=data['end']
+            start_time=start_time,
+            end_time=end_time,
+            color=data.get('color', '#000000')  # Default color if not provided
         )
-        return JsonResponse({'status': 'Event Created'}, status=201)
-
+        
+        return JsonResponse({'status': 'Event Created', 'event_id': event.id}, status=201)
+    
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido.'}, status=405)
 
 
 @login_required
@@ -765,6 +854,7 @@ def day_view(request, date):
     
     # Filtrar los eventos del usuario que ha iniciado sesión y la fecha específica
     events = Event.objects.filter(start_time__date=date_obj, user=request.user)
+    error_message = None  # Inicializar el mensaje de error como None
     
     if request.method == 'POST':
         # Manejar la creación de un nuevo evento
@@ -773,16 +863,68 @@ def day_view(request, date):
         end_time = f"{date} {request.POST.get('end_time')}"
         color = request.POST.get('color')
 
-        Event.objects.create(
-            title=title,
-            start_time=start_time,
-            end_time=end_time,
-            color=color,
-            user=request.user  # Asignar el evento al usuario actual
-        )
+        # Validar que la hora de fin sea posterior a la hora de inicio
+        if end_time <= start_time:
+            error_message = "La hora de finalización debe ser posterior a la hora de inicio."
+        else:
+            # Crear el evento si la validación es exitosa
+            Event.objects.create(
+                title=title,
+                start_time=start_time,
+                end_time=end_time,
+                color=color,
+                user=request.user  # Asignar el evento al usuario actual
+            )
+            return redirect('calendar')
 
-    return render(request, 'day_view.html', {'date': date, 'events': events})
+    return render(request, 'day_view.html', {'date': date, 'events': events, 'error_message': error_message})
 
+
+@login_required
+def edit_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id, user=request.user)
+    error_message = None
+
+    if request.method == 'POST':
+        if 'save_changes' in request.POST:
+            title = request.POST.get('title')
+            start_time = request.POST.get('start_time')
+            end_time = request.POST.get('end_time')
+            color = request.POST.get('color')
+
+            # Validación para asegurar que la hora de finalización sea posterior a la hora de inicio
+            if end_time <= start_time:
+                error_message = "La hora de finalización debe ser posterior a la hora de inicio."
+            else:
+                event.title = title
+                event.start_time = start_time
+                event.end_time = end_time
+                event.color = color
+                event.save()
+                return redirect('calendar')
+        
+        elif 'delete_event' in request.POST:
+            return redirect('delete-event', event_id=event.id)
+
+    return render(request, 'edit_event.html', {'event': event, 'error_message': error_message})
+
+
+
+
+@login_required
+def delete_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id, user=request.user)
+    
+    if request.method == 'POST':
+        event.delete()
+        return redirect('calendar')
+
+    return render(request, 'delete_event.html', {'event': event})
+
+def delete_unactivated_users():
+    expiration_time = timezone.now() - timezone.timedelta(minutes=30)
+    unactivated_users = User.objects.filter(is_active=False, created_at__lt=expiration_time)
+    unactivated_users.delete()
 
 
 #############################################################

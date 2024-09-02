@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Editar Evento</h2>
+
+{% if error_message %}
+    <div class="alert alert-danger">{{ error_message }}</div>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    <label for="title">Título:</label>
+    <input type="text" id="title" name="title" value="{{ event.title }}" required>
+
+    <label for="start_time">Hora de Inicio:</label>
+    <input type="datetime-local" id="start_time" name="start_time" value="{{ event.start_time|date:'Y-m-d\TH:i:s' }}" required>
+
+    <label for="end_time">Hora de Fin:</label>
+    <input type="datetime-local" id="end_time" name="end_time" value="{{ event.end_time|date:'Y-m-d\TH:i:s' }}" required>
+
+    <label for="color">Color:</label>
+    <input type="color" id="color" name="color" value="{{ event.color }}" required>
+
+    <button type="submit" name="save_changes" class="btn btn-primary">Guardar cambios</button>
+    <a href="{% url 'calendar' %}" class="btn btn-secondary">Cancelar</a>
+    <button type="submit" name="delete_event" class="btn btn-danger">Eliminar evento</button>
+</form>
+{% endblock %}

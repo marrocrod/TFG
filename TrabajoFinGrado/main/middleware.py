@@ -2,6 +2,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.conf import settings
 from django.contrib.auth import logout
+from .views import delete_unactivated_users
 
 class SessionTimeoutMiddleware:
     def __init__(self, get_response):
@@ -23,5 +24,15 @@ class SessionTimeoutMiddleware:
                 else:
                     request.session['last_activity'] = now.isoformat()
 
+        response = self.get_response(request)
+        return response
+
+
+class CleanupMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        delete_unactivated_users()
         response = self.get_response(request)
         return response

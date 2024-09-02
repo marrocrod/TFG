@@ -9,8 +9,8 @@ from django.utils import timezone
 
 
 class User(AbstractUser):
+    created_at = models.DateTimeField(auto_now_add=True) 
     email = models.EmailField(unique=True) 
-    phone = models.CharField(max_length=15, blank=True, null=True)
 
     class DegreeChoices(models.TextChoices):
         SOFTWARE_ENGINEERING = 'Software Engineering'
@@ -25,13 +25,14 @@ class User(AbstractUser):
 
     user_type = models.CharField(max_length=10, choices=UserTypeChoices.choices)
 
-    groups = models.ManyToManyField(
-        'auth.Group',
-        related_name='users_in_auth_groups',
-        blank=True,
-        help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.',
-        verbose_name='groups',
-    )
+    class GroupChoices(models.TextChoices):
+        GROUP_1 = 'Grupo 1'
+        GROUP_2 = 'Grupo 2'
+        GROUP_3 = 'Grupo 3'
+        GROUP_4 = 'Grupo 4'
+
+    group = models.CharField(max_length=50, choices=GroupChoices.choices, verbose_name='Group')
+
     user_permissions = models.ManyToManyField(
         'auth.Permission',
         related_name='users_with_permissions',
@@ -209,3 +210,23 @@ class Event(models.Model):
     def __str__(self):
         return self.title
 
+class Forum(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_closed = models.BooleanField(default=False)
+    archived = models.BooleanField(default=False)
+    image = models.ImageField(upload_to='forum_images/', blank=True, null=True)
+
+    def __str__(self):
+        return self.title
+
+class Comment(models.Model):
+    forum = models.ForeignKey(Forum, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField(max_length=3000)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Comment by {self.user.username} on {self.forum.title}'

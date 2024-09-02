@@ -1,8 +1,30 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Calendario</h2>
-<div id="calendar"></div>
+<div class="row">
+    <!-- Columna para la lista de eventos -->
+    <div class="col-md-2 pr-0">
+        <h4 class="text-center">Eventos en los próximos 30 días</h4>    
+        <ul class="list-group">
+            {% for event in upcoming_events %}
+                <li class="list-group-item">
+                    <span class="event-color-dot" style="background-color: {{ event.color }};"></span>
+                    <strong>{{ event.title }}</strong><br>
+                    <span>{{ event.start_time|date:"j F" }}</span><br>
+                    <span>{{ event.start_time|date:"H:i" }} - {{ event.end_time|date:"H:i" }}</span>
+                </li>
+            {% empty %}
+                <li class="list-group-item">No hay eventos próximos</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Columna para el calendario -->
+    <div class="col-md-10">
+        <h2>Calendario</h2>
+        <div id="calendar"></div>
+    </div>
+</div>
 
 <!-- Ventana Modal -->
 <div id="eventModal" class="modal">
@@ -28,56 +50,150 @@
     document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth', // Vista de mes completa
-            events: '/api/calendar-events/', // URL para obtener los eventos
+            initialView: 'dayGridMonth',
+            events: '/api/calendar-events/',  // Asegúrate de que esta URL esté correctamente configurada
+            eventContent: function(arg) {
+                // Crear el punto de color
+                let dotEl = document.createElement('span');
+                dotEl.className = "fc-event-dot";
+                dotEl.style.backgroundColor = arg.event.backgroundColor;
+    
+                // Crear el nombre del evento
+                let titleEl = document.createElement('span');
+                titleEl.className = "fc-event-title";
+                titleEl.innerText = ` ${arg.event.title}`;
+    
+                // Agrupar el punto de color y el nombre del evento en una línea
+                let titleContainerEl = document.createElement('div');
+                titleContainerEl.className = 'fc-event-title-container';
+                titleContainerEl.append(dotEl, titleEl);
+    
+                // Crear el tramo horario debajo del nombre
+                let timeEl = document.createElement('div');
+                timeEl.className = "fc-event-time";
+                timeEl.innerText = `${arg.event.startStr.slice(11, 16)} - ${arg.event.endStr.slice(11, 16)}`;  // Extraer las horas y minutos
+    
+                // Agrupar todo (nombre del evento y tramo horario)
+                let eventContentEl = document.createElement('div');
+                eventContentEl.append(titleContainerEl, timeEl);
+    
+                return { domNodes: [eventContentEl] };
+            },
             dateClick: function(info) {
-                // Redirige a la vista del día seleccionado
                 window.location.href = `/calendar/day/${info.dateStr}/`;
             },
             eventClick: function(info) {
-                alert('Evento: ' + info.event.title);
-                // Puedes agregar lógica para mostrar más detalles del evento
+                window.location.href = `/calendar/edit/${info.event.id}/`;
             }
         });
         calendar.render();
     });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var form = document.getElementById('eventForm');
+        var startTimeInput = document.getElementById('start');
+        var endTimeInput = document.getElementById('end');
+    
+        form.addEventListener('submit', function(event) {
+            var startTime = new Date(startTimeInput.value);
+            var endTime = new Date(endTimeInput.value);
+    
+            if (endTime <= startTime) {
+                event.preventDefault();
+                alert("La hora de finalización debe ser posterior a la hora de inicio.");
+            }
+        });
+    });
+    
+    
 </script>
+
+
 
 <!-- Estilos para la ventana modal -->
 <style>
-    .modal {
-        display: none; /* Oculto por defecto */
-        position: fixed; /* Fijado en la pantalla */
-        z-index: 1; /* Aparece en la parte superior */
-        left: 0;
-        top: 0;
-        width: 100%; /* Ocupa todo el ancho de la pantalla */
-        height: 100%; /* Ocupa todo el alto de la pantalla */
-        overflow: auto; /* Permite scroll si el contenido es grande */
-        background-color: rgb(0,0,0); /* Color de fondo */
-        background-color: rgba(0,0,0,0.4); /* Color de fondo con transparencia */
+    /* Estilo para los puntos de color en la lista de eventos */
+    .event-color-dot {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+    
+    /* Asegura que todos los eventos en el calendario se muestren con un punto */
+    .fc-daygrid-event-dot {
+        width: 10px; /* Tamaño del punto de color */
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 5px;
+        display: inline-block;
+        vertical-align: middle;
     }
 
-    .modal-content {
-        background-color: #fefefe;
-        margin: 15% auto; /* 15% desde la parte superior y centrado */
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%; /* Ancho de la ventana modal */
+    .fc-event-container {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
-    .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
+    .fc-daygrid-event {
+        max-width: 100%; /* Asegura que el evento no desborde su contenedor */
+        overflow: hidden; /* Oculta cualquier desbordamiento de contenido */
+        white-space: nowrap; /* Mantiene el contenido en una sola línea */
+        text-overflow: ellipsis; /* Muestra puntos suspensivos si el contenido es demasiado largo */
+        display: block; /* Asegura que se comporte como un bloque */
+        font-size: 0.85em; /* Ajuste de tamaño para mejor visualización */
+        color: black; /* Asegura que todo el texto del evento tenga el mismo color */
+    }
+    
+    .fc-event-title-container {
+        display: flex;
+        align-items: center;
+        max-width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    
+    .fc-event-title {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: black;  /* Mantiene el color del texto */
+    }
+    
+    /* Asegura que el evento no tenga fondo de color extendido */
+    .fc-event {
+        background-color: transparent !important;
+        border: none !important;
+    }
+    
+    /* Punto de color para los eventos */
+    .fc-event-dot {
+        width: 10px; /* Tamaño del punto de color */
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 5px;
+        display: inline-block;
+        vertical-align: middle;
     }
 
-    .close:hover,
-    .close:focus {
-        color: black;
-        text-decoration: none;
-        cursor: pointer;
+    /.fc-event-time {
+        font-size: 0.85em;
+        color: #666;
+        margin-top: 2px;  /* Un pequeño margen superior para separar del título */
+        display: block;  /* Asegura que la hora esté en una nueva línea */
+    }
+
+    .fc-event-title-container,
+    .fc-event-time {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 </style>
 {% endblock %}

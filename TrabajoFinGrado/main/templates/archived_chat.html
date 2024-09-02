@@ -11,7 +11,12 @@
     {% endfor %}
 </div>
 
-<!-- Enlace para volver al perfil del estudiante -->
-<a href="{% url 'student_detail' chat.student.id %}">Volver al perfil del estudiante</a>
+{% if user.is_teacher %}
+    <!-- Enlace para volver al perfil del estudiante -->
+    <a href="{% url 'student_detail' chat.student.id %}" class="btn btn-primary">Volver al Perfil del Estudiante</a>
+{% elif user.is_student %}
+    <!-- Enlace para volver a la vista principal del chat -->
+    <a href="{% url 'chat_default' %}" class="btn btn-primary">Volver al Chat Principal</a>
+{% endif %}
 
 {% endblock %}

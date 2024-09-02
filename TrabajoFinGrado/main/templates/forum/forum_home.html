@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <h3>Debates Recientes</h3>
+        <ul>
+            {% for forum in recent_forums %}
+                <li>
+                    <a href="{% url 'view_forum' forum.id %}">{{ forum.title }}</a>
+                    <br>
+                    <small>Creado por {{ forum.created_by.username }} el {{ forum.created_at|date:"d M Y" }}</small>
+                </li>
+            {% endfor %}
+        </ul>
+        <a href="{% url 'create_forum' %}" class="btn btn-primary mt-3">Crear un Debate</a>
+    </div>
+    <div class="col-md-8">
+        <h3>Todos los Debates</h3>
+        <ul>
+            {% for forum in all_forums %}
+                <li>
+                    <a href="{% url 'view_forum' forum.id %}">{{ forum.title }}</a>
+                    <br>
+                    <small>Creado por {{ forum.created_by.username }} el {{ forum.created_at|date:"d M Y" }}</small>
+                    {% if forum.is_closed %}
+                        <span class="badge badge-danger">Cerrado</span>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

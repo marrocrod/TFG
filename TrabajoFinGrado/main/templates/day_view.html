@@ -17,6 +17,11 @@
 </div>
 
 <h3>Agregar Nuevo Evento</h3>
+
+{% if error_message %}
+    <div class="alert alert-danger">{{ error_message }}</div>
+{% endif %}
+
 <form method="post">
     {% csrf_token %}
     <label for="title">Nombre del Evento:</label>
