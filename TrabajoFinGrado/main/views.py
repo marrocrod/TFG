@@ -105,7 +105,7 @@ def content_for_students_only(request):
 #~~~~~~~~REGISTERS~~~~~~~~
 
 def register(request):
-    return render(request, 'register.html')
+    return render(request, 'register/register.html')
 
 
 def register_student(request):
@@ -131,7 +131,7 @@ def register_student(request):
             return render(request, 'register/registration_complete.html')  
     else:
         form = UserRegistrationForm()
-    return render(request, 'register_student.html', {'form': form})
+    return render(request, 'register/register_student.html', {'form': form})
 
 
 def register_teacher(request):
@@ -157,7 +157,7 @@ def register_teacher(request):
             return render(request, 'register/registration_complete.html')  
     else:
         form = UserRegistrationForm()
-    return render(request, 'register_teacher.html', {'form': form})
+    return render(request, 'register/register_teacher.html', {'form': form})
 
 def activate(request, uidb64, token):
     try:
@@ -435,7 +435,7 @@ def chat_view(request, chat_id=None):
     else:
         form = ChatForm()
 
-    return render(request, 'chat.html', {'form': form, 'chat': chat})
+    return render(request, 'chat/chat.html', {'form': form, 'chat': chat})
 
 
 @login_required
@@ -459,7 +459,7 @@ def archived_chat_view(request, chat_id):
     context = {
         'chat': chat
     }
-    return render(request, 'archived_chat.html', context)
+    return render(request, 'chat/archived_chat.html', context)
 
 
 @login_required
@@ -469,7 +469,7 @@ def archived_chats_list(request):
     else:
         chats = Chat.objects.filter(is_archived=True, student=request.user)
 
-    return render(request, 'archived_chats_list.html', {'chats': chats})
+    return render(request, 'chat/archived_chats_list.html', {'chats': chats})
 
 #~~~~~~~~EXERCISES~~~~~~~~
 
@@ -515,7 +515,7 @@ def generate_exercises(request):
     else:
         form = ExerciseGenerationForm()
 
-    return render(request, 'generate_exercises.html', {'form': form})
+    return render(request, 'exercise/generate_exercises.html', {'form': form})
 
 
 
@@ -565,7 +565,7 @@ def parse_generated_text(generated_text):
 def exercise_set_detail(request, set_id):
     exercise_set = get_object_or_404(ExerciseSet, set_id=set_id, student=request.user)
     exercises = exercise_set.exercises.all()
-    return render(request, 'exercise_set_detail.html', {'exercise_set': exercise_set, 'exercises': exercises})
+    return render(request, 'exercise/exercise_set_detail.html', {'exercise_set': exercise_set, 'exercises': exercises})
 
 
 @login_required
@@ -576,7 +576,7 @@ def generate_exercises_view(request):
 
     exercise_sets = user.exercise_sets.all().order_by('-created_at')
 
-    return render(request, 'exercises.html', {
+    return render(request, 'exercise/exercises.html', {
         'exercise_sets': exercise_sets
     })
 
@@ -652,7 +652,7 @@ def generate_exam(request):
     else:
         form = ExamGenerationForm()
 
-    return render(request, 'generate_exam.html', {'form': form})
+    return render(request, 'exam/generate_exam.html', {'form': form})
 
 
 @login_required
@@ -676,7 +676,7 @@ def exam_detail(request, exam_id):
     time_left_seconds = max(time_left.total_seconds(), 0)
     print(f"Tiempo restante para el examen {exam_id}: {time_left_seconds} segundos")
     
-    return render(request, 'exam_detail.html', {
+    return render(request, 'exam/exam_detail.html', {
         'exam': exam,
         'time_left': time_left_seconds,
     })
@@ -752,7 +752,7 @@ def submit_exam(request, exam_id):
     total_score = exam.grade
     print(f"Total score calculated: {total_score}")
 
-    return render(request, 'archived_exam.html', {'exam': exam, 'total_score': total_score})
+    return render(request, 'exam/archived_exam.html', {'exam': exam, 'total_score': total_score})
 
 
 
@@ -765,9 +765,11 @@ def archived_exam(request, exam_id):
         return HttpResponseForbidden("No tienes permiso para acceder a este examen.")
     
     total_score = exam.grade
-    return render(request, 'archived_exam.html', {'exam': exam, 'total_score': total_score})
+    return render(request, 'exam/archived_exam.html', {'exam': exam, 'total_score': total_score})
 
 
+
+#~~~~ CALENDARIO ~~~~~~
 def calendar_view(request):
     now = timezone.now()
     thirty_days_from_now = now + timedelta(days=30)
@@ -781,7 +783,7 @@ def calendar_view(request):
     context = {
         'upcoming_events': upcoming_events
     }
-    return render(request, 'calendar.html', context)
+    return render(request, 'calendar/calendar.html', context)
 
 
 
@@ -855,7 +857,7 @@ def day_view(request, date):
             )
             return redirect('calendar')
 
-    return render(request, 'day_view.html', {'date': date, 'events': events, 'error_message': error_message})
+    return render(request, 'calendar/day_view.html', {'date': date, 'events': events, 'error_message': error_message})
 
 
 @login_required
@@ -883,7 +885,7 @@ def edit_event(request, event_id):
         elif 'delete_event' in request.POST:
             return redirect('delete-event', event_id=event.id)
 
-    return render(request, 'edit_event.html', {'event': event, 'error_message': error_message})
+    return render(request, 'calendar/edit_event.html', {'event': event, 'error_message': error_message})
 
 
 
@@ -896,7 +898,7 @@ def delete_event(request, event_id):
         event.delete()
         return redirect('calendar')
 
-    return render(request, 'delete_event.html', {'event': event})
+    return render(request, 'calendar/delete_event.html', {'event': event})
 
 def delete_unactivated_users():
     expiration_time = timezone.now() - timezone.timedelta(minutes=30)
