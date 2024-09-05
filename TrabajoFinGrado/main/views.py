@@ -24,7 +24,7 @@ import openai
 import json
 
 
-
+#~~~~~~~~HOME~~~~~~~~
 def home(request):
 
     delete_unactivated_users()
@@ -37,11 +37,9 @@ def home(request):
     if request.user.is_authenticated:
         user = request.user
         if user.user_type == "Teacher":
-            # Filtros
             search_query = request.GET.get('search', '')
             degree_filters = request.GET.getlist('degrees')
 
-            # Filtrar estudiantes por búsqueda
             students = User.objects.filter(user_type='Student').order_by('username')
 
             if search_query:
@@ -59,19 +57,17 @@ def home(request):
                 'message': "Bienvenido, Profesor.",
                 'user_type': "Teacher",
                 'students': students,
-                'degrees': User.DegreeChoices.choices,  # Enviar los grados al contexto
-                'selected_degrees': degree_filters,  # Enviar los grados seleccionados al contexto
-                'search_query': search_query  # Enviar el término de búsqueda al contexto
+                'degrees': User.DegreeChoices.choices,  
+                'selected_degrees': degree_filters,  
+                'search_query': search_query  
             })
             
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                 return render(request, 'partials/student_list.html', {'students': students})
 
         elif user.user_type == "Student":
-            # Obtener todos los exámenes del estudiante
             exams = user.exams.all().order_by('-created_at')
 
-            # Obtener todos los conjuntos de ejercicios del estudiante
             exercise_sets = user.exercise_sets.all().order_by('-created_at')
 
             context.update({
@@ -93,6 +89,8 @@ def home(request):
 
     return render(request, 'home.html', context)
 
+#~~~~~~~~PERMISSONS~~~~~~~~
+
 def no_permission(request):
     return render(request, 'no_permission.html', {
         'message': 'No tienes permiso para acceder a este contenido.'
@@ -102,6 +100,9 @@ def content_for_students_only(request):
     return render(request, 'content_for_students_only.html', {
         'message': 'Este contenido es solo para alumnos.'
     })
+
+
+#~~~~~~~~REGISTERS~~~~~~~~
 
 def register(request):
     return render(request, 'register.html')
@@ -113,10 +114,9 @@ def register_student(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.user_type = 'Student'
-            user.is_active = False  # Desactivar la cuenta hasta la verificación
+            user.is_active = False  
             user.save()
             
-            # Enviar correo de activación
             current_site = get_current_site(request)
             mail_subject = 'Activate your Student account.'
             message = render_to_string('register/acc_active_email.html', {
@@ -128,7 +128,7 @@ def register_student(request):
             email = EmailMessage(mail_subject, message, to=[user.email])
             email.send()
             
-            return render(request, 'register/registration_complete.html')  # Página de confirmación
+            return render(request, 'register/registration_complete.html')  
     else:
         form = UserRegistrationForm()
     return render(request, 'register_student.html', {'form': form})
@@ -140,10 +140,9 @@ def register_teacher(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.user_type = 'Teacher'
-            user.is_active = False  # Desactivar la cuenta hasta la verificación
+            user.is_active = False  
             user.save()
             
-            # Enviar correo de activación
             current_site = get_current_site(request)
             mail_subject = 'Activate your Teacher account.'
             message = render_to_string('register/acc_active_email.html', {
@@ -155,7 +154,7 @@ def register_teacher(request):
             email = EmailMessage(mail_subject, message, to=[user.email])
             email.send()
             
-            return render(request, 'register/registration_complete.html')  # Página de confirmación
+            return render(request, 'register/registration_complete.html')  
     else:
         form = UserRegistrationForm()
     return render(request, 'register_teacher.html', {'form': form})
@@ -171,54 +170,10 @@ def activate(request, uidb64, token):
         user.is_active = True
         user.save()
         login(request, user)
-        return render(request, 'register/account_activated.html')  # Página de éxito
+        return render(request, 'register/account_activated.html')  
     else:
-        return render(request, 'register/activation_invalid.html')  # Página de error
-
-
-class CustomLoginView(LoginView):
-    User = get_user_model()
-    form_class = CustomAuthenticationForm
-    template_name = 'login.html'
-
-    def post(self, request, *args, **kwargs):
-        delete_unactivated_users()
-        print("POST request received")
+        return render(request, 'register/activation_invalid.html') 
     
-        form = self.get_form()
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        print(f"Username: {username}")
-
-        try:
-            user = User.objects.get(username=username)
-            print(f"Usuario encontrado: {user.username}, Activo: {user.is_active}")
-        
-            if not user.is_active:
-                print("Cuenta inactiva detectada")
-                context = self.get_context_data(form=form)
-                context['inactive'] = True
-                context['user_email'] = user.email
-                return self.render_to_response(context)
-        except User.DoesNotExist:
-            print("Usuario no encontrado")
-            # Evita añadir errores aquí. Permite que la autenticación los maneje.
-            pass
-
-        # Intentar autenticar
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            print("Autenticación exitosa, iniciando sesión")
-            login(request, user)
-            return redirect(self.get_success_url())
-        else:
-            print("Autenticación fallida")
-            # Asegúrate de añadir el error solo una vez aquí
-            if not form.non_field_errors():
-                form.add_error(None, "Please enter a correct username and password. Note that both fields may be case-sensitive.")
-    
-        print("Formulario inválido, renderizando con errores")
-        return self.form_invalid(form)
 
 User = get_user_model()
 
@@ -232,7 +187,6 @@ def resend_activation_email(request):
         if user_id:
             user = User.objects.get(pk=user_id)
 
-            # Verificar si el nuevo correo ya está en uso
             if User.objects.filter(email=email).exists():
                 error_message = "Este correo electrónico ya está en uso."
                 print("Correo electrónico ya en uso")
@@ -270,7 +224,6 @@ def resend_activation_email(request):
         print(f"GET recibido, email: {email}")
 
         if user and not user.is_active:
-            # Guardar el user_id en la sesión para usarlo después
             request.session['user_id'] = user.pk
             print(f"Usuario encontrado y no activo, user_id: {user.pk}")
             return render(request, 'register/resend_activation_email.html', {'email': email})
@@ -278,6 +231,51 @@ def resend_activation_email(request):
     print("Redirigiendo a login desde GET")
     return redirect('login')
 
+#~~~~~~~~LOGIN~~~~~~~~
+
+class CustomLoginView(LoginView):
+    User = get_user_model()
+    form_class = CustomAuthenticationForm
+    template_name = 'login.html'
+
+    def post(self, request, *args, **kwargs):
+        delete_unactivated_users()
+        print("POST request received")
+    
+        form = self.get_form()
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        print(f"Username: {username}")
+
+        try:
+            user = User.objects.get(username=username)
+            print(f"Usuario encontrado: {user.username}, Activo: {user.is_active}")
+        
+            if not user.is_active:
+                print("Cuenta inactiva detectada")
+                context = self.get_context_data(form=form)
+                context['inactive'] = True
+                context['user_email'] = user.email
+                return self.render_to_response(context)
+        except User.DoesNotExist:
+            print("Usuario no encontrado")
+            pass
+
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            print("Autenticación exitosa, iniciando sesión")
+            login(request, user)
+            return redirect(self.get_success_url())
+        else:
+            print("Autenticación fallida")
+            if not form.non_field_errors():
+                form.add_error(None, "Please enter a correct username and password. Note that both fields may be case-sensitive.")
+    
+        print("Formulario inválido, renderizando con errores")
+        return self.form_invalid(form)
+
+
+#~~~~~~~~PROFILE~~~~~~~~
 
 @login_required
 def user_profile(request):
@@ -312,11 +310,13 @@ def edit_profile(request):
         form = UserProfileForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
-            return redirect('user_profile')  # Redirige al perfil del usuario tras guardar los cambios
+            return redirect('user_profile')  
     else:
         form = UserProfileForm(instance=user)
 
     return render(request, 'edit_profile.html', {'form': form})
+
+#~~~~~~~~FORUM~~~~~~~~
 
 @login_required
 def forum_home(request):
@@ -375,13 +375,13 @@ def close_forum(request, forum_id):
 #############################################################
 #############################################################
 
+#~~~~~~~~TEACHERS_LIST~~~~~~~~
+
 @login_required
 def teacher_list(request):
-    # Verificar si el usuario es un estudiante
     if not request.user.is_student:
-        return redirect('home')  # O a cualquier otra página apropiada
+        return redirect('home')  
     
-    # Filtrar solo los usuarios que son profesores
     teachers = User.objects.filter(user_type='Teacher')
 
     context = {
@@ -390,19 +390,18 @@ def teacher_list(request):
 
     return render(request, 'teacher_list.html', context)
 
+#~~~~~~~~CHAT~~~~~~~~
+
 openai.api_key = settings.OPENAI_API_KEY
 
 @login_required
 def chat_view(request, chat_id=None):
     if chat_id is None:
-        # Buscar la última conversación no archivada del usuario
         chat = Chat.objects.filter(student=request.user, is_archived=False).order_by('-last_activity').first()
 
         if chat:
-            # Si hay una conversación no archivada, redirigir a ella
             return redirect('chat', chat_id=chat.chat_id)
         else:
-            # Si todas las conversaciones están archivadas, crear una nueva conversación y redirigir a ella
             chat = Chat.objects.create(student=request.user, conversation=json.dumps([]))
             return redirect('chat', chat_id=chat.chat_id)
     else:
@@ -410,7 +409,6 @@ def chat_view(request, chat_id=None):
         print(f"Chat ID: {chat.chat_id}, Conversation at load: {chat.get_conversation()}")
 
         if chat.is_archived:
-            # Si el chat está archivado, redirigir a la vista del chat archivado
             return redirect('archived_chat', chat_id=chat_id)
 
         if request.user != chat.student and request.user.user_type != 'Teacher':
@@ -426,7 +424,7 @@ def chat_view(request, chat_id=None):
             print(f"Chat ID: {chat.chat_id}, Conversation after adding user message: {chat.get_conversation()}")
 
             response = openai.ChatCompletion.create(
-                model="gpt-4o-mini",  # Asegúrate de utilizar el modelo correcto
+                model="gpt-4o-mini",  
                 messages=chat.get_conversation()
             )
             response_text = response['choices'][0]['message']['content']
@@ -444,25 +442,20 @@ def chat_view(request, chat_id=None):
 def archive_chat(request, chat_id):
     chat = get_object_or_404(Chat, chat_id=chat_id)
 
-    # Verificar que solo el estudiante que creó el chat o un profesor puede archivarlo
     if request.user != chat.student and request.user.user_type != 'Teacher':
         return HttpResponseForbidden("No tienes permiso para archivar este chat.")
 
-    # Marcar el chat como archivado
     chat.is_archived = True
     chat.save()
     return redirect('archived_chat', chat_id=chat.chat_id)
 
 @login_required
 def archived_chat_view(request, chat_id):
-    # Obtener el chat correspondiente al chat_id
     chat = get_object_or_404(Chat, chat_id=chat_id)
     
-    # Verificar que el usuario sea el estudiante que creó el chat o un profesor
     if request.user != chat.student and request.user.user_type != 'Teacher':
         return HttpResponseForbidden("No tienes permiso para acceder a este chat.")
     
-    # Renderizar la conversación guardada
     context = {
         'chat': chat
     }
@@ -471,16 +464,14 @@ def archived_chat_view(request, chat_id):
 
 @login_required
 def archived_chats_list(request):
-    # Verificar si el usuario es un profesor
     if request.user.user_type == 'Teacher':
-        # El profesor puede ver todos los chats archivados
         chats = Chat.objects.filter(is_archived=True)
     else:
-        # El estudiante solo puede ver sus propios chats archivados
         chats = Chat.objects.filter(is_archived=True, student=request.user)
 
     return render(request, 'archived_chats_list.html', {'chats': chats})
 
+#~~~~~~~~EXERCISES~~~~~~~~
 
 @login_required
 def generate_exercises(request):
@@ -490,17 +481,15 @@ def generate_exercises(request):
             topic = form.cleaned_data['topic']
             difficulty = form.cleaned_data['difficulty']
             number_of_exercises = int(form.cleaned_data['number_of_exercises'])
-            set_name = form.cleaned_data['set_name']  # Recoge el nombre del conjunto
+            set_name = form.cleaned_data['set_name']  
 
-            # Crear un nuevo ExerciseSet con el nombre proporcionado
             exercise_set = ExerciseSet.objects.create(student=request.user, name=set_name)
 
             for _ in range(number_of_exercises):
                 prompt = generate_prompt(topic, difficulty)
                 
-                # Utiliza el modelo gpt-4o-mini con el endpoint correcto
                 response = openai.ChatCompletion.create(
-                    model="gpt-4o-mini",  # Cambiar el modelo aquí
+                    model="gpt-4o-mini",  
                     messages=[
                         {"role": "system", "content": "You are a helpful assistant."},
                         {"role": "user", "content": prompt}
@@ -511,7 +500,6 @@ def generate_exercises(request):
                 generated_text = response['choices'][0]['message']['content'].strip()
                 statement, solution = parse_generated_text(generated_text)
                 
-                # Crear y guardar el ejercicio dentro del set
                 exercise = Exercise.objects.create(
                     exercise_set=exercise_set,
                     student=request.user,
@@ -522,7 +510,7 @@ def generate_exercises(request):
                 )
                 exercise.generate_html_content()
 
-            return redirect('exercise_set_detail', set_id=exercise_set.set_id)  # Redirigir a la vista del conjunto de ejercicios
+            return redirect('exercise_set_detail', set_id=exercise_set.set_id)  
 
     else:
         form = ExerciseGenerationForm()
@@ -532,7 +520,6 @@ def generate_exercises(request):
 
 
 def generate_prompt(topic, difficulty):
-    # Define la explicación previa sobre los niveles de dificultad
     difficulty_explanation = {
         'Easy': "El ejercicio debe ser sencillo, adecuado para principiantes, y no requerir conocimientos avanzados. Como mucho se podrá resolver en 10 minutos.",
         'Medium': "El ejercicio debe tener un nivel intermedio de dificultad, adecuado para estudiantes con conocimientos básicos de programación. Deberá poder resolverse en 20 minutos máximo.",
@@ -587,7 +574,6 @@ def generate_exercises_view(request):
     if user.user_type != 'Student':
         return redirect('home')
 
-    # Obtener los conjuntos de ejercicios generados por el estudiante
     exercise_sets = user.exercise_sets.all().order_by('-created_at')
 
     return render(request, 'exercises.html', {
@@ -601,7 +587,6 @@ def generate_exam_view(request):
     if user.user_type != 'Student':
         return redirect('home')
 
-    # Obtener los exámenes generados por el estudiante
     exams = user.exams.all().order_by('-created_at')
 
     return render(request, 'exams.html', {
@@ -701,7 +686,7 @@ def exam_detail(request, exam_id):
 @login_required
 def submit_exam(request, exam_id):
     print(f"Submit exam triggered for exam_id: {exam_id}")
-    print("request.POST:", request.POST)  # Verifica todo lo que está en POST
+    print("request.POST:", request.POST)  
 
     exam = get_object_or_404(Exam, exam_id=exam_id, student=request.user)
     exam.is_submitted = True
@@ -713,7 +698,6 @@ def submit_exam(request, exam_id):
         print(f"Received solution for {student_solution_key}: {student_solution_value}")
 
         if student_solution_value:
-            # Asegúrate de asignar correctamente el valor antes de guardar
             exercise.student_solution = student_solution_value
             
             prompt = f"""Estoy haciendo ejercicios de un examen y quiero evaluar la solución del siguiente ejercicio:
@@ -743,7 +727,6 @@ def submit_exam(request, exam_id):
             evaluation = response['choices'][0]['message']['content'].strip().lower()
             print(f"OpenAI evaluation result: {evaluation}")
 
-            # Solo marcar como correcto si la evaluación empieza con "correcto"
             if evaluation.startswith("correcto"):
                 exercise.is_correct = True
                 if exercise in exam.exercises.all()[:2]:
@@ -760,9 +743,8 @@ def submit_exam(request, exam_id):
             print(f"No solution provided for exercise ID: {exercise.exercise_id}. Skipping OpenAI evaluation.")
             exercise.is_correct = False
             exercise.score = 0.0
-            exercise.student_solution = ""  # Guarda una cadena vacía si no hay solución
+            exercise.student_solution = ""  
 
-        # Aquí es donde se guarda el ejercicio, asegurémonos de que el valor esté correcto
         print(f"Saving exercise {exercise.exercise_id} with solution: {exercise.student_solution}")
         exercise.save()
 
@@ -779,7 +761,6 @@ def submit_exam(request, exam_id):
 def archived_exam(request, exam_id):
     exam = get_object_or_404(Exam, exam_id=exam_id, is_submitted=True)
     
-    # Verificar que el usuario es el estudiante propietario del examen o un profesor
     if request.user != exam.student and not request.user.is_teacher:
         return HttpResponseForbidden("No tienes permiso para acceder a este examen.")
     
@@ -806,15 +787,15 @@ def calendar_view(request):
 
 @login_required
 def calendar_events(request):
-    events = Event.objects.filter(user=request.user)  # Filtrar por usuario
+    events = Event.objects.filter(user=request.user)  
     events_list = []
     for event in events:
         events_list.append({
-            'id': event.id,  # Asegúrate de incluir el ID
+            'id': event.id,  
             'title': event.title,
             'start': event.start_time.isoformat(),
             'end': event.end_time.isoformat(),
-            'color': event.color,  # Añadir color al evento
+            'color': event.color,  
         })
     return JsonResponse(events_list, safe=False)
 
@@ -839,7 +820,7 @@ def create_event(request):
             title=data['title'],
             start_time=start_time,
             end_time=end_time,
-            color=data.get('color', '#000000')  # Default color if not provided
+            color=data.get('color', '#000000')  
         )
         
         return JsonResponse({'status': 'Event Created', 'event_id': event.id}, status=201)
@@ -849,31 +830,28 @@ def create_event(request):
 
 @login_required
 def day_view(request, date):
-    # Convertir la fecha de la URL en un objeto datetime
     date_obj = datetime.strptime(date, '%Y-%m-%d').date()
     
-    # Filtrar los eventos del usuario que ha iniciado sesión y la fecha específica
     events = Event.objects.filter(start_time__date=date_obj, user=request.user)
-    error_message = None  # Inicializar el mensaje de error como None
+    error_message = None  
     
     if request.method == 'POST':
-        # Manejar la creación de un nuevo evento
         title = request.POST.get('title')
         start_time = f"{date} {request.POST.get('start_time')}"
         end_time = f"{date} {request.POST.get('end_time')}"
         color = request.POST.get('color')
 
-        # Validar que la hora de fin sea posterior a la hora de inicio
+        
         if end_time <= start_time:
             error_message = "La hora de finalización debe ser posterior a la hora de inicio."
         else:
-            # Crear el evento si la validación es exitosa
+            
             Event.objects.create(
                 title=title,
                 start_time=start_time,
                 end_time=end_time,
                 color=color,
-                user=request.user  # Asignar el evento al usuario actual
+                user=request.user  
             )
             return redirect('calendar')
 
@@ -892,7 +870,6 @@ def edit_event(request, event_id):
             end_time = request.POST.get('end_time')
             color = request.POST.get('color')
 
-            # Validación para asegurar que la hora de finalización sea posterior a la hora de inicio
             if end_time <= start_time:
                 error_message = "La hora de finalización debe ser posterior a la hora de inicio."
             else:
