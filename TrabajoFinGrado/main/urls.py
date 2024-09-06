@@ -18,6 +18,8 @@ urlpatterns = [
     path('login/', CustomLoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
     path('session-expired/', session_expired, name='session_expired'),
+    path('rejected-teacher/', rejected_teacher, name='rejected_teacher'),
+    path('pending-teacher/', pending_teacher, name='pending_teacher'),
     path('user_profile/', user_profile, name='user_profile'),
     path('profile/edit/', edit_profile, name='edit_profile'),
     path('chat/<int:chat_id>/', chat_view, name='chat'),  # Ruta con chat_id

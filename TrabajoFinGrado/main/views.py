@@ -36,7 +36,7 @@ def home(request):
 
     if request.user.is_authenticated:
         user = request.user
-        if user.user_type == "Teacher":
+        if user.user_type == "Teacher" and request.user.verification_status == 'APPROVED':
             search_query = request.GET.get('search', '')
             degree_filters = request.GET.getlist('degrees')
 
@@ -64,6 +64,9 @@ def home(request):
             
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                 return render(request, 'partials/student_list.html', {'students': students})
+        
+        elif request.user.user_type == 'Teacher' and request.user.verification_status == 'PENDING':
+            return redirect('pending_teacher')
 
         elif user.user_type == "Student":
             exams = user.exams.all().order_by('-created_at')
@@ -140,6 +143,7 @@ def register_teacher(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.user_type = 'Teacher'
+            user.verification_status = 'PENDING'  
             user.is_active = False  
             user.save()
             
@@ -169,7 +173,6 @@ def activate(request, uidb64, token):
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
-        login(request, user)
         return render(request, 'register/account_activated.html')  
     else:
         return render(request, 'register/activation_invalid.html') 
@@ -320,8 +323,18 @@ def edit_profile(request):
 
 @login_required
 def forum_home(request):
-    recent_forums = Forum.objects.filter(is_closed=False).order_by('-created_at')[:4]
-    all_forums = Forum.objects.all().order_by('-created_at')
+    # Consulta los foros que no están cerrados y ordénalos por fecha de creación
+    open_forums = Forum.objects.filter(is_closed=False).order_by('-created_at')
+    
+    # Consulta los foros que están cerrados y ordénalos por fecha de creación
+    closed_forums = Forum.objects.filter(is_closed=True).order_by('-created_at')
+    
+    # Concatenamos ambas listas: primero los abiertos, luego los cerrados
+    all_forums = list(open_forums) + list(closed_forums)
+
+    # Los foros recientes solo incluyen los que están abiertos
+    recent_forums = open_forums[:5]
+    
     context = {
         'recent_forums': recent_forums,
         'all_forums': all_forums,
@@ -574,12 +587,20 @@ def generate_exercises_view(request):
     if user.user_type != 'Student':
         return redirect('home')
 
-    exercise_sets = user.exercise_sets.all().order_by('-created_at')
+    # Obtener los ExerciseSet relacionados con los ejercicios que están en exámenes
+    exam_exercise_sets = Exam.objects.filter(student=request.user).values_list('exercises__exercise_set', flat=True)
+
+    # Excluir los ExerciseSet que están relacionados con exámenes
+    exercise_sets = user.exercise_sets.exclude(set_id__in=exam_exercise_sets).order_by('-created_at')
 
     return render(request, 'exercise/exercises.html', {
         'exercise_sets': exercise_sets
     })
 
+
+
+
+#~~~~~~EXAMS~~~~~~~~
 
 @login_required
 def generate_exam_view(request):
@@ -589,7 +610,7 @@ def generate_exam_view(request):
 
     exams = user.exams.all().order_by('-created_at')
 
-    return render(request, 'exams.html', {
+    return render(request, 'exam/exams.html', {
         'exams': exams
     })
 
@@ -659,7 +680,6 @@ def generate_exam(request):
 def exam_detail(request, exam_id):
     exam = get_object_or_404(Exam, exam_id=exam_id)
     
-    # Verifica si el usuario es el estudiante dueño del examen o un profesor
     if exam.student != request.user and not request.user.is_teacher:
         return HttpResponseForbidden("No tienes permiso para acceder a este examen.")
 
@@ -671,7 +691,6 @@ def exam_detail(request, exam_id):
         print(f"Examen {exam_id} está siendo entregado.")
         return redirect('submit_exam', exam_id=exam_id)
     
-    # Calcular el tiempo restante
     time_left = (exam.start_time + timezone.timedelta(minutes=90)) - timezone.now()
     time_left_seconds = max(time_left.total_seconds(), 0)
     print(f"Tiempo restante para el examen {exam_id}: {time_left_seconds} segundos")
@@ -911,6 +930,17 @@ def delete_unactivated_users():
 ################# ---- PROFESORES ---- ######################
 #############################################################
 #############################################################
+
+@login_required
+def pending_teacher(request):
+    if request.user.verification_status == 'PENDING' and request.user.user_type == 'Teacher':
+        return render(request, 'pending_teacher.html')
+    return redirect('home')  
+
+@login_required
+def rejected_teacher(request):
+    return render(request, 'rejected_teacher.html')
+
 
 @login_required
 def student_detail(request, student_id):

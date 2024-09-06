@@ -40,8 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'main',
-    'students',
-    'teachers',
 ]
 
 MIDDLEWARE = [
@@ -53,7 +51,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'main.middleware.SessionTimeoutMiddleware',
-    'main.middleware.CleanupMiddleware', 
+    'main.middleware.CleanupMiddleware',
+    'main.middleware.PendingTeacherMiddleware',
+    'main.middleware.RejectedTeacherMiddleware',
+    'main.middleware.TeacherAccessMiddleware',
+    'main.middleware.StudentRestrictionMiddleware'
 
 ]
 
