@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Eliminar Evento</h2>
+
+<p>¿Estás seguro de que quieres eliminar el evento <strong>{{ event.title }}</strong> programado para {{ event.start_time|date:"j F Y H:i" }} - {{ event.end_time|date:"H:i" }}?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Eliminar evento</button>
+    <a href="{% url 'calendar' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

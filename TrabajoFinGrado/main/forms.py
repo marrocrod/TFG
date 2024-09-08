@@ -1,18 +1,23 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import get_user_model
-from .models import User
+from .models import User, Event, Forum, Comment
+from django.core.exceptions import ValidationError
 
 class UserRegistrationForm(UserCreationForm):
+    first_name = forms.CharField(max_length=30, required=True)
+    last_name = forms.CharField(max_length=30, required=True)
+    degree = forms.ChoiceField(choices=User.DegreeChoices.choices, required=True)
+    group = forms.ChoiceField(choices=User.GroupChoices.choices, required=True)
+
     class Meta:
         model = User
-        fields = ['username', 'email', 'password1', 'password2']  # Añade otros campos según sea necesario
+        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'degree', 'group']
 
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['username', 'email', 'phone', 'degree']  # Añade otros campos que quieras que el usuario pueda editar
-
+        fields = ['username', 'first_name', 'last_name']  
 
 class ChatForm(forms.Form):
     user_input = forms.CharField(widget=forms.Textarea(attrs={'rows': 4}), label='Escribe tu mensaje')
@@ -37,6 +42,21 @@ class StudentSolutionForm(forms.Form):
     exercise_id = forms.IntegerField(widget=forms.HiddenInput())
     student_solution = forms.CharField(widget=forms.Textarea, required=False)
 
+class EventForm(forms.ModelForm):
+    class Meta:
+        model = Event
+        fields = ['title', 'start_time', 'end_time', 'color']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start_time = cleaned_data.get("start_time")
+        end_time = cleaned_data.get("end_time")
+
+        if start_time and end_time and end_time <= start_time:
+            raise ValidationError("La hora de finalización debe ser posterior a la hora de inicio.")
+
+        return cleaned_data
+
 
 User = get_user_model()
 
@@ -56,3 +76,14 @@ class EmailUpdateForm(forms.Form):
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError("Este correo electrónico ya está en uso.")
         return email
+    
+
+class ForumForm(forms.ModelForm):
+    class Meta:
+        model = Forum
+        fields = ['title', 'description', 'image']
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']

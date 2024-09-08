@@ -6,11 +6,9 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 
 
-
-
 class User(AbstractUser):
+    created_at = models.DateTimeField(auto_now_add=True) 
     email = models.EmailField(unique=True) 
-    phone = models.CharField(max_length=15, blank=True, null=True)
 
     class DegreeChoices(models.TextChoices):
         SOFTWARE_ENGINEERING = 'Software Engineering'
@@ -25,13 +23,26 @@ class User(AbstractUser):
 
     user_type = models.CharField(max_length=10, choices=UserTypeChoices.choices)
 
-    groups = models.ManyToManyField(
-        'auth.Group',
-        related_name='users_in_auth_groups',
-        blank=True,
-        help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.',
-        verbose_name='groups',
+    class GroupChoices(models.TextChoices):
+        GROUP_1 = 'Grupo 1'
+        GROUP_2 = 'Grupo 2'
+        GROUP_3 = 'Grupo 3'
+        GROUP_4 = 'Grupo 4'
+
+    group = models.CharField(max_length=50, choices=GroupChoices.choices, verbose_name='Group')
+
+    # Nuevo campo para la verificación del estado
+    class VerificationStatus(models.TextChoices):
+        PENDING = 'PENDING', 'Pending'
+        APPROVED = 'APPROVED', 'Approved'
+        REJECTED = 'REJECTED', 'Rejected'
+        
+    verification_status = models.CharField(
+        max_length=10,
+        choices=VerificationStatus.choices,
+        default=VerificationStatus.APPROVED  # Default a APPROVED para estudiantes
     )
+
     user_permissions = models.ManyToManyField(
         'auth.Permission',
         related_name='users_with_permissions',
@@ -47,25 +58,6 @@ class User(AbstractUser):
     @property
     def is_student(self):
         return self.user_type == "Student"
-
-class Course(models.Model):
-    course_id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100)
-    groups = models.ManyToManyField('Group', related_name='courses_in')
-
-class Group(models.Model):
-    group_id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=50)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='groups_in_course')
-    teachers = models.ManyToManyField(User, related_name='teaching_groups', limit_choices_to=Q(user_type='Teacher'))
-    students = models.ManyToManyField(User, related_name='student_groups', limit_choices_to=Q(user_type='Student'))
-
-class Subgroup(models.Model):
-    subgroup_id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=50)
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='subgroups')
-    teachers = models.ManyToManyField(User, related_name='teaching_subgroups', limit_choices_to=Q(user_type='Teacher'))
-    students = models.ManyToManyField(User, related_name='student_subgroups', limit_choices_to=Q(user_type='Student'))
 
 
 class ExerciseSet(models.Model):
@@ -138,24 +130,6 @@ class Exam(models.Model):
     def is_time_over(self):
         return timezone.now() > self.start_time + timezone.timedelta(minutes=90)
 
-class RequestStateChoices(models.TextChoices):
-    ON_HOLD = 'ON_HOLD', 'On hold'
-    REJECTED = 'REJECTED', 'Rejected'
-    ACCEPTED = 'ACCEPTED', 'Accepted'
-
-class RequestGroup(models.Model):
-    request_id = models.AutoField(primary_key=True)
-    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='group_request_students', limit_choices_to=Q(user_type='Student'))
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='group_requests')
-    teachers = models.ManyToManyField(User, related_name='group_request_teachers', limit_choices_to=Q(user_type='Teacher'))
-    state = models.CharField(max_length=10, choices=RequestStateChoices.choices)
-
-class RequestSubgroup(models.Model):
-    request_id = models.AutoField(primary_key=True)
-    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='subgroup_request_students', limit_choices_to=Q(user_type='Student'))
-    subgroup = models.ForeignKey(Subgroup, on_delete=models.CASCADE, related_name='subgroup_requests')
-    teachers = models.ManyToManyField(User, related_name='subgroup_request_teachers', limit_choices_to=Q(user_type='Teacher'))
-    state = models.CharField(max_length=10, choices=RequestStateChoices.choices)
 
 class Chat(models.Model):
     chat_id = models.AutoField(primary_key=True)
@@ -209,3 +183,23 @@ class Event(models.Model):
     def __str__(self):
         return self.title
 
+class Forum(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_closed = models.BooleanField(default=False)
+    archived = models.BooleanField(default=False)
+    image = models.ImageField(upload_to='forum_images/', blank=True, null=True)
+
+    def __str__(self):
+        return self.title
+
+class Comment(models.Model):
+    forum = models.ForeignKey(Forum, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField(max_length=3000)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Comment by {self.user.username} on {self.forum.title}'

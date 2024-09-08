@@ -6,12 +6,13 @@
 <div class="container">
     <h1 class="mt-4">Perfil del Usuario</h1>
     <p><strong>Nombre de usuario:</strong> {{ user.username }}</p>
+    <p><strong>Nombre:</strong> {{ user.first_name }}</p>
+    <p><strong>Apellidos:</strong> {{ user.last_name }}</p>
     <p><strong>Correo electrónico:</strong> {{ user.email }}</p>
-    <p><strong>Teléfono:</strong> {{ user.phone }}</p>
-    <p><strong>Tipo de usuario:</strong> {{ user_type }}</p>
+    <p><strong>Tipo de usuario:</strong> {{ user.user_type }}</p>
     <p><strong>Grado:</strong> {{ user.degree }}</p>
+    <p><strong>Grupo:</strong> {{ user.group }}</p>
 
     <a href="{% url 'edit_profile' %}" class="btn btn-secondary mt-3">Editar Perfil</a>
-
 </div>
 {% endblock %}

@@ -40,8 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'main',
-    'students',
-    'teachers',
 ]
 
 MIDDLEWARE = [
@@ -52,7 +50,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'main.middleware.SessionTimeoutMiddleware', 
+    'main.middleware.SessionTimeoutMiddleware',
+    'main.middleware.CleanupMiddleware',
+    'main.middleware.PendingTeacherMiddleware',
+    'main.middleware.RejectedTeacherMiddleware',
+    'main.middleware.TeacherAccessMiddleware',
+    'main.middleware.StudentRestrictionMiddleware'
 
 ]
 
@@ -112,7 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Madrid'
 
 USE_I18N = True
 
@@ -128,6 +131,10 @@ BASE_DIR / "main/static",
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+#MEDIA
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # Default primary key field type
@@ -162,17 +169,4 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'saympl3xfp@gmail.com'  # Reemplaza con tu dirección de correo de Hotmail
 EMAIL_HOST_PASSWORD = 'nppp qtoa ifhm gcky'  # Reemplaza con tu contraseña correcta
 
-
-#CELERY
-CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Configuración del broker de Celery, puede ser Redis o RabbitMQ
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-
-from celery.schedules import crontab
-
-CELERY_BEAT_SCHEDULE = {
-    'delete_unactivated_users_every_hour': {
-        'task': 'main.tasks.delete_unactivated_users',
-        'schedule': crontab(minute=0, hour='*/1'),  # Cada hora
-    },
-}
 

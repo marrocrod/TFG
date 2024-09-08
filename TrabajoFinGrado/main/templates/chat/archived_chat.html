@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Chat Archivado{% endblock %}
+
+{% block content %}
+<h1>Chat Archivado</h1>
+
+<div>
+    {% for message in chat.get_conversation %}
+        <p><strong>{{ message.role }}:</strong> {{ message.content }}</p>
+    {% endfor %}
+</div>
+
+{% if user.is_teacher %}
+    <!-- Enlace para volver al perfil del estudiante -->
+    <a href="{% url 'student_detail' chat.student.id %}" class="btn btn-primary">Volver al Perfil del Estudiante</a>
+{% elif user.is_student %}
+    <!-- Enlace para volver a la vista principal del chat -->
+    <a href="{% url 'chat_default' %}" class="btn btn-primary">Volver al Chat Principal</a>
+{% endif %}
+
+{% endblock %}
