@@ -18,6 +18,8 @@ urlpatterns = [
     path('login/', CustomLoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
     path('session-expired/', session_expired, name='session_expired'),
+    path('rejected-teacher/', rejected_teacher, name='rejected_teacher'),
+    path('pending-teacher/', pending_teacher, name='pending_teacher'),
     path('user_profile/', user_profile, name='user_profile'),
     path('profile/edit/', edit_profile, name='edit_profile'),
     path('chat/<int:chat_id>/', chat_view, name='chat'),  # Ruta con chat_id
@@ -35,11 +37,19 @@ urlpatterns = [
     path('exam/<int:exam_id>/archived/', archived_exam, name='archived_exam'),
     path('calendar/', calendar_view, name='calendar'),
     path('calendar/day/<str:date>/', day_view, name='day-view'),
+    path('calendar/edit/<int:event_id>/', edit_event, name='edit-event'),  # Ruta para editar evento
+    path('calendar/delete/<int:event_id>/', delete_event, name='delete-event'),  # Ruta para eliminar evento
     path('api/calendar-events/', calendar_events, name='calendar-events'),  # API para los eventos
     path('students/<int:student_id>/', student_detail, name='student_detail'),
+    path('teachers/', teacher_list, name='teacher_list'),
+    path('forums/', forum_home, name='forum_home'),
+    path('forums/create/', create_forum, name='create_forum'),
+    path('forums/<int:forum_id>/', view_forum, name='view_forum'),
+    path('forums/<int:forum_id>/close/', close_forum, name='close_forum'),
 
 ]
 
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  # Añadir esta línea

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>{{ forum.title }}</h2>
+    <p>{{ forum.description }}</p>
+    <small>Creado por {{ forum.created_by.username }} el {{ forum.created_at|date:"d M Y" }}</small>
+    {% if forum.image %}
+        <img src="{{ forum.image.url }}" alt="{{ forum.title }}" class="img-fluid mt-3">
+    {% endif %}
+    {% if forum.is_closed %}
+        <span class="badge badge-danger">Debate Cerrado</span>
+    {% endif %}
+
+    <h3>Comentarios</h3>
+    <ul>
+        {% for comment in comments %}
+            <li>
+                <strong>{{ comment.user.username }}</strong>: {{ comment.content }}
+                <br>
+                <small>{{ comment.created_at|date:"d M Y H:i" }}</small>
+            </li>
+        {% empty %}
+            <p>No hay comentarios aún.</p>
+        {% endfor %}
+    </ul>
+
+    {% if not forum.is_closed %}
+        <h4>Agregar Comentario</h4>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Comentar</button>
+        </form>
+        {% if forum.created_by == request.user %}
+            <a href="{% url 'close_forum' forum.id %}" class="btn btn-danger mt-3">Cerrar Debate</a>
+        {% endif %}
+    {% else %}
+        <p>El debate está cerrado y no se pueden agregar más comentarios.</p>
+    {% endif %}
+</div>
+{% endblock %}

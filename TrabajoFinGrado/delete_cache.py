@@ -32,3 +32,27 @@ for dir_path in migration_dirs:
                 print(f'Eliminado: {file_path}')
 
 print('Limpieza completada')
+
+media_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'media')
+
+def delete_media_files():
+    if os.path.exists(media_folder):
+        # Recorre todos los archivos y carpetas en "media"
+        for filename in os.listdir(media_folder):
+            file_path = os.path.join(media_folder, filename)
+            try:
+                # Si es un archivo, lo elimina
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path)
+                    print(f'Archivo {file_path} eliminado.')
+                # Si es una carpeta, la elimina junto con su contenido
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+                    print(f'Carpeta {file_path} eliminada.')
+            except Exception as e:
+                print(f'Error al eliminar {file_path}. Razón: {e}')
+    else:
+        print('La carpeta media no existe.')
+
+if __name__ == '__main__':
+    delete_media_files()

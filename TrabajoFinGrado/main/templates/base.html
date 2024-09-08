@@ -28,6 +28,12 @@
             <ul class="navbar-nav ml-auto">
                 {% if user.is_authenticated and user.user_type == "Student" %}
                 <li class="nav-item">
+                    <a class="nav-link" href="{% url 'teacher_list' %}">Profesores</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'forum_home' %}">Foro</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{% url 'chat_default' %}">Chat</a>
                 </li>
                 <li class="nav-item">
@@ -41,6 +47,9 @@
                 </li>
 
                 {% elif user.is_authenticated and user.user_type == "Teacher" %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'forum_home' %}">Foro</a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'home' %}">Alumnos</a>
                 </li>
