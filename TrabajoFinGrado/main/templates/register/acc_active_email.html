@@ -2,6 +2,6 @@ Hola {{ user.username }},
 
 Por favor, haz clic en el enlace siguiente para activar tu cuenta de {{ user.user_type }}:
 
-http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+        http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
 
 Recuerda que si no activas tu cuenta en un plazo de 30 minutos deberás comenzar desde cero el registro.

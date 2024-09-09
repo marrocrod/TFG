@@ -1,0 +1,149 @@
+/*****************************************
+***************//*Fuentes*//**************
+*****************************************/
+
+@font-face {
+    font-family: 'Omnes';
+    src: url('/static/fonts/omnes/Omnes-Extralight.woff2') format('woff2'),
+         url('/static/fonts/omnes/Omnes-Extralight.woff') format('woff'),
+         url('/static/fonts/omnes/Omnes-Extralight.ttf') format('truetype');
+    font-weight: 200; /* Esto es para la variante Extralight */
+    font-style: normal;
+}
+
+/*****************************************
+***************//*Botones*//**************
+*****************************************/
+
+.custom-btn {
+    padding: 12px;  /* Reduce el padding para hacerlo más fino */
+    font-size: 18px;
+    border-radius: 8px;
+    background-color: #38c19e; /* Cambia el color del botón a un azul */
+    border: none;
+    width: 100%;
+    box-shadow: 0px 6px 6px rgba(0, 0, 0, 0.1); /* Añade sombra sutil al botón */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.custom-btn:hover {
+    background-color: #0d9595; /* Cambia el color del botón al hacer hover */
+}
+
+.btn-yellow {
+    background-color: #ffc107; /* Color amarillento (puedes ajustar el tono) */
+    color: #000000; /* Texto blanco */
+    border: none; /* Sin borde */
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-yellow:hover {
+    background-color: #daa609; /* Un tono más oscuro al hacer hover */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra al hacer hover */
+}
+
+/*****************************************
+************//*Perfil Usuario*//**********
+*****************************************/
+
+.custom-card {
+    max-width: 900px; /* Define un ancho máximo más grande para la tarjeta */
+    width: 100%; /* Ocupa el 100% del ancho disponible en pantallas más pequeñas */
+    margin: auto; /* Asegura que la tarjeta esté centrada horizontalmente */
+    padding: 20px; /* Espacio interno adicional */
+}
+
+.card-header {
+    background-color: #38c19e !important; /* Color personalizado para la cabecera */
+    color: #fff !important;
+}
+
+.card-body p {
+    font-size: 1.1rem; /* Tamaño de fuente ligeramente más grande */
+    margin-bottom: 15px; /* Espaciado entre párrafos */
+}
+
+.card-footer .btn {
+    font-size: 1.1rem;
+    padding: 10px 20px;
+}
+
+
+/*****************************************
+*************//*Formularios*//************
+*****************************************/
+
+/*Perfil*/
+
+.edit-profile-form input,
+.edit-profile-form select,
+.edit-profile-form textarea {
+    border-radius: 10px; /* Esquinas redondeadas */
+    padding: 12px 20px; /* Más padding para hacerlo más alto y largo */
+    border: 1px solid #ccc; /* Un borde sutil */
+    width: 100%; /* Ocupará todo el ancho disponible */
+    max-width: 600px; /* Asegura que los campos no sean demasiado anchos en pantallas grandes */
+    height: 45px; /* Hace que los campos sean más altos */
+    margin-bottom: 15px; /* Espaciado entre los campos */
+    box-sizing: border-box; /* Asegura que padding y borde no afecten el ancho */
+}
+
+.edit-profile-form input[type="submit"],
+.edit-profile-form button {
+    width: auto; /* Deja que el botón tenga un tamaño basado en el contenido */
+    padding: 10px 30px; /* Aumenta el padding del botón */
+}
+
+/*Registro*/
+
+.form-text {
+    font-size: 0.875rem; /* Tamaño de letra más pequeño */
+    color: #6c757d; /* Color grisáceo (clase "text-muted" de Bootstrap) */
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    border-radius: 8px; /* Esquinas redondeadas */
+    padding: 10px; /* Espacio interno */
+    width: 100%; /* Ocupar todo el ancho del contenedor */
+    box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
+    margin-bottom: 15px; /* Espaciado entre los campos */
+}
+
+
+/*****************************************
+**************//*Registro*//**************
+*****************************************/
+
+/* Estilos para el botón de registro de profesor */
+.register-page .register-btn-teacher {
+    background-color: #38c19e; /* Verde menta (color principal) */
+    color: white; /* Texto en blanco */
+    border-radius: 10px; /* Bordes redondeados */
+    padding: 15px 20px; /* Padding interno */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+    transition: all 0.3s ease; /* Transición suave */
+}
+
+.register-page .register-btn-teacher:hover {
+    background-color: #33ab8d; /* Color más oscuro al hacer hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada en hover */
+}
+
+/* Estilos para el botón de registro de estudiante */
+.register-page .register-btn-student {
+    background-color: #3498db; /* Azul vibrante */
+    color: white;
+    border-radius: 10px;
+    padding: 15px 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.register-page .register-btn-student:hover {
+    background-color: #2980b9; /* Azul más oscuro al hacer hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}

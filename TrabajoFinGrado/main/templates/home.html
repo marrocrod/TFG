@@ -10,22 +10,25 @@
     {% if user.user_type == "Teacher" %}
     <div class="mb-4">
         <h2>Listado de Alumnos</h2>
-        
+
         <!-- Barra de búsqueda y filtros -->
-        <form method="GET" id="filterForm" class="form-inline mb-4">
-            <div class="form-group mb-2" style="flex-grow: 1;">
-                <input type="text" name="search" id="searchInput" class="form-control" placeholder="Buscar por nombre de usuario, nombre, apellidos o correo" value="{{ search_query }}" style="width: 100%;">
+        <form method="GET" id="filterForm" class="row mb-4">
+            <div class="col-md-8 mb-2">
+                <input type="text" name="search" id="searchInput" class="form-control" placeholder="Buscar por nombre de usuario, nombre, apellidos o correo" value="{{ search_query }}">
             </div>
-            <div class="form-group mb-2 ml-2">
+            <div class="col-md-4 mb-2">
                 <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownDegrees" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button class="btn btn-secondary dropdown-toggle w-100" type="button" id="dropdownDegrees" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Filtrar por Grado
                     </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownDegrees">
+                    <div class="dropdown-menu w-100 p-2" aria-labelledby="dropdownDegrees">
                         {% for degree_code, degree_name in degrees %}
-                            <a class="dropdown-item degree-option" href="#" data-value="{{ degree_code }}">
-                                <input type="checkbox" {% if degree_code in selected_degrees %}checked{% endif %}> {{ degree_name }}
-                            </a>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="degrees" id="degree-{{ degree_code }}" value="{{ degree_code }}" {% if degree_code in selected_degrees %}checked{% endif %}>
+                                <label class="form-check-label" for="degree-{{ degree_code }}">
+                                    {{ degree_name }}
+                                </label>
+                            </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -104,41 +107,64 @@
 </div>
 
 <script>
-    document.querySelectorAll('.degree-option').forEach(function(option) {
-        option.addEventListener('click', function(event) {
-            event.preventDefault();
-            const checkbox = this.querySelector('input[type="checkbox"]');
-            checkbox.checked = !checkbox.checked;
+document.querySelectorAll('.degree-option').forEach(function(option) {
+    option.addEventListener('click', function(event) {
+        event.preventDefault();
+        const checkbox = this.querySelector('input[type="checkbox"]');
+        checkbox.checked = !checkbox.checked;
 
-            updateStudentList();
-        });
+        updateStudentList();  // Llama a la función para actualizar la lista
+    });
+});
+
+document.getElementById('searchInput').addEventListener('input', updateStudentList);
+
+function updateStudentList() {
+    const searchQuery = document.getElementById('searchInput').value;
+    const selectedDegrees = Array.from(document.querySelectorAll('.degree-option input:checked'))
+        .map(checkbox => checkbox.value);  // Usamos el value del checkbox directamente
+
+    // Creamos una URL con los parámetros necesarios
+    const url = new URL(window.location.href);
+    url.searchParams.set('search', searchQuery);
+    url.searchParams.delete('degrees');
+    selectedDegrees.forEach(degree => {
+        url.searchParams.append('degrees', degree);
     });
 
-    document.getElementById('searchInput').addEventListener('input', updateStudentList);
+    // Realizamos la solicitud AJAX
+    fetch(url, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'  // Especificamos que es una solicitud AJAX
+        }
+    })
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('studentListContainer').innerHTML = data;
+    })
+    .catch(error => console.error('Error al actualizar la lista de estudiantes:', error));
+}
 
-    function updateStudentList() {
-        const searchQuery = document.getElementById('searchInput').value;
-        const selectedDegrees = Array.from(document.querySelectorAll('.degree-option input:checked'))
-            .map(checkbox => checkbox.closest('.degree-option').getAttribute('data-value'));
-
-        const url = new URL(window.location.href);
-        url.searchParams.set('search', searchQuery);
-        url.searchParams.delete('degrees');
-        selectedDegrees.forEach(degree => {
-            url.searchParams.append('degrees', degree);
-        });
-
-        fetch(url, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('studentListContainer').innerHTML = data;
-        });
-    }
 </script>
 
+<style>
+    .dropdown-menu {
+        max-height: 300px;  /* Limita la altura para que el menú no sea demasiado largo */
+        overflow-y: auto;   /* Añade barra de desplazamiento si hay muchas opciones */
+    }
+    
+    .form-check {
+        padding-left: 1.5rem;  /* Aumenta el espacio entre checkbox y label */
+    }
+    
+    .form-check-input {
+        margin-top: 0.3rem;
+    }
+    
+    .form-check-label {
+        margin-left: 0.5rem;
+    }
+    
+</style>
 
 {% endblock %}
