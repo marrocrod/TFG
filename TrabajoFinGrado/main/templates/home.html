@@ -18,20 +18,18 @@
             </div>
             <div class="col-md-4 mb-2">
                 <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle w-100" type="button" id="dropdownDegrees" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownDegrees" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Filtrar por Grado
                     </button>
-                    <div class="dropdown-menu w-100 p-2" aria-labelledby="dropdownDegrees">
+                    <div class="dropdown-menu" aria-labelledby="dropdownDegrees">
                         {% for degree_code, degree_name in degrees %}
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="degrees" id="degree-{{ degree_code }}" value="{{ degree_code }}" {% if degree_code in selected_degrees %}checked{% endif %}>
-                                <label class="form-check-label" for="degree-{{ degree_code }}">
-                                    {{ degree_name }}
-                                </label>
-                            </div>
+                            <a class="dropdown-item degree-option" href="#" data-value="{{ degree_code }}">
+                                <input type="checkbox" {% if degree_code in selected_degrees %}checked{% endif %}> {{ degree_name }}
+                            </a>
                         {% endfor %}
                     </div>
                 </div>
+                
             </div>
         </form>
 
@@ -107,43 +105,54 @@
 </div>
 
 <script>
+    // Evento para el filtro de grados
 document.querySelectorAll('.degree-option').forEach(function(option) {
     option.addEventListener('click', function(event) {
         event.preventDefault();
         const checkbox = this.querySelector('input[type="checkbox"]');
         checkbox.checked = !checkbox.checked;
 
-        updateStudentList();  // Llama a la función para actualizar la lista
+        updateStudentList();  // Actualiza la lista cuando se selecciona un grado
     });
 });
 
-document.getElementById('searchInput').addEventListener('input', updateStudentList);
+// Evento para la búsqueda dinámica (input)
+document.getElementById('searchInput').addEventListener('input', function() {
+    updateStudentList();  // Actualiza la lista cuando el usuario escribe
+});
 
+// Función para actualizar la lista de estudiantes
 function updateStudentList() {
     const searchQuery = document.getElementById('searchInput').value;
     const selectedDegrees = Array.from(document.querySelectorAll('.degree-option input:checked'))
-        .map(checkbox => checkbox.value);  // Usamos el value del checkbox directamente
+        .map(checkbox => checkbox.closest('.degree-option').getAttribute('data-value'));
 
-    // Creamos una URL con los parámetros necesarios
+    // Crear URL con los parámetros de búsqueda y grados seleccionados
     const url = new URL(window.location.href);
     url.searchParams.set('search', searchQuery);
-    url.searchParams.delete('degrees');
+    url.searchParams.delete('degrees');  // Elimina grados anteriores
     selectedDegrees.forEach(degree => {
-        url.searchParams.append('degrees', degree);
+        url.searchParams.append('degrees', degree);  // Agrega cada grado seleccionado
     });
 
-    // Realizamos la solicitud AJAX
+    // Llamada AJAX para actualizar la lista de estudiantes dinámicamente
     fetch(url, {
         headers: {
-            'X-Requested-With': 'XMLHttpRequest'  // Especificamos que es una solicitud AJAX
+            'X-Requested-With': 'XMLHttpRequest'
         }
     })
     .then(response => response.text())
     .then(data => {
-        document.getElementById('studentListContainer').innerHTML = data;
+        document.getElementById('studentListContainer').innerHTML = data;  // Actualiza el contenido de la tabla
     })
-    .catch(error => console.error('Error al actualizar la lista de estudiantes:', error));
+    .catch(error => {
+        console.error('Error al actualizar la lista de estudiantes:', error);
+    });
 }
+
+    
+    
+    
 
 </script>
 

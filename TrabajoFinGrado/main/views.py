@@ -40,6 +40,10 @@ def home(request):
             search_query = request.GET.get('search', '')
             degree_filters = request.GET.getlist('degrees')
 
+            # Print para depurar búsqueda y grados seleccionados
+            print(f"Search Query: {search_query}")
+            print(f"Degree Filters: {degree_filters}")
+
             students = User.objects.filter(user_type='Student').order_by('username')
 
             if search_query:
@@ -51,7 +55,11 @@ def home(request):
                 )
             
             if degree_filters:
+                print(f"Filtrando por grados: {degree_filters}")
                 students = students.filter(degree__in=degree_filters)
+            
+            # Print de los estudiantes después de aplicar los filtros
+            print(f"Estudiantes después de filtrar: {students}")
 
             context.update({
                 'message': "Bienvenido, Profesor.",
@@ -63,6 +71,7 @@ def home(request):
             })
             
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                print("Renderizando partial con estudiantes filtrados.")
                 return render(request, 'partials/student_list.html', {'students': students})
         
         elif request.user.user_type == 'Teacher' and request.user.verification_status == 'PENDING':
@@ -90,7 +99,9 @@ def home(request):
             'user_type': "Guest"
         }
 
+    print("Renderizando home.html con contexto:", context)
     return render(request, 'home.html', context)
+
 
 #~~~~~~~~PERMISSONS~~~~~~~~
 
