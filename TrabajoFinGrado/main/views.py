@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
 
 from datetime import datetime, timedelta
 
@@ -19,9 +20,13 @@ from .forms import UserRegistrationForm, UserProfileForm, ChatForm, ExerciseGene
 from .models import User, Chat, Exam, Exercise, ExerciseSet, Event, Forum, Comment
 from .tokens import account_activation_token  
 
+from django.utils.dateparse import parse_datetime
+from django.views.decorators.csrf import csrf_exempt
+
 
 import openai
 import json
+import markdown
 
 
 #~~~~~~~~HOME~~~~~~~~
@@ -41,8 +46,7 @@ def home(request):
             degree_filters = request.GET.getlist('degrees')
 
             # Print para depurar búsqueda y grados seleccionados
-            print(f"Search Query: {search_query}")
-            print(f"Degree Filters: {degree_filters}")
+
 
             students = User.objects.filter(user_type='Student').order_by('username')
 
@@ -55,11 +59,9 @@ def home(request):
                 )
             
             if degree_filters:
-                print(f"Filtrando por grados: {degree_filters}")
                 students = students.filter(degree__in=degree_filters)
             
             # Print de los estudiantes después de aplicar los filtros
-            print(f"Estudiantes después de filtrar: {students}")
 
             context.update({
                 'message': "Bienvenido, Profesor.",
@@ -589,7 +591,10 @@ def parse_generated_text(generated_text):
 def exercise_set_detail(request, set_id):
     exercise_set = get_object_or_404(ExerciseSet, set_id=set_id, student=request.user)
     exercises = exercise_set.exercises.all()
-    return render(request, 'exercise/exercise_set_detail.html', {'exercise_set': exercise_set, 'exercises': exercises})
+    return render(request, 'exercise/exercise_set_detail.html', {
+        'exercise_set': exercise_set,
+        'exercises': exercises
+    })
 
 
 @login_required
@@ -607,6 +612,20 @@ def generate_exercises_view(request):
     return render(request, 'exercise/exercises.html', {
         'exercise_sets': exercise_sets
     })
+
+
+def render_exercises(request):
+    exercises = Exercise.objects.all()
+
+    for exercise in exercises:
+        print(f"Contenido original (Markdown): {exercise.statement}")
+
+        # Convierte Markdown a HTML seguro
+        exercise.statement = mark_safe(markdown.markdown(exercise.statement, extensions=['fenced_code', 'codehilite', 'extra']))
+
+        print(f"Contenido convertido (HTML): {exercise.statement}")
+
+    return render(request, 'exercise_set.html', {'exercises': exercises})
 
 
 
@@ -690,23 +709,24 @@ def generate_exam(request):
 @login_required
 def exam_detail(request, exam_id):
     exam = get_object_or_404(Exam, exam_id=exam_id)
-    
+
     if exam.student != request.user and not request.user.is_teacher:
         return HttpResponseForbidden("No tienes permiso para acceder a este examen.")
 
     if exam.is_submitted:
         return redirect('archived_exam', exam_id=exam_id)
-    
+
     if request.method == "POST" and 'submit_exam' in request.POST:
         return redirect('submit_exam', exam_id=exam_id)
-    
+
     time_left = (exam.start_time + timezone.timedelta(minutes=90)) - timezone.now()
     time_left_seconds = max(time_left.total_seconds(), 0)
-    
+
     return render(request, 'exam/exam_detail.html', {
         'exam': exam,
         'time_left': time_left_seconds,
     })
+
 
 
 
@@ -786,7 +806,10 @@ def archived_exam(request, exam_id):
         return HttpResponseForbidden("No tienes permiso para acceder a este examen.")
     
     total_score = exam.grade
-    return render(request, 'exam/archived_exam.html', {'exam': exam, 'total_score': total_score})
+    return render(request, 'exam/archived_exam.html', {
+        'exam': exam,
+        'total_score': total_score,
+    })
 
 
 
@@ -822,11 +845,6 @@ def calendar_events(request):
         })
     return JsonResponse(events_list, safe=False)
 
-from django.http import JsonResponse
-from django.utils.dateparse import parse_datetime
-from django.views.decorators.csrf import csrf_exempt
-import json
-from .models import Event
 
 @csrf_exempt
 def create_event(request):

@@ -1,13 +1,86 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Eliminar Evento</h2>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Eliminar Evento</h2>
 
-<p>¿Estás seguro de que quieres eliminar el evento <strong>{{ event.title }}</strong> programado para {{ event.start_time|date:"j F Y H:i" }} - {{ event.end_time|date:"H:i" }}?</p>
+    <div class="card shadow-sm p-4">
+        <p class="text-center mb-4">
+            ¿Estás seguro de que quieres eliminar el evento <strong>{{ event.title }}</strong> programado para
+            <strong>{{ event.start_time|date:"j F Y H:i" }}</strong> - <strong>{{ event.end_time|date:"H:i" }}</strong>?
+        </p>
 
-<form method="post">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Eliminar evento</button>
-    <a href="{% url 'calendar' %}" class="btn btn-secondary">Cancelar</a>
-</form>
+        <div class="d-flex justify-content-center gap-3">
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Eliminar evento</button>
+            </form>
+            <a href="{% url 'calendar' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </div>
+</div>
+<style>
+    /* General container styling */
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+/* Estilo del título */
+h2 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #dc3545; /* Color de alerta para resaltar que es una acción peligrosa */
+    margin-bottom: 30px;
+}
+
+/* Estilo de la tarjeta que envuelve el contenido */
+.card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+}
+
+/* Estilo del texto de confirmación */
+p {
+    font-size: 1.2rem;
+    color: #343a40;
+    text-align: center;
+}
+
+/* Estilo del botón de eliminar */
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+/* Estilo del botón de cancelar */
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    padding: 10px 20px;
+    font-size: 1rem;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* Espaciado entre los botones */
+.d-flex.justify-content-center.gap-3 {
+    gap: 15px;
+}
+
+</style>
 {% endblock %}

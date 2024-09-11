@@ -1,42 +1,181 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <h2>{{ forum.title }}</h2>
-    <p>{{ forum.description }}</p>
-    <small>Creado por {{ forum.created_by.username }} el {{ forum.created_at|date:"d M Y" }}</small>
-    {% if forum.image %}
-        <img src="{{ forum.image.url }}" alt="{{ forum.title }}" class="img-fluid mt-3">
-    {% endif %}
-    {% if forum.is_closed %}
-        <span class="badge badge-danger">Debate Cerrado</span>
-    {% endif %}
+<div class="container mt-4">
+    <!-- Título y descripción del foro -->
+    <div class="forum-details mb-4">
+        <h1 class="forum-title">{{ forum.title }}</h1>
+        <p class="forum-description">{{ forum.description }}</p>
+        <small class="text-muted">
+            Creado por <strong>{{ forum.created_by.username }}</strong> el {{ forum.created_at|date:"d M Y" }}
+        </small>
 
-    <h3>Comentarios</h3>
-    <ul>
-        {% for comment in comments %}
-            <li>
-                <strong>{{ comment.user.username }}</strong>: {{ comment.content }}
-                <br>
-                <small>{{ comment.created_at|date:"d M Y H:i" }}</small>
-            </li>
-        {% empty %}
-            <p>No hay comentarios aún.</p>
-        {% endfor %}
-    </ul>
-
-    {% if not forum.is_closed %}
-        <h4>Agregar Comentario</h4>
-        <form method="POST">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Comentar</button>
-        </form>
-        {% if forum.created_by == request.user %}
-            <a href="{% url 'close_forum' forum.id %}" class="btn btn-danger mt-3">Cerrar Debate</a>
+        <!-- Imagen del foro si existe -->
+        {% if forum.image %}
+            <img src="{{ forum.image.url }}" alt="{{ forum.title }}" class="img-fluid mt-3 rounded">
         {% endif %}
+
+        <!-- Estado del foro cerrado -->
+        {% if forum.is_closed %}
+            <span class="badge bg-danger mt-3">Debate Cerrado</span>
+        {% endif %}
+    </div>
+
+    <!-- Sección de comentarios -->
+    <div class="comments-section">
+        <h3>Comentarios</h3>
+        <ul class="comments-list">
+            {% for comment in comments %}
+                <li class="comment mb-3">
+                    <strong class="comment-author">{{ comment.user.username }}</strong>
+                    <p class="comment-content">{{ comment.content }}</p>
+                    <small class="text-muted">{{ comment.created_at|date:"d M Y H:i" }}</small>
+                </li>
+            {% empty %}
+                <li>
+                    <p class="text-muted">No hay comentarios aún.</p>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Agregar nuevo comentario (solo si el foro no está cerrado) -->
+    {% if not forum.is_closed %}
+        <div class="add-comment-section mt-4">
+            <h4>Agregar Comentario</h4>
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary mt-3">Comentar</button>
+            </form>
+
+            <!-- Botón para cerrar el debate (solo visible para el creador del foro) -->
+            {% if forum.created_by == request.user %}
+                <a href="{% url 'close_forum' forum.id %}" class="btn btn-danger mt-3">Cerrar Debate</a>
+            {% endif %}
+        </div>
     {% else %}
-        <p>El debate está cerrado y no se pueden agregar más comentarios.</p>
+        <div class="alert alert-warning mt-4">
+            El debate está cerrado y no se pueden agregar más comentarios.
+        </div>
     {% endif %}
 </div>
+<style>
+    /* Estilo general del contenedor */
+.container {
+    background-color: #f9f9f9;
+    padding: 30px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* Estilo para el título y la descripción del foro */
+.forum-title {
+    font-size: 2.8rem;
+    font-weight: bold;
+    color: #343a40;
+    margin-bottom: 10px;
+}
+
+.forum-description {
+    font-size: 1.5rem;
+    color: #6c757d;
+    margin-bottom: 15px;
+}
+
+/* Estilo para la sección de comentarios */
+.comments-section h3 {
+    font-size: 1.75rem;
+    margin-bottom: 20px;
+}
+
+/* Lista de comentarios */
+.comments-list {
+    padding: 0;
+    list-style-type: none;
+    border-top: 1px solid #e9ecef;
+    margin-top: 20px;
+}
+
+.comment {
+    padding: 15px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.comment-author {
+    font-size: 1.1rem;
+    color: #007bff;
+}
+
+.comment-content {
+    margin: 10px 0;
+    font-size: 1rem;
+    color: #495057;
+}
+
+.comment small {
+    color: #6c757d;
+}
+
+/* Reducir la altura del campo de comentario */
+textarea, input {
+    width: 100%;
+    padding: 8px; /* Reducir el padding para que sea más fino */
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+    font-size: 1rem;
+    resize: none;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    height: 100px; /* Ajuste automático basado en el atributo 'rows' */
+}
+
+textarea {
+    rows: 2; /* Solo dos filas para hacer el input más bajo */
+}
+
+/* Estilo del botón de comentar */
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    padding: 10px 20px;
+    font-size: 1rem;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+/* Estilo del botón de cerrar debate */
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    padding: 10px 20px;
+    font-size: 1rem;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #c82333;
+}
+
+/* Estilo para la alerta si el debate está cerrado */
+.alert-warning {
+    background-color: #ffc107;
+    color: #856404;
+    border-radius: 5px;
+    padding: 15px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* Imagen del foro */
+img.img-fluid {
+    border-radius: 8px;
+    margin-top: 1rem;
+    max-height: 400px;
+    object-fit: cover;
+}
+
+</style>
 {% endblock %}

@@ -1,36 +1,49 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="container mt-5">
+    <h2>Generar Ejercicios</h2>
+    <p class="lead">Rellena el formulario para crear un conjunto de ejercicios personalizado.</p>
 
-<!-- Mensaje de carga -->
-<div id="loadingMessage" style="display: none;" class="alert alert-info mt-3">
-    Generando ejercicios, este proceso puede tardar unos segundos...
+    <!-- Mensaje de carga -->
+    <div id="loadingMessage" style="display: none;" class="alert alert-info mt-4">
+        <i class="fas fa-spinner fa-spin"></i> Generando ejercicios, este proceso puede tardar unos segundos...
+    </div>
+
+    <!-- Formulario para generar ejercicios -->
+    <form id="generateExercisesForm" method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            {{ form.set_name.label_tag }}
+            {{ form.set_name }}  <!-- Campo renderizado automáticamente con la clase "form-control-sm" -->
+            <small class="form-text text-muted">Introduce un nombre descriptivo para el conjunto de ejercicios.</small>
+        </div>
+
+        <div class="form-group">
+            {{ form.topic.label_tag }}
+            {{ form.topic }}  <!-- Campo renderizado automáticamente con la clase "form-control-sm" -->
+            <small class="form-text text-muted">Selecciona el tema relacionado con los ejercicios.</small>
+        </div>
+
+        <div class="form-group">
+            {{ form.difficulty.label_tag }}
+            {{ form.difficulty }}  <!-- Campo renderizado automáticamente con la clase "form-control-sm" -->
+            <small class="form-text text-muted">Elige el nivel de dificultad de los ejercicios.</small>
+        </div>
+
+        <div class="form-group">
+            {{ form.number_of_exercises.label_tag }}
+            {{ form.number_of_exercises }}  <!-- Campo renderizado automáticamente con la clase "form-control-sm" -->
+            <small class="form-text text-muted">Indica cuántos ejercicios quieres generar (máximo: 4).</small>
+        </div>
+
+        <!-- Botón para generar -->
+        <button type="submit" class="btn custom-btn btn-success btn-block">
+            <i class="fas fa-cogs"></i> Generar Ejercicios
+        </button>
+    </form>
 </div>
-
-<h2>Generar Ejercicios</h2>
-
-<!-- Formulario para generar ejercicios -->
-<form id="generateExercisesForm" method="post">
-    {% csrf_token %}
-    <div class="form-group">
-        {{ form.set_name.label_tag }}
-        {{ form.set_name }}
-    </div>
-    <div class="form-group">
-        {{ form.topic.label_tag }}
-        {{ form.topic }}
-    </div>
-    <div class="form-group">
-        {{ form.difficulty.label_tag }}
-        {{ form.difficulty }}
-    </div>
-    <div class="form-group">
-        {{ form.number_of_exercises.label_tag }}
-        {{ form.number_of_exercises }}
-    </div>
-    <button type="submit" class="btn btn-primary">Generar Ejercicios</button>
-</form>
-
 
 <script>
     document.getElementById('generateExercisesForm').addEventListener('submit', function() {
@@ -38,5 +51,26 @@
         document.getElementById('loadingMessage').style.display = 'block';
     });
 </script>
+
+<style>
+    .custom-input {
+        height: 40px; /* Ajusta la altura a un valor menor */
+        font-size: 16px;
+        padding: 8px; /* Un padding ligeramente menor */
+        border-radius: 6px; /* Ajuste del borde redondeado para un estilo más sutil */
+    }
+
+    /* Aumenta el tamaño de los selectores */
+    select.form-control-lg {
+        height: 40px; /* Ajusta la altura para los select */
+        font-size: 16px;
+    }
+
+    input::placeholder {
+        color: #aaa;
+        font-style: italic;
+    }
+</style>
+
 
 {% endblock %}

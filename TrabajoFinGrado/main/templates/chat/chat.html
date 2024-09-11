@@ -3,32 +3,170 @@
 {% block title %}Chat{% endblock %}
 
 {% block content %}
-<h1>Chat</h1>
+<!-- Estilos adicionales para el chat tipo ChatGPT con los ajustes pedidos -->
+<style>
+    #chat-container {
+        background-color: #ffffff;
+        border-radius: 8px;
+        padding: 20px;
+        max-height: 500px;
+        overflow-y: auto;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin: 0 auto;
+        margin-bottom: 20px;
+        width: 80%;
+    }
 
-<!-- Contenedor para la conversación con scroll si es necesario -->
-<div style="max-height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 20px;">
+    .user-message, .assistant-message {
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        max-width: 75%;
+        word-wrap: break-word;
+    }
+
+    .user-message {
+        background-color: #007bff;
+        color: white;
+        align-self: flex-end;
+        margin-left: auto;
+    }
+
+    .assistant-message {
+        background-color: #f1f1f1;
+        color: black;
+        font-family: 'Courier New', Courier, monospace;
+        align-self: flex-start;
+    }
+
+    .message-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Ajustar el estilo para los botones */
+    #chat-form {
+        display: flex;
+        gap: 10px; /* Añade un espacio entre los botones */
+        justify-content: flex-end; /* Alinea los botones al final del formulario */
+        width: 80%; /* Mantén el formulario alineado con el contenedor */
+        margin: 0 auto;
+    }
+
+    textarea {
+        flex-grow: 1;
+        padding: 8px; /* Reduce el padding para que el input sea más fino */
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        resize: none;
+        font-size: 16px;
+        height: 40px; /* Ajusta la altura para hacerlo más fino */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .send-btn, .archive-btn, .history-btn {
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    /* Estilos específicos para cada botón */
+    .send-btn {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .send-btn:hover {
+        background-color: #0056b3;
+    }
+
+    .archive-btn {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .archive-btn:hover {
+        background-color: #5a6268;
+    }
+
+    .history-btn {
+        background-color: #ffc107;
+        color: white;
+        text-decoration: none; /* Eliminar subrayado del enlace */
+    }
+
+    .history-btn:hover {
+        background-color: #e0a800;
+    }
+
+    #loading-spinner {
+        display: none; /* Oculto por defecto */
+    }
+</style>
+
+<!-- Título del chat -->
+<h1 class="text-center mb-4">Chat</h1>
+
+<!-- Contenedor del chat con estilo tipo ChatGPT -->
+<div id="chat-container" class="chat-box">
     {% for message in chat.get_conversation %}
-        <p><strong>{{ message.role }}:</strong> {{ message.content }}</p>
+        <div class="message-container">
+            {% if message.role == 'assistant' %}
+                <div class="assistant-message">
+                    {{ message.content }}
+                </div>
+            {% else %}
+                <div class="user-message">
+                    {{ message.content }}
+                </div>
+            {% endif %}
+        </div>
     {% endfor %}
 </div>
 
-<form method="post">
+<!-- Formulario para enviar mensaje -->
+<form method="post" id="chat-form">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Enviar</button>
+    <textarea name="user_input" rows="2" placeholder="Escribe tu mensaje aquí..." id="user-input">{{ form.user_input.value|default_if_none:"" }}</textarea>
+    <button id="send-btn" type="submit" class="send-btn">Enviar</button>
+
+    <!-- Botón de archivar (solo si no está archivado y tiene mensajes) -->
+    {% if chat.get_conversation|length > 0 and not chat.is_archived %}
+        <button type="submit" formaction="{% url 'archive_chat' chat.chat_id %}" class="archive-btn">Archivar Chat</button>
+    {% endif %}
+
+    <!-- Botón para ver el historial de chats, alineado a la derecha -->
+    <a href="{% url 'archived_chats_list' %}" class="history-btn">Ver Historial</a>
 </form>
 
-{% if not chat.is_archived %}
-    <!-- Botón para archivar el chat -->
-    <form method="post" action="{% url 'archive_chat' chat.chat_id %}">
-        {% csrf_token %}
-        <button type="submit">Archivar Chat</button>
-    </form>
-{% endif %}
-
-<!-- Enlace al historial de chats archivados -->
-<div style="margin-top: 20px;">
-    <a href="{% url 'archived_chats_list' %}">Ver Historial de Chats Archivados</a>
+<!-- Indicador de carga (spinner), oculto por defecto -->
+<div id="loading-spinner" class="text-center">
+    <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Cargando...</span>
+    </div>
 </div>
+
+<!-- JavaScript para el scroll automático y el spinner -->
+<script>
+    var chatContainer = document.getElementById("chat-container");
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    // Evento 'submit' para el formulario
+    document.getElementById("chat-form").addEventListener("submit", function(event) {
+        // Mostrar spinner de carga
+        document.getElementById("loading-spinner").style.display = "block";
+        
+        // Deshabilitar el botón de envío para evitar múltiples envíos
+        document.getElementById("send-btn").disabled = true;
+        
+        // Después de un pequeño retraso, vaciar el campo de texto (esperando que el formulario se haya enviado)
+        setTimeout(function() {
+            document.getElementById("user-input").value = ""; 
+        }, 100); // Tiempo de espera de 100 milisegundos antes de vaciar el campo
+    });
+</script>
 
 {% endblock %}
