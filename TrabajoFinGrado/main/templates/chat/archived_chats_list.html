@@ -3,18 +3,85 @@
 {% block title %}Chats Archivados{% endblock %}
 
 {% block content %}
-<h1>Chats Archivados</h1>
+<!-- Estilos adicionales para el historial de chats -->
+<style>
+   
+    .chat-list-container {
+        background-color: #ffffff;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin: 20px auto;
+        width: 80%;
+    }
 
-<ul>
-    {% for chat in chats %}
-        <li>
-            <a href="{% url 'archived_chat' chat.chat_id %}">Chat con {{ chat.student.username }} - ID {{ chat.chat_id }}</a>
-        </li>
-    {% empty %}
-        <li>No hay chats archivados disponibles.</li>
-    {% endfor %}
-</ul>
+    .chat-item {
+        list-style: none;
+        margin-bottom: 10px;
+        padding: 10px 15px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        transition: background-color 0.3s ease;
+    }
 
-<a href="{% url 'chat_default' %}">Volver al chat en vivo</a>
+    .chat-item a {
+        text-decoration: none;
+        color: #007bff;
+        font-weight: bold;
+        display: block;
+    }
+
+    .chat-item:hover {
+        background-color: #e9ecef;
+    }
+
+    .chat-item a:hover {
+        color: #0056b3;
+    }
+
+    .empty-list {
+        text-align: center;
+        color: #6c757d;
+        padding: 20px;
+    }
+
+    .back-btn {
+        display: inline-block;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 16px;
+        margin-top: 20px;
+        transition: background-color 0.3s ease;
+    }
+
+    .back-btn:hover {
+        background-color: #0056b3;
+    }
+
+</style>
+
+<!-- Título del historial de chats -->
+<h1 class="text-center mb-4">Chats Archivados</h1>
+
+<!-- Contenedor de la lista de chats -->
+<div class="chat-list-container">
+    <ul>
+        {% for chat in chats %}
+            <li class="chat-item">
+                <a href="{% url 'archived_chat' chat.chat_id %}">Chat con {{ chat.student.username }} - ID {{ chat.chat_id }}</a>
+            </li>
+        {% empty %}
+            <li class="empty-list">No hay chats archivados disponibles.</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Botón para volver al chat en vivo -->
+    <a href="{% url 'chat_default' %}" class="back-btn">Volver al chat en vivo</a>
+</div>
 
 {% endblock %}

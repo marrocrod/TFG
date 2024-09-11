@@ -1,4 +1,4 @@
-<table class="table mt-4">
+<table class="table table-bordered table-striped mt-4">
     <thead>
         <tr>
             <th>Nombre de Usuario</th>
@@ -6,6 +6,7 @@
             <th>Apellidos</th>
             <th>Correo Electrónico</th>
             <th>Grado</th>
+            <th>Grupo</th>  
         </tr>
     </thead>
     <tbody>
@@ -15,7 +16,8 @@
                 <td>{{ student.first_name }}</td>
                 <td>{{ student.last_name }}</td>
                 <td>{{ student.email }}</td>
-                <td>{{ student.degree }}</td>
+                <td>{{ student.get_degree_display }}</td> <!-- Mostrar nombre legible del grado -->
+                <td>{{ student.get_group_display }}</td> <!-- Mostrar grupo del estudiante -->
             </tr>
         {% endfor %}
     </tbody>

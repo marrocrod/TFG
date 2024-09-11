@@ -2,22 +2,52 @@
 {% block title %}Generar Ejercicios{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2>Generar Ejercicios</h2>
-    <a href="{% url 'generate_exercises' %}" class="btn btn-primary mb-3">Generar Nuevos Ejercicios</a>
+<div class="container mt-5">
+    <!-- Título principal -->
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Generar Ejercicios</h2>
+            <p class="lead">Genera conjuntos de ejercicios personalizados y accede a los que ya has creado.</p>
+            <a href="{% url 'generate_exercises' %}" class="btn btn-success btn-lg my-3">
+                <i class="fas fa-plus-circle"></i> Generar Nuevos Ejercicios
+            </a>
+        </div>
+    </div>
 
-    <h3>Tus Conjuntos de Ejercicios Generados</h3>
-    {% if exercise_sets.exists %}
-        <ul>
-        {% for exercise_set in exercise_sets %}
-            <li>
-                <h4>{{ exercise_set.name }} - Generado: {{ exercise_set.created_at|date:"d M Y H:i" }} - Tema {{ exercise_set.exercises.first.topic }}</h4>
-                <a href="{% url 'exercise_set_detail' exercise_set.set_id %}">Ver Conjunto de Ejercicios</a>
-            </li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>No has generado ningún conjunto de ejercicios aún.</p>
-    {% endif %}
+    <!-- Conjuntos de ejercicios generados -->
+    <div class="row mt-5">
+        <div class="col-md-10">
+            <h3 class="mb-4">Tus Conjuntos de Ejercicios Generados</h3>
+            
+            {% if exercise_sets.exists %}
+                <table class="table table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Nombre del Conjunto</th>
+                            <th scope="col">Fecha de Generación</th>
+                            <th scope="col">Tema</th>
+                            <th scope="col" class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for exercise_set in exercise_sets %}
+                            <tr>
+                                <td>{{ exercise_set.name }}</td>
+                                <td>{{ exercise_set.created_at|date:"d M Y H:i" }}</td>
+                                <td>{{ exercise_set.exercises.first.topic }}</td>
+                                <td class="text-center">
+                                    <a href="{% url 'exercise_set_detail' exercise_set.set_id %}" class="btn btn-primary">
+                                        <i class="fas fa-eye"></i> Ver Conjunto
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No has generado ningún conjunto de ejercicios aún.</p>
+            {% endif %}
+        </div>
+    </div>
 </div>
 {% endblock %}

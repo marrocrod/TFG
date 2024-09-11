@@ -3,15 +3,21 @@
 {% block title %}Registro{% endblock %}
 
 {% block content %}
-<div class="container text-center">
+<div class="container register-page text-center">
     <h1 class="mt-4 mb-4">Registro</h1>
-    <p>Selecciona cómo deseas registrarte:</p>
+    <p class="lead">Selecciona cómo deseas registrarte:</p>
     <div class="row justify-content-center mt-5">
-        <div class="col-md-4">
-            <a href="{% url 'register_teacher' %}" class="btn btn-primary btn-lg btn-block">Registrarse como Profesor</a>
+        <!-- Botón de Registro para Profesor -->
+        <div class="col-md-4 mb-3">
+            <a href="{% url 'register_teacher' %}" class="btn register-btn-teacher btn-lg btn-block">
+                <i class="fas fa-chalkboard-teacher"></i> Registrarse como Profesor
+            </a>
         </div>
-        <div class="col-md-4">
-            <a href="{% url 'register_student' %}" class="btn btn-secondary btn-lg btn-block">Registrarse como Estudiante</a>
+        <!-- Botón de Registro para Estudiante -->
+        <div class="col-md-4 mb-3">
+            <a href="{% url 'register_student' %}" class="btn register-btn-student btn-lg btn-block">
+                <i class="fas fa-user-graduate"></i> Registrarse como Estudiante
+            </a>
         </div>
     </div>
 </div>

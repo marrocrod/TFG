@@ -4,7 +4,8 @@ from django.db.models import Q
 import json
 from datetime import datetime, timedelta
 from django.utils import timezone
-
+import markdown
+from django.utils.safestring import mark_safe
 
 class User(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True) 
@@ -91,6 +92,10 @@ class Exercise(models.Model):
     score = models.FloatField(default=0.0)
     exercise_set = models.ForeignKey(ExerciseSet, on_delete=models.CASCADE, related_name='exercises')  # Asegúrate de que este campo está definido si es necesario
 
+    def statement_as_html(self):
+        """Convierte el enunciado Markdown a HTML cuando se solicite."""
+        return mark_safe(markdown.markdown(self.statement, extensions=['fenced_code', 'codehilite', 'extra']))
+    
     def generate_html_content(self):
         self.html_content = f"""
         <div class="exercise">

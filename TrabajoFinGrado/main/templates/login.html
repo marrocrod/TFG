@@ -8,10 +8,35 @@
         <div class="col-md-6">
             <h1 class="mt-4 mb-4 text-center">Iniciar Sesión</h1>
 
-            <form method="post" action="{% url 'login' %}">
+            <form method="post" action="{% url 'login' %}" class="text-center">
                 {% csrf_token %}
-                {{ form.as_p }}
-            
+
+                <div class="form-group">
+                    <input type="text" name="username" id="id_username" class="form-control custom-input" placeholder="Username">
+                </div>
+
+                <div class="form-group">
+                    <input type="password" name="password" id="id_password" class="form-control custom-input" placeholder="Password">
+                </div>
+
+                <!-- Mostrar mensajes de error aquí, debajo de los campos -->
+                {% if form.errors or messages %}
+                    <div class="alert alert-danger">
+                        <ul>
+                            <!-- Mostrar errores del formulario -->
+                            {% for field, errors in form.errors.items %}
+                                <li>{{ errors|striptags }}</li>
+                            {% endfor %}
+
+                            <!-- Mostrar mensajes flash (por ejemplo, cuenta inactiva o credenciales incorrectas) -->
+                            {% for message in messages %}
+                                <li>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <!-- Mostrar mensaje si la cuenta está inactiva -->
                 {% if inactive %}
                     <div class="alert alert-danger">
                         Tu cuenta no está activada. Revisa tu correo para activarla.
@@ -19,10 +44,11 @@
                         ¿No recibiste el correo? <a href="{% url 'resend_activation_email' %}?email={{ user_email }}">Reenviar correo de activación</a>
                     </div>
                 {% endif %}
-            
-                <button type="submit" class="btn btn-primary btn-block">Iniciar Sesión</button>
+
+                <!-- Botón más abajo -->
+                <button type="submit" class="btn btn-primary btn-block custom-btn mt-5">Iniciar Sesión</button>
             </form>
-            
+
         </div>
     </div>
 </div>

@@ -3,15 +3,58 @@
 {% block title %}Sesión Expirada{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <h2 class="mt-4 mb-4 text-center">Sesión Expirada</h2>
-            <p class="text-center">Tu sesión ha expirado debido a inactividad. Por favor, inicia sesión de nuevo.</p>
-            <div class="text-center">
-                <a href="{% url 'login' %}" class="btn btn-primary">Ir al Login</a>
+        <div class="col-md-6 text-center">
+            <!-- Icono de advertencia -->
+            <div class="mb-4">
+                <i class="fas fa-exclamation-circle" style="font-size: 4rem; color: #dc3545;"></i>
             </div>
+
+            <!-- Título -->
+            <h2 class="mb-3">Sesión Expirada</h2>
+
+            <!-- Mensaje de información -->
+            <p class="lead mb-4">Tu sesión ha expirado debido a inactividad. Por favor, inicia sesión nuevamente para continuar.</p>
+
+            <!-- Botón de redirección al Login -->
+            <a href="{% url 'login' %}" class="btn btn-lg custom-btn btn-primary btn px-5">
+                <i class="fas fa-sign-in-alt"></i> Ir al Login
+            </a>
         </div>
     </div>
 </div>
+
+<!-- Estilos personalizados -->
+<style>
+    .btn-primary {
+        background-color: #38c19e;
+        border-color: #007bff;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #0d9595;
+        transform: translateY(-2px);
+    }
+
+    .lead {
+        font-size: 1.2rem;
+        color: #555;
+    }
+
+    i.fas.fa-exclamation-circle {
+        animation: pulse 1s infinite alternate;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+        100% {
+            transform: scale(1.1);
+        }
+    }
+</style>
 {% endblock %}
+

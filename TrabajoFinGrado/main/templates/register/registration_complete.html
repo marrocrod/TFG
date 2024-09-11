@@ -3,6 +3,17 @@
 {% block title %}Registro Completo{% endblock %}
 
 {% block content %}
-    <h1>Registro Completo</h1>
-    <p>Gracias por registrarte. Hemos enviado un enlace de activación a tu correo electrónico. Por favor, revisa tu correo y haz clic en el enlace para activar tu cuenta.</p>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h1 class="mb-4">¡Registro Completo!</h1>
+            <p class="lead">Gracias por registrarte. Hemos enviado un enlace de activación a tu correo electrónico.</p>
+            <p>Por favor, revisa tu correo y haz clic en el enlace para activar tu cuenta.</p>
+            
+            <div class="mt-4">
+                <a href="{% url 'login' %}" class="btn custom-btn btn-primary btn-lg">Ir a Iniciar Sesión</a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

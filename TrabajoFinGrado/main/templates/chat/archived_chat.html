@@ -3,20 +3,75 @@
 {% block title %}Chat Archivado{% endblock %}
 
 {% block content %}
-<h1>Chat Archivado</h1>
+<!-- Estilos adicionales para el chat archivado -->
+<style>
 
-<div>
+
+    .chat-archived-container {
+        background-color: #ffffff;
+        border-radius: 8px;
+        padding: 20px;
+        max-height: 500px;
+        overflow-y: auto;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin: 20px auto;
+        width: 80%;
+    }
+
+    .message-item {
+        padding: 10px 15px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        background-color: #f8f9fa;
+        border: 1px solid #ccc;
+    }
+
+    .message-item strong {
+        color: #007bff;
+    }
+
+    .message-item p {
+        margin: 0;
+    }
+
+    /* Botones */
+    .back-btn {
+        display: inline-block;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 16px;
+        margin-top: 20px;
+        transition: background-color 0.3s ease;
+    }
+
+    .back-btn:hover {
+        background-color: #0056b3;
+    }
+
+</style>
+
+<h1 class="text-center mb-4">Chat Archivado</h1>
+
+<!-- Contenedor del chat archivado -->
+<div class="chat-archived-container">
     {% for message in chat.get_conversation %}
-        <p><strong>{{ message.role }}:</strong> {{ message.content }}</p>
+        <div class="message-item">
+            <p><strong>{{ message.role }}:</strong> {{ message.content }}</p>
+        </div>
     {% endfor %}
 </div>
 
+<!-- Botón de retorno dependiendo del tipo de usuario -->
 {% if user.is_teacher %}
     <!-- Enlace para volver al perfil del estudiante -->
-    <a href="{% url 'student_detail' chat.student.id %}" class="btn btn-primary">Volver al Perfil del Estudiante</a>
+    <a href="{% url 'student_detail' chat.student.id %}" class="back-btn">Volver al Perfil del Estudiante</a>
 {% elif user.is_student %}
     <!-- Enlace para volver a la vista principal del chat -->
-    <a href="{% url 'chat_default' %}" class="btn btn-primary">Volver al Chat Principal</a>
+    <a href="{% url 'chat_default' %}" class="back-btn">Volver al Chat Principal</a>
 {% endif %}
 
 {% endblock %}
