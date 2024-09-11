@@ -1,39 +1,55 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="container mt-5">
+    <h2>Generar Examen</h2>
+    <p class="lead">Rellena el formulario para crear un examen personalizado.</p>
 
-<!-- Mensaje de carga -->
-<div id="loadingMessage" style="display: none;" class="alert alert-info mt-3">
-    Generando examen, este proceso puede tardar unos segundos...
+    <!-- Mensaje de carga -->
+    <div id="loadingMessage" style="display: none;" class="alert alert-info mt-4">
+        <i class="fas fa-spinner fa-spin"></i> Generando examen, este proceso puede tardar unos segundos...
+    </div>
+
+    <!-- Formulario para generar exámenes -->
+    <form id="generateExamForm" method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            {{ form.exam_name.label_tag }}
+            {{ form.exam_name }} <!-- El input tendrá más altura -->
+            <small class="form-text text-muted">Introduce un nombre descriptivo para el examen.</small>
+        </div>
+
+        <div class="form-group">
+            {{ form.topic_1.label_tag }}
+            {{ form.topic_1 }} <!-- El input tendrá más altura -->
+            <small class="form-text text-muted">Selecciona el tema para el ejercicio 1.</small>
+        </div>
+
+        <div class="form-group">
+            {{ form.topic_2.label_tag }}
+            {{ form.topic_2 }} <!-- El input tendrá más altura -->
+            <small class="form-text text-muted">Selecciona el tema para el ejercicio 2.</small>
+        </div>
+
+        <div class="form-group">
+            {{ form.topic_3.label_tag }}
+            {{ form.topic_3 }} <!-- El input tendrá más altura -->
+            <small class="form-text text-muted">Selecciona el tema para el ejercicio 3.</small>
+        </div>
+
+        <div class="form-group">
+            {{ form.topic_4.label_tag }}
+            {{ form.topic_4 }} <!-- El input tendrá más altura -->
+            <small class="form-text text-muted">Selecciona el tema para el ejercicio 4.</small>
+        </div>
+
+        <!-- Botón para generar el examen -->
+        <button type="submit" class="btn custom-btn btn-success btn-block">
+            <i class="fas fa-cogs"></i> Generar Examen
+        </button>
+    </form>
 </div>
-
-<h2>Generar Examen</h2>
-
-<!-- Formulario para generar exámenes -->
-<form id="generateExamForm" method="post">
-    {% csrf_token %}
-    <div class="form-group">
-        {{ form.exam_name.label_tag }}
-        {{ form.exam_name }}
-    </div>
-    <div class="form-group">
-        {{ form.topic_1.label_tag }}
-        {{ form.topic_1 }}
-    </div>
-    <div class="form-group">
-        {{ form.topic_2.label_tag }}
-        {{ form.topic_2 }}
-    </div>
-    <div class="form-group">
-        {{ form.topic_3.label_tag }}
-        {{ form.topic_3 }}
-    </div>
-    <div class="form-group">
-        {{ form.topic_4.label_tag }}
-        {{ form.topic_4 }}
-    </div>
-    <button type="submit" class="btn btn-primary">Generar Examen</button>
-</form>
 
 <script>
     document.getElementById('generateExamForm').addEventListener('submit', function() {
@@ -41,5 +57,19 @@
         document.getElementById('loadingMessage').style.display = 'block';
     });
 </script>
+
+<style>
+    .custom-input {
+        height: 45px; /* Aumenta la altura de los inputs */
+        font-size: 16px;
+        padding: 10px; /* Padding más grande para mayor espacio */
+        border-radius: 6px;
+    }
+
+    input::placeholder {
+        color: #aaa;
+        font-style: italic;
+    }
+</style>
 
 {% endblock %}

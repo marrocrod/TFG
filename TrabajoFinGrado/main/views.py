@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
 
 from datetime import datetime, timedelta
 
@@ -19,9 +20,13 @@ from .forms import UserRegistrationForm, UserProfileForm, ChatForm, ExerciseGene
 from .models import User, Chat, Exam, Exercise, ExerciseSet, Event, Forum, Comment
 from .tokens import account_activation_token  
 
+from django.utils.dateparse import parse_datetime
+from django.views.decorators.csrf import csrf_exempt
+
 
 import openai
 import json
+import markdown
 
 
 #~~~~~~~~HOME~~~~~~~~
@@ -40,6 +45,9 @@ def home(request):
             search_query = request.GET.get('search', '')
             degree_filters = request.GET.getlist('degrees')
 
+            # Print para depurar búsqueda y grados seleccionados
+
+
             students = User.objects.filter(user_type='Student').order_by('username')
 
             if search_query:
@@ -52,6 +60,8 @@ def home(request):
             
             if degree_filters:
                 students = students.filter(degree__in=degree_filters)
+            
+            # Print de los estudiantes después de aplicar los filtros
 
             context.update({
                 'message': "Bienvenido, Profesor.",
@@ -63,6 +73,7 @@ def home(request):
             })
             
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                print("Renderizando partial con estudiantes filtrados.")
                 return render(request, 'partials/student_list.html', {'students': students})
         
         elif request.user.user_type == 'Teacher' and request.user.verification_status == 'PENDING':
@@ -90,7 +101,9 @@ def home(request):
             'user_type': "Guest"
         }
 
+    print("Renderizando home.html con contexto:", context)
     return render(request, 'home.html', context)
+
 
 #~~~~~~~~PERMISSONS~~~~~~~~
 
@@ -541,8 +554,8 @@ def generate_prompt(topic, difficulty):
     
     # Define diferentes prompts en función del tema seleccionado
     topic_prompts = {
-        1: f"Genera un ejercicio de programación en Python sobre estructuras de datos.",
-        2: f"Genera un ejercicio de programación en Python sobre algoritmos de ordenación.",
+        1: f"Genera un ejercicio de programación en Python que cubra el tema de 'Instrucciones y funciones'. Este tema abarca el uso de sentencias y funciones predefinidas, como print, la definición de funciones personalizadas, el uso de comentarios y la estructura básica de un programa en Python. Se deberá pedir al estudiante que defina una función con parámetros, que utilice instrucciones sencillas como asignaciones o bucles, y que explique con comentarios cada parte de la función.",
+        2: f"Genera un ejercicio de programación en Python que cubra el tema de 'Expresiones y tipos'. Este tema trata sobre el uso de expresiones, operadores aritméticos, y variables en Python. Se debe pedir que el estudiante resuelva un ejercicio utilizando operadores y expresiones para manipular variables y tipos básicos de datos (números, cadenas, booleanos).",
         3: f"Genera un ejercicio de programación en Python sobre recursividad.",
         4: f"Genera un ejercicio de programación en Python sobre estructuras de control.",
         5: f"Genera un ejercicio de programación en Python sobre manipulación de cadenas.",
@@ -578,7 +591,10 @@ def parse_generated_text(generated_text):
 def exercise_set_detail(request, set_id):
     exercise_set = get_object_or_404(ExerciseSet, set_id=set_id, student=request.user)
     exercises = exercise_set.exercises.all()
-    return render(request, 'exercise/exercise_set_detail.html', {'exercise_set': exercise_set, 'exercises': exercises})
+    return render(request, 'exercise/exercise_set_detail.html', {
+        'exercise_set': exercise_set,
+        'exercises': exercises
+    })
 
 
 @login_required
@@ -596,6 +612,20 @@ def generate_exercises_view(request):
     return render(request, 'exercise/exercises.html', {
         'exercise_sets': exercise_sets
     })
+
+
+def render_exercises(request):
+    exercises = Exercise.objects.all()
+
+    for exercise in exercises:
+        print(f"Contenido original (Markdown): {exercise.statement}")
+
+        # Convierte Markdown a HTML seguro
+        exercise.statement = mark_safe(markdown.markdown(exercise.statement, extensions=['fenced_code', 'codehilite', 'extra']))
+
+        print(f"Contenido convertido (HTML): {exercise.statement}")
+
+    return render(request, 'exercise_set.html', {'exercises': exercises})
 
 
 
@@ -646,7 +676,7 @@ def generate_exam(request):
                 response = openai.ChatCompletion.create(
                     model="gpt-4o-mini",
                     messages=[
-                        {"role": "system", "content": "You are an assistant that generates educational content."},
+                        {"role": "system", "content": "Eres un asistente que está generando contenido educacional para universitarios que están aprendiendo a programar en Python"},
                         {"role": "user", "content": prompt}
                     ],
                     max_tokens=500,
@@ -679,22 +709,19 @@ def generate_exam(request):
 @login_required
 def exam_detail(request, exam_id):
     exam = get_object_or_404(Exam, exam_id=exam_id)
-    
+
     if exam.student != request.user and not request.user.is_teacher:
         return HttpResponseForbidden("No tienes permiso para acceder a este examen.")
 
     if exam.is_submitted:
-        print(f"Examen {exam_id} ya fue entregado.")
         return redirect('archived_exam', exam_id=exam_id)
-    
+
     if request.method == "POST" and 'submit_exam' in request.POST:
-        print(f"Examen {exam_id} está siendo entregado.")
         return redirect('submit_exam', exam_id=exam_id)
-    
+
     time_left = (exam.start_time + timezone.timedelta(minutes=90)) - timezone.now()
     time_left_seconds = max(time_left.total_seconds(), 0)
-    print(f"Tiempo restante para el examen {exam_id}: {time_left_seconds} segundos")
-    
+
     return render(request, 'exam/exam_detail.html', {
         'exam': exam,
         'time_left': time_left_seconds,
@@ -702,9 +729,9 @@ def exam_detail(request, exam_id):
 
 
 
+
 @login_required
 def submit_exam(request, exam_id):
-    print(f"Submit exam triggered for exam_id: {exam_id}")
     print("request.POST:", request.POST)  
 
     exam = get_object_or_404(Exam, exam_id=exam_id, student=request.user)
@@ -714,7 +741,6 @@ def submit_exam(request, exam_id):
     for exercise in exam.exercises.all():
         student_solution_key = f'student_solution_{exercise.exercise_id}'
         student_solution_value = request.POST.get(student_solution_key)
-        print(f"Received solution for {student_solution_key}: {student_solution_value}")
 
         if student_solution_value:
             exercise.student_solution = student_solution_value
@@ -731,20 +757,19 @@ def submit_exam(request, exam_id):
             {exercise.solution}
 
             Responde únicamente con "correcto" o "incorrecto" en función de si el programa que 
-            te he pasado es correcto o no respecto al enunciado y a la solución que se pide y dame
+            te he pasado es correcto o no respecto al enunciado que se propone y a la solución que se pide y dame
             una breve explicación si es necesario para señalar los fallos o aciertos del código."""
 
             print("Sending prompt to OpenAI...")
             response = openai.ChatCompletion.create(
                 model="gpt-4o-mini",
                 messages=[
-                    {"role": "system", "content": "Eres un asistente educativo."},
+                    {"role": "system", "content": "Eres un asistente educativo que tiene que evaluar el resultado un ejercicio dado el enunciado de un ejercicio, la solución que ha proporcionado el alumno y la solución que ha generado una IA como posible solución del ejercicio."},
                     {"role": "user", "content": prompt}
                 ],
                 max_tokens=150
             )
             evaluation = response['choices'][0]['message']['content'].strip().lower()
-            print(f"OpenAI evaluation result: {evaluation}")
 
             if evaluation.startswith("correcto"):
                 exercise.is_correct = True
@@ -759,17 +784,14 @@ def submit_exam(request, exam_id):
                 exercise.score = 0.0
 
         else:
-            print(f"No solution provided for exercise ID: {exercise.exercise_id}. Skipping OpenAI evaluation.")
             exercise.is_correct = False
             exercise.score = 0.0
             exercise.student_solution = ""  
 
-        print(f"Saving exercise {exercise.exercise_id} with solution: {exercise.student_solution}")
         exercise.save()
 
     exam.save()
     total_score = exam.grade
-    print(f"Total score calculated: {total_score}")
 
     return render(request, 'exam/archived_exam.html', {'exam': exam, 'total_score': total_score})
 
@@ -784,7 +806,10 @@ def archived_exam(request, exam_id):
         return HttpResponseForbidden("No tienes permiso para acceder a este examen.")
     
     total_score = exam.grade
-    return render(request, 'exam/archived_exam.html', {'exam': exam, 'total_score': total_score})
+    return render(request, 'exam/archived_exam.html', {
+        'exam': exam,
+        'total_score': total_score,
+    })
 
 
 
@@ -820,11 +845,6 @@ def calendar_events(request):
         })
     return JsonResponse(events_list, safe=False)
 
-from django.http import JsonResponse
-from django.utils.dateparse import parse_datetime
-from django.views.decorators.csrf import csrf_exempt
-import json
-from .models import Event
 
 @csrf_exempt
 def create_event(request):

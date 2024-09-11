@@ -4,11 +4,45 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="mt-4">Editar Perfil</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-    </form>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Tarjeta para el formulario -->
+            <div class="card shadow-sm mt-5">
+                <div class="card-header text-center bg-primary text-white">
+                    <h2><i class="fas fa-user-edit"></i> Editar Perfil</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="edit-profile-form">
+                        {% csrf_token %}
+                        <!-- Campos del formulario renderizados de manera personalizada -->
+                        <div class="form-group">
+                            <label for="id_username"><strong><i class="fas fa-user-circle"></i> Nombre de usuario</strong></label>
+                            {{ form.username }}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_first_name"><strong><i class="fas fa-id-badge"></i> Nombre</strong></label>
+                            {{ form.first_name }}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_last_name"><strong><i class="fas fa-user-tag"></i> Apellidos</strong></label>
+                            {{ form.last_name }}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_email"><strong><i class="fas fa-envelope"></i> Correo electrónico</strong></label>
+                            {{ form.email }}
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn custom-btn btn-primary">Guardar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
+

@@ -2,39 +2,110 @@
 {% block title %}Detalle del Alumno{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2>Detalle del Alumno: {{ student.username }}</h2>
-    <p><strong>Nombre:</strong> {{ student.username }}</p>
-    <p><strong>Correo Electrónico:</strong> {{ student.email }}</p>
-    <p><strong>Grado:</strong> {{ student.degree }}</p>
+<div class="container mt-5">
+    <!-- Detalles del Alumno -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Detalle del Alumno</h2>
+            <p><strong>Nombre de Usuario:</strong> {{ student.username }}</p>
+            <p><strong>Correo Electrónico:</strong> {{ student.email }}</p>
+            <p><strong>Grado:</strong> {{ student.degree }}</p>
+        </div>
+    </div>
 
-    <!-- Mostrar Chats Archivados -->
-    <h3>Chats Archivados</h3>
-    {% if archived_chats %}
-        <ul>
-            {% for chat in archived_chats %}
-                <li>
-                    <a href="{% url 'archived_chat' chat.chat_id %}">Chat con ID {{ chat.chat_id }} - Última actividad: {{ chat.last_activity|date:"d M Y H:i" }}</a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No hay chats archivados para este alumno.</p>
-    {% endif %}
+    <!-- Chats Archivados -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h3 class="card-title">Chats Archivados</h3>
+            {% if archived_chats %}
+                <ul class="list-group list-group-flush">
+                    {% for chat in archived_chats %}
+                        <li class="list-group-item">
+                            <a href="{% url 'archived_chat' chat.chat_id %}" class="text-decoration-none">
+                                Chat con ID {{ chat.chat_id }} - Última actividad: {{ chat.last_activity|date:"d M Y H:i" }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">No hay chats archivados para este alumno.</p>
+            {% endif %}
+        </div>
+    </div>
 
-    <!-- Mostrar Exámenes Archivados -->
-    <h3>Exámenes Archivados</h3>
-    {% if archived_exams %}
-        <ul>
-            {% for exam in archived_exams %}
-                <li>
-                    <a href="{% url 'archived_exam' exam.exam_id %}">Examen: {{ exam.name }} - Entregado: {{ exam.submission_time|date:"d M Y H:i" }}</a>
-                    <p><strong>Nota Obtenida:</strong> {{ exam.grade }} / 10</p>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No hay exámenes archivados para este alumno.</p>
-    {% endif %}
+    <!-- Exámenes Archivados -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h3 class="card-title">Exámenes Archivados</h3>
+            {% if archived_exams %}
+                <ul class="list-group list-group-flush">
+                    {% for exam in archived_exams %}
+                        <li class="list-group-item">
+                            <a href="{% url 'archived_exam' exam.exam_id %}" class="text-decoration-none">
+                                Examen: {{ exam.name }} - Entregado: {{ exam.submission_time|date:"d M Y H:i" }}
+                            </a>
+                            <p><strong>Nota Obtenida:</strong> {{ exam.grade }} / 10</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">No hay exámenes archivados para este alumno.</p>
+            {% endif %}
+        </div>
+    </div>
 </div>
+<style>
+    /* General container styling */
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+    }
+    
+    /* Estilo para las tarjetas */
+    .card {
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .card-title {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #343a40;
+        margin-bottom: 20px;
+    }
+    
+    /* Estilo para la lista de chats y exámenes */
+    .list-group-item {
+        padding: 15px;
+        font-size: 1rem;
+        font-weight: bold;
+    }
+    
+    .list-group-item a {
+        color: #007bff;
+    }
+    
+    .list-group-item a:hover {
+        text-decoration: underline;
+    }
+    
+    /* Texto de chats y exámenes archivados */
+    .text-muted {
+        color: #6c757d;
+    }
+    
+    /* Espaciado en la sección de notas */
+    .list-group-item p {
+        margin-top: 10px;
+        font-size: 1rem;
+        font-weight: normal;
+        color: #495057;
+    }
+    
+</style>
 {% endblock %}

@@ -3,7 +3,30 @@
 {% block title %}Enlace de Activación Inválido{% endblock %}
 
 {% block content %}
-    <h1>Enlace de Activación Inválido</h1>
-    <p>El enlace de activación es inválido o ha expirado. Por favor, intenta registrarte nuevamente o contacta con el soporte.</p>
-    <a href="{% url 'register' %}" class="btn btn-primary">Volver a Registrar</a>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <!-- Icono de advertencia -->
+            <div class="mb-4">
+                <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem; color: #dc3545;"></i>
+            </div>
+
+            <h1 class="mb-3">Enlace de Activación Inválido</h1>
+            <p class="lead">El enlace de activación es inválido o ha expirado. Por favor, intenta registrarte nuevamente o contacta con el soporte.</p>
+            
+            <!-- Botón de Volver a Registrar con estilo rojo personalizado -->
+            <div class="mt-4">
+                <a href="{% url 'register' %}" class="btn custom-btn btn-lg" style="background-color: #dc3545;">Volver a Registrar</a>
+            </div>
+
+            <!-- Mensaje adicional -->
+            <p class="lead mt-4">Si ya has activado tu cuenta, prueba a iniciar sesión nuevamente.</p>
+            
+            <!-- Botón para iniciar sesión -->
+            <div class="mt-4">
+                <a href="{% url 'login' %}" class="btn custom-btn btn-success btn-lg">Iniciar Sesión</a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -1,31 +1,89 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>{{ exam.name }} (Examen Archivado)</h2>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">{{ exam.name }} <small>(Examen Archivado)</small></h2>
+    
+    <div class="d-flex justify-content-center mb-4">
+        <p class="lead"><strong>Nota Total:</strong> <span class="text-info">{{ total_score }} / 10</span></p>
+    </div>
 
-<p><strong>Nota Total:</strong> {{ total_score }} / 10</p>
+    <div class="card p-4">
+        {% for exercise in exam.exercises.all %}
+            <div class="exercise mb-5">
+                <h4 class="mb-3">Ejercicio {{ forloop.counter }}</h4>
+                
+                <!-- Mostrar el enunciado como texto plano sin convertir a HTML o Markdown -->
+                <p class="p-3 bg-light border rounded">{{ exercise.statement_as_html|safe }}</p>
 
-<div>
-    {% for exercise in exam.exercises.all %}
-        <div class="exercise">
-            <h3>Ejercicio {{ forloop.counter }}</h3>
-            <p>{{ exercise.statement }}</p>
-            <div id="solution_{{ exercise.exercise_id }}">
-                <h4>Solución del Alumno:</h4>
-                <pre>{{ exercise.student_solution }}</pre>
-                <h4>Solución Correcta:</h4>
-                <pre>{{ exercise.solution }}</pre>
-                <p><strong>Comentario:</strong> {% if exercise.is_correct %} <span class="text-success">Correcto</span> {% else %} <span class="text-danger">Incorrecto</span> {% endif %}</p>
-                <p><strong>Puntuación:</strong> {{ exercise.score }} puntos</p>
+                <div id="solution_{{ exercise.exercise_id }}" class="mt-3">
+                    <div class="mb-4">
+                        <h5 class="text-primary">Solución del Alumno:</h5>
+                        <pre class="bg-light p-3 rounded">{{ exercise.student_solution }}</pre>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="text-success">Solución Correcta:</h5>
+                        <pre class="bg-light p-3 rounded">{{ exercise.solution }}</pre>
+                    </div>
+
+                    <div class="mb-3">
+                        <p><strong>Comentario:</strong> 
+                            {% if exercise.is_correct %} 
+                                <span class="text-success">✔ Correcto</span> 
+                            {% else %} 
+                                <span class="text-danger">✘ Incorrecto</span> 
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <p class="font-weight-bold"><strong>Puntuación:</strong> 
+                        <span class="text-info">{{ exercise.score }} puntos</span>
+                    </p>
+                </div>
             </div>
-        </div>
-    {% endfor %}
+        {% endfor %}
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        {% if request.user.is_teacher %}
+            <a href="{% url 'student_detail' exam.student.id %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-user"></i> Volver al perfil del estudiante
+            </a>
+        {% elif request.user.is_student %}
+            <a href="{% url 'home' %}" class="btn btn-secondary btn-lg">
+                <i class="fas fa-home"></i> Volver al Inicio
+            </a>
+        {% endif %}
+    </div>
 </div>
 
-{% if request.user.is_teacher %}
-    <a href="{% url 'student_detail' exam.student.id %}" class="btn btn-primary">Volver al perfil del estudiante</a>
-{% elif request.user.is_student %}
-    <a href="{% url 'home' %}" class="btn btn-primary">Volver al Inicio</a>
-{% endif %}
-
+<style>
+    .exercise h4 {
+        color: #333;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 5px;
+    }
+    .exercise pre {
+        background-color: #f8f9fa;
+        border-left: 3px solid #007bff;
+        padding: 15px;
+        font-size: 14px;
+        white-space: pre-wrap;  /* Asegura que el texto largo no se desborde */
+    }
+    .lead {
+        font-size: 1.5rem;
+        font-weight: 500;
+    }
+    .card {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .text-info {
+        font-size: 1.2rem;
+    }
+    .text-success, .text-danger {
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+</style>
 {% endblock %}

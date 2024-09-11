@@ -2,33 +2,61 @@
 
 {% block content %}
 <div class="row">
+    <!-- Sección de Debates Recientes -->
     <div class="col-md-4">
-        <h3>Debates Recientes</h3>
-        <ul>
-            {% for forum in recent_forums %}
-                <li>
-                    <a href="{% url 'view_forum' forum.id %}">{{ forum.title }}</a>
-                    <br>
-                    <small>Creado por {{ forum.created_by.username }} el {{ forum.created_at|date:"d M Y" }}</small>
-                </li>
-            {% endfor %}
-        </ul>
-        <a href="{% url 'create_forum' %}" class="btn btn-primary mt-3">Crear un Debate</a>
+        <h3 class="mb-4">Debates Recientes</h3>
+        {% if recent_forums %}
+            <ul class="list-group">
+                {% for forum in recent_forums %}
+                    <li class="list-group-item">
+                        <a href="{% url 'view_forum' forum.id %}" class="text-decoration-none">
+                            <strong>{{ forum.title }}</strong>
+                        </a>
+                        <br>
+                        <small class="text-muted">
+                            Creado por {{ forum.created_by.username }} el {{ forum.created_at|date:"d M Y" }}
+                        </small>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted">No hay debates recientes.</p>
+        {% endif %}
+        <a href="{% url 'create_forum' %}" class="btn btn-primary mt-3 w-100">Crear un Debate</a>
     </div>
+
+    <!-- Sección de Todos los Debates -->
     <div class="col-md-8">
-        <h3>Todos los Debates</h3>
-        <ul>
-            {% for forum in all_forums %}
-                <li>
-                    <a href="{% url 'view_forum' forum.id %}">{{ forum.title }}</a>
-                    <br>
-                    <small>Creado por {{ forum.created_by.username }} el {{ forum.created_at|date:"d M Y" }}</small>
-                    {% if forum.is_closed %}
-                        <span class="badge badge-danger">Cerrado</span>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
+        <h3 class="mb-4">Todos los Debates</h3>
+        {% if all_forums %}
+            <div class="row">
+                {% for forum in all_forums %}
+                    <div class="col-md-12 mb-3">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <a href="{% url 'view_forum' forum.id %}" class="text-decoration-none text-dark">
+                                        {{ forum.title }}
+                                    </a>
+                                </h5>
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        Creado por {{ forum.created_by.username }} el {{ forum.created_at|date:"d M Y" }}
+                                    </small>
+                                </p>
+                                {% if forum.is_closed %}
+                                    <span class="badge bg-danger">Cerrado</span>
+                                {% else %}
+                                    <span class="badge bg-success">Abierto</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted">No hay debates disponibles.</p>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
