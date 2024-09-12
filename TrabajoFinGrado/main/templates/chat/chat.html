@@ -26,7 +26,7 @@
     }
 
     .user-message {
-        background-color: #007bff;
+        background-color: #38C29F;
         color: white;
         align-self: flex-end;
         margin-left: auto;
@@ -64,7 +64,7 @@
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
-    .send-btn, .archive-btn, .history-btn {
+    .send-btn, .archive-btn {
         border: none;
         padding: 10px 20px;
         border-radius: 5px;
@@ -73,33 +73,42 @@
         transition: background-color 0.3s ease;
     }
 
+    .history-btn{
+        background-color: #38B6C2;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        color: white;
+         
+    }
+
     /* Estilos específicos para cada botón */
     .send-btn {
-        background-color: #007bff;
+        background-color: #38C29F;
         color: white;
     }
 
     .send-btn:hover {
-        background-color: #0056b3;
+        background-color: #0d9595;
+
     }
 
     .archive-btn {
-        background-color: #6c757d;
+        background-color: #E4B478;
         color: white;
     }
 
     .archive-btn:hover {
-        background-color: #5a6268;
-    }
-
-    .history-btn {
-        background-color: #ffc107;
-        color: white;
-        text-decoration: none; /* Eliminar subrayado del enlace */
+        background-color: #E0CC9D;
     }
 
     .history-btn:hover {
-        background-color: #e0a800;
+        background-color: #29959C;
+        text-decoration: none;
+        color: white
     }
 
     #loading-spinner {

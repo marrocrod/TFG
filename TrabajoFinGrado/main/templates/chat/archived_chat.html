@@ -34,10 +34,12 @@
         margin: 0;
     }
 
-    /* Botones */
     .back-btn {
-        display: inline-block;
-        background-color: #007bff;
+        display: flex;
+        justify-content: center;  /* Centra el texto horizontalmente */
+        align-items: center;  /* Centra el texto verticalmente */
+        width: 70%;  /* Ajusta el ancho del botón al tamaño del texto */
+        background-color: #38c19e;
         color: white;
         border: none;
         padding: 10px 20px;
@@ -47,11 +49,18 @@
         margin-top: 20px;
         transition: background-color 0.3s ease;
     }
-
+    
     .back-btn:hover {
-        background-color: #0056b3;
+        background-color: #0d9595;
+        text-decoration: none; 
+        color: white;
     }
-
+    
+    .button-container {
+        display: flex;
+        justify-content: center;  /* Asegura que el botón esté centrado */
+    }
+    
 </style>
 
 <h1 class="text-center mb-4">Chat Archivado</h1>
@@ -65,13 +74,14 @@
     {% endfor %}
 </div>
 
-<!-- Botón de retorno dependiendo del tipo de usuario -->
-{% if user.is_teacher %}
-    <!-- Enlace para volver al perfil del estudiante -->
-    <a href="{% url 'student_detail' chat.student.id %}" class="back-btn">Volver al Perfil del Estudiante</a>
-{% elif user.is_student %}
-    <!-- Enlace para volver a la vista principal del chat -->
-    <a href="{% url 'chat_default' %}" class="back-btn">Volver al Chat Principal</a>
-{% endif %}
+<div class="button-container">
+    {% if user.is_teacher %}
+        <!-- Enlace para volver al perfil del estudiante -->
+        <a href="{% url 'student_detail' chat.student.id %}" class="back-btn">Volver al Perfil del Estudiante</a>
+    {% elif user.is_student %}
+        <!-- Enlace para volver a la vista principal del chat -->
+        <a href="{% url 'chat_default' %}" class="back-btn">Volver al Chat Principal</a>
+    {% endif %}
+</div>
 
 {% endblock %}

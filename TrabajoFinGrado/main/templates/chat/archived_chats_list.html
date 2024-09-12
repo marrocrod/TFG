@@ -48,7 +48,7 @@
 
     .back-btn {
         display: inline-block;
-        background-color: #007bff;
+        background-color: #38c19e;
         color: white;
         border: none;
         padding: 10px 20px;
@@ -60,7 +60,10 @@
     }
 
     .back-btn:hover {
-        background-color: #0056b3;
+        background-color: #0d9595;
+        text-decoration: none; 
+        color: white;
+
     }
 
 </style>
@@ -81,7 +84,7 @@
     </ul>
 
     <!-- Botón para volver al chat en vivo -->
-    <a href="{% url 'chat_default' %}" class="back-btn">Volver al chat en vivo</a>
+    <a href="{% url 'chat_default' %}" class="text-center custom-btn back-btn">Volver al chat en vivo</a>
 </div>
 
 {% endblock %}

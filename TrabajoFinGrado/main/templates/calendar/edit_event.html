@@ -34,9 +34,9 @@
 
             <!-- Botones de acción -->
             <div class="d-flex justify-content-between">
-                <button type="submit" name="save_changes" class="btn btn-primary">Guardar cambios</button>
-                <a href="{% url 'calendar' %}" class="btn btn-secondary">Cancelar</a>
-                <button type="submit" name="delete_event" class="btn btn-danger">Eliminar evento</button>
+                <button type="submit" name="save_changes" class="btn btn-primary g-btn">Guardar cambios</button>
+                <a href="{% url 'calendar' %}" class="btn btn-secondary c-btn">Cancelar</a>
+                <button type="submit" name="delete_event" class="btn btn-danger e-btn">Eliminar evento</button>
             </div>
         </form>
     </div>
@@ -88,20 +88,18 @@ h2 {
 /* Botones de acción */
 .btn-primary {
     background-color: #007bff;
-    border-color: #007bff;
     padding: 10px 20px;
     font-size: 1rem;
-    font-weight: bold;
+    border: none; /* Elimina el borde */
+
 }
 
 .btn-primary:hover {
     background-color: #0056b3;
-    border-color: #0056b3;
 }
 
 .btn-secondary {
     background-color: #6c757d;
-    border-color: #6c757d;
     padding: 10px 20px;
     font-size: 1rem;
 }
@@ -112,7 +110,6 @@ h2 {
 
 .btn-danger {
     background-color: #dc3545;
-    border-color: #dc3545;
     padding: 10px 20px;
     font-size: 1rem;
 }
@@ -126,6 +123,29 @@ h2 {
 .d-flex.justify-content-between {
     gap: 10px;
 }
+
+.e-btn{
+    background-color:#D63B2D
+}
+
+
+.c-btn{
+
+}
+
+.c-btn:hover{
+
+}
+
+.g-btn{
+    background-color: #38C29F;
+    color: white;
+}
+
+.g-btn:hover{
+    background-color: #0d9595;
+}
+
 
 </style>
 {% endblock %}

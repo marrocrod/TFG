@@ -21,7 +21,7 @@
                     <p><strong><i class="fas fa-users"></i> Grupo:</strong> {{ user.group }}</p>
                 </div>
                 <div class="card-footer text-center text-black">
-                    <a href="{% url 'edit_profile' %}" class="btn btn-secondary btn-yellow mt-3">
+                    <a href="{% url 'edit_profile' %}" class="btn btn-secondary btn-yellow mt-3 edit-btn">
                         <i class="fas fa-edit "></i> Editar Perfil
                     </a>
                 </div>
@@ -30,4 +30,17 @@
         </div>
     </div>
 </div>
+
+<style>
+
+    .edit-btn {
+        background-color: #E4B478;
+        color: white;
+    }
+
+    .edit-btn:hover {
+        background-color: #E0CC9D;
+    }
+
+</style>
 {% endblock %}

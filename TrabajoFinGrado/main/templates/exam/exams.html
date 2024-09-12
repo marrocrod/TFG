@@ -8,7 +8,7 @@
         <div class="col-md-8">
             <h2>Generar Exámenes</h2>
             <p class="lead">Genera exámenes personalizados y accede a los que ya has creado.</p>
-            <a href="{% url 'generate_exam' %}" class="btn btn-success btn-lg my-3">
+            <a href="{% url 'generate_exam' %}" class="btn btn-success btn-lg my-3 gen-btn">
                 <i class="fas fa-plus-circle"></i> Generar Nuevo Examen
             </a>
         </div>
@@ -25,7 +25,8 @@
                         <tr>
                             <th scope="col">Nombre del Examen</th>
                             <th scope="col">Fecha de Generación</th>
-                            <th scope="col">Número de Ejercicios</th>
+                            <th scope="col" >Número de Ejercicios</th>
+                            <th scope="col" >Calificación</th>
                             <th scope="col" class="text-center">Acciones</th>
                         </tr>
                     </thead>
@@ -34,9 +35,10 @@
                             <tr>
                                 <td>{{ exam.name }}</td>
                                 <td>{{ exam.created_at|date:"d M Y H:i" }}</td>
-                                <td>{{ exam.exercises.count }}</td>
+                                <td class="text-center">{{ exam.exercises.count }}</td>
+                                <td class="text-center">{{ exam.grade }}</td>
                                 <td class="text-center">
-                                    <a href="{% url 'exam_detail' exam.exam_id %}" class="btn btn-primary">
+                                    <a href="{% url 'exam_detail' exam.exam_id %}" class="btn btn-primary view-btn">
                                         <i class="fas fa-eye"></i> Ver Examen
                                     </a>
                                 </td>
@@ -50,4 +52,20 @@
         </div>
     </div>
 </div>
+<style>
+    .view-btn{
+        background-color: #38B6C2;
+    }
+    .view-btn:hover{
+        background-color: #29959C;
+    }
+
+    .gen-btn{
+        background-color: #38C29F;
+    }
+
+    .gen-btn:hover{
+        background-color: #0d9595;
+    }
+</style>
 {% endblock %}

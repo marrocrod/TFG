@@ -85,8 +85,12 @@ WSGI_APPLICATION = 'admin.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'saymplexfp',
+        'USER': 'postgres',
+        'PASSWORD': 'admin',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -152,7 +156,7 @@ AUTH_USER_MODEL = 'main.User'
 
 
 #API OPENAI
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "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")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "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")
 
 
 #SESION

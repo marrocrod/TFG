@@ -37,8 +37,8 @@
     </div>
 
     <!-- Botón para volver al inicio -->
-    <div class="mt-4">
-        <a href="{% url 'home' %}" class="btn custom-btn btn-primary btn-lg">Ir al inicio</a>
+    <div class="button-container">
+        <a href="{% url 'home' %}" class="back-btn">Ir al inicio</a>
     </div>
 </div>
 
@@ -109,5 +109,33 @@
         solutionDiv.style.display = solutionDiv.style.display === "none" ? "block" : "none";
     }
 </script>
+<style>
+    .back-btn {
+        display: flex;
+        justify-content: center;  /* Centra el texto horizontalmente */
+        align-items: center;  /* Centra el texto verticalmente */
+        width: 60%;  /* Ajusta el ancho del botón al tamaño del texto */
+        background-color: #38c19e;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 16px;
+        margin-top: 20px;
+        transition: background-color 0.3s ease;
+    }
+    
+    .back-btn:hover {
+        background-color: #0d9595;
+        text-decoration: none; 
+        color: white;
+    }
+    
+    .button-container {
+        display: flex;
+        justify-content: center;  /* Asegura que el botón esté centrado */
+    }
+</style>
 
 {% endblock %}

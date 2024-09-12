@@ -1,7 +1,6 @@
 import os
 import django
 from random import choice
-from datetime import datetime
 
 # Configura Django si este archivo está fuera del entorno
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'admin.settings')
@@ -36,12 +35,12 @@ def populate():
             first_name=teacher['first_name'],
             last_name=teacher['last_name'],
             email=teacher['email'],
-            password='password123',  # Contraseña común para todos
+            password='password123',
             user_type=User.UserTypeChoices.TEACHER,
             verification_status=User.VerificationStatus.APPROVED,  
             is_active=True,
             degree=teacher['degree'],
-            group=teacher['group']  # Asignar grupo
+            group=teacher['group']  
         )
         new_teacher.save()
         print(f"Creado profesor: {new_teacher.username} ({new_teacher.email})")
@@ -53,7 +52,6 @@ def populate():
         {'first_name': 'Charlie', 'last_name': 'Taylor', 'email': 'charlie.taylor@student.com', 'degree': User.DegreeChoices.COMPUTER_ENGINEERING},
         {'first_name': 'Diana', 'last_name': 'Moore', 'email': 'diana.moore@student.com', 'degree': User.DegreeChoices.SOFTWARE_ENGINEERING},
         {'first_name': 'Ethan', 'last_name': 'Wilson', 'email': 'ethan.wilson@student.com', 'degree': User.DegreeChoices.HEALTH_ENGINEERING},
-        # Añadir más estudiantes según sea necesario
     ]
 
     # Crear estudiantes
@@ -66,20 +64,20 @@ def populate():
             first_name=student['first_name'],
             last_name=student['last_name'],
             email=student['email'],
-            password='password123',  # Contraseña común para todos
+            password='password123',
             user_type=User.UserTypeChoices.STUDENT,
             is_active=True,
             degree=student['degree'],
-            group=choice(groups)  # Asignar grupo aleatorio
+            group=choice(groups)
         )
         new_student.save()
         students.append(new_student)
         print(f"Creado estudiante: {new_student.username} ({new_student.email})")
 
-    # Crear exámenes y exercise sets para los estudiantes
+    # Crear exámenes y marcarlos como archivados
     for student in students:
         exam_name = f"Examen {student.first_name} {student.last_name}"
-        exam = Exam.objects.create(student=student, name=exam_name)
+        exam = Exam.objects.create(student=student, name=exam_name, is_submitted=True)  # Marcamos el examen como archivado
 
         # Crear un conjunto de ejercicios (ExerciseSet)
         exercise_set = ExerciseSet.objects.create(student=student, name=f"Set de ejercicios de {student.first_name}")
@@ -92,23 +90,24 @@ def populate():
                 solution=f"Solución {i + 1}",
                 difficulty='Easy',
                 topic=1,
-                exercise_set=exercise_set  # Asociar al conjunto de ejercicios
+                exercise_set=exercise_set  
             )
             exam.exercises.add(exercise)
 
         exam.save()
-        print(f"Creado examen para {student.username}: {exam.name}")
+        print(f"Creado examen archivado para {student.username}: {exam.name}")
 
-    # Crear chats para los estudiantes
+    # Crear chats y marcarlos como archivados
     for student in students:
         chat = Chat.objects.create(
             student=student,
             url=f"https://chat/{student.username}",
-            conversation="[]"
+            conversation="[]",
+            is_archived=True  # Marcamos el chat como archivado
         )
         chat.add_message("user", f"Hola, soy {student.first_name}. ¿Cómo estás?")
         chat.add_message("assistant", "¡Hola! Estoy aquí para ayudarte.")
-        print(f"Creado chat para {student.username}")
+        print(f"Creado chat archivado para {student.username}")
 
     # Crear foros y comentarios
     for i, teacher in enumerate(User.objects.filter(user_type=User.UserTypeChoices.TEACHER)):

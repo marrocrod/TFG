@@ -47,12 +47,12 @@
 
     <div class="d-flex justify-content-center mt-4">
         {% if request.user.is_teacher %}
-            <a href="{% url 'student_detail' exam.student.id %}" class="btn btn-primary btn-lg">
-                <i class="fas fa-user"></i> Volver al perfil del estudiante
+            <a href="{% url 'student_detail' exam.student.id %}" class="btn btn-primary btn-lg back-btn">
+                Volver al perfil del estudiante
             </a>
         {% elif request.user.is_student %}
-            <a href="{% url 'home' %}" class="btn btn-secondary btn-lg">
-                <i class="fas fa-home"></i> Volver al Inicio
+            <a href="{% url 'home' %}" class="back-btn">
+                 Volver al Inicio
             </a>
         {% endif %}
     </div>
@@ -85,5 +85,33 @@
         font-size: 1.1rem;
         font-weight: bold;
     }
+
+    .back-btn {
+        display: flex;
+        justify-content: center;  /* Centra el texto horizontalmente */
+        align-items: center;  /* Centra el texto verticalmente */
+        width: 70%;  /* Ajusta el ancho del botón al tamaño del texto */
+        background-color: #38c19e;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 16px;
+        margin-top: 20px;
+        transition: background-color 0.3s ease;
+    }
+    
+    .back-btn:hover {
+        background-color: #0d9595;
+        text-decoration: none; 
+        color: white;
+    }
+    
+    .button-container {
+        display: flex;
+        justify-content: center;  /* Asegura que el botón esté centrado */
+    }
+    
 </style>
 {% endblock %}

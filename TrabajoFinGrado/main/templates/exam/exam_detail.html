@@ -23,11 +23,12 @@
 
                     <!-- Editor de código -->
                     <div class="code-editor mt-4 mb-3">
-                        <textarea id="editor_{{ exercise.exercise_id }}" class="form-control" rows="8"></textarea>
+                        <textarea name="student_solution_{{ exercise.exercise_id }}" id="editor_{{ exercise.exercise_id }}" class="form-control" rows="8"></textarea>
+                        <input type="hidden" name="student_solution_hidden_{{ exercise.exercise_id }}" id="hidden_{{ exercise.exercise_id }}">
                     </div>
-                    
+
                     <!-- Botón de Ejecutar código -->
-                    <button class="btn btn-primary mb-2" onclick="runCode({{ exercise.exercise_id }})">Ejecutar código</button>
+                    <button type="button" class="btn btn-primary mb-2" onclick="runCode({{ exercise.exercise_id }})">Ejecutar código</button>
 
                     <!-- Área de salida del código -->
                     <pre id="output_{{ exercise.exercise_id }}" class="p-3 bg-dark text-light rounded"></pre>
@@ -36,9 +37,12 @@
         </div>
 
         {% if not exam.is_submitted %}
-        <button type="submit" name="submit_exam" class="btn btn-danger btn-lg btn-block">
-            <i class="fas fa-file-alt"></i> Entregar Examen
-        </button>
+        <div class="d-flex justify-content-center">
+            <button type="submit" name="submit_exam" class="btn btn-danger btn-lg">
+                <i class="fas fa-file-alt"></i> Entregar Examen
+            </button>
+        </div>
+        
         {% endif %}
     </form>
 
@@ -131,62 +135,59 @@
             }
         }
     </script>
-
 </div>
 
 <style>
-    <style>
-        .exercise p {
-            font-size: 1.1rem;
-            line-height: 1.5;
-        }
-    
-        .exercise pre {
-            background-color: #f8f9fa;
-            padding: 10px;
-            border-radius: 5px;
-            font-family: monospace;
-        }
-    
-        .exercise code {
-            background-color: #f0f0f0;
-            padding: 2px 4px;
-            border-radius: 3px;
-        }
-    
-        /* Estilos para el cronómetro */
-        .timer-box {
-            position: fixed;
-            top: 10px;
-            right: 20px;
-            font-size: 24px;
-            font-weight: bold;
-            color: red;
-            z-index: 1000; /* Para asegurarse de que esté por encima del contenido */
-        }
+    .exercise p {
+        font-size: 1.1rem;
+        line-height: 1.5;
+    }
 
-        
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-    
-        .btn-primary:hover {
-            background-color: #0056b3;
-            transform: translateY(-2px);
-        }
-    
-        .btn-danger {
-            background-color: #dc3545;
-            border-color: #dc3545;
-        }
-    
-        .btn-danger:hover {
-            background-color: #c82333;
-            transform: translateY(-2px);
-        }
-    
-    </style>
+    .exercise pre {
+        background-color: #f8f9fa;
+        padding: 10px;
+        border-radius: 5px;
+        font-family: monospace;
+    }
+
+    .exercise code {
+        background-color: #f0f0f0;
+        padding: 2px 4px;
+        border-radius: 3px;
+    }
+
+    /* Estilos para el cronómetro */
+    .timer-box {
+        position: fixed;
+        top: 10px;
+        right: 20px;
+        font-size: 24px;
+        font-weight: bold;
+        color: red;
+        z-index: 1000; /* Para asegurarse de que esté por encima del contenido */
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        transform: translateY(-2px);
+    }
+
+    .btn-danger {
+        background-color: #D63B2D;
+        border-color: #dc3545;
+        width: 80%;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+        transform: translateY(-2px);
+    }
+
 </style>
 {% endblock %}
