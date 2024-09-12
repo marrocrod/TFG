@@ -732,30 +732,32 @@ def exam_detail(request, exam_id):
 
 @login_required
 def submit_exam(request, exam_id):
+    # Imprime los datos POST enviados
     print("request.POST:", request.POST)  
 
     exam = get_object_or_404(Exam, exam_id=exam_id, student=request.user)
     exam.is_submitted = True
     exam.submission_time = timezone.now()
 
+    # Itera sobre los ejercicios y verifica si se envía la solución del alumno
     for exercise in exam.exercises.all():
         student_solution_key = f'student_solution_{exercise.exercise_id}'
         student_solution_value = request.POST.get(student_solution_key)
 
+        # Imprime la solución del alumno para cada ejercicio
+        print(f"Solución recibida para ejercicio {exercise.exercise_id}: {student_solution_value}")
+
         if student_solution_value:
             exercise.student_solution = student_solution_value
-            
-            prompt = f"""Estoy haciendo ejercicios de un examen y quiero evaluar la solución del siguiente ejercicio:
 
+            # Proceso de evaluación usando OpenAI, si es necesario
+            prompt = f"""Estoy haciendo ejercicios de un examen y quiero evaluar la solución del siguiente ejercicio:
             Enunciado del ejercicio:
             {exercise.statement}
-
             Solución del alumno:
             {student_solution_value}
-
             Solución esperada por el profesor:
             {exercise.solution}
-
             Responde únicamente con "correcto" o "incorrecto" en función de si el programa que 
             te he pasado es correcto o no respecto al enunciado que se propone y a la solución que se pide y dame
             una breve explicación si es necesario para señalar los fallos o aciertos del código."""
@@ -771,6 +773,8 @@ def submit_exam(request, exam_id):
             )
             evaluation = response['choices'][0]['message']['content'].strip().lower()
 
+            print(f"Evaluación recibida: {evaluation}")
+
             if evaluation.startswith("correcto"):
                 exercise.is_correct = True
                 if exercise in exam.exercises.all()[:2]:
@@ -784,14 +788,19 @@ def submit_exam(request, exam_id):
                 exercise.score = 0.0
 
         else:
+            # No se envió solución, marcar como incorrecto
+            print(f"No se recibió solución para el ejercicio {exercise.exercise_id}.")
             exercise.is_correct = False
             exercise.score = 0.0
-            exercise.student_solution = ""  
+            exercise.student_solution = ""  # No hay solución enviada
 
         exercise.save()
 
+    # Guarda el examen con su estado de envío
     exam.save()
     total_score = exam.grade
+
+    print(f"Examen {exam.exam_id} completado. Puntuación total: {total_score}")
 
     return render(request, 'exam/archived_exam.html', {'exam': exam, 'total_score': total_score})
 

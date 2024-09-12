@@ -22,7 +22,9 @@
         {% else %}
             <p class="text-muted">No hay debates recientes.</p>
         {% endif %}
-        <a href="{% url 'create_forum' %}" class="btn btn-primary mt-3 w-100">Crear un Debate</a>
+        <a href="{% url 'create_forum' %}" class="btn btn-success btn-lg my-3 create-btn">
+            <i class="fas fa-plus-circle"></i> Crear nuevo debate
+        </a>
     </div>
 
     <!-- Sección de Todos los Debates -->
@@ -59,4 +61,13 @@
         {% endif %}
     </div>
 </div>
+<style>
+    .create-btn{
+        background-color: #38C29F;
+    }
+
+    .create-btn:hover{
+        background-color: #0d9595;
+    }
+</style>
 {% endblock %}

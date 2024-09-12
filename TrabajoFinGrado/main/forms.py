@@ -52,8 +52,6 @@ class UserProfileForm(forms.ModelForm):
         model = User
         fields = ['username', 'first_name', 'last_name']  
 
-from django import forms
-
 class ChatForm(forms.Form):
     user_input = forms.CharField(
         widget=forms.Textarea(attrs={

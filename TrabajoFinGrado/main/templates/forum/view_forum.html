@@ -45,13 +45,13 @@
             <h4>Agregar Comentario</h4>
             <form method="POST">
                 {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn btn-primary mt-3">Comentar</button>
+                {{ form.content }}
+                <button type="submit" class="custom-btn">Comentar</button>
             </form>
 
             <!-- Botón para cerrar el debate (solo visible para el creador del foro) -->
             {% if forum.created_by == request.user %}
-                <a href="{% url 'close_forum' forum.id %}" class="btn btn-danger mt-3">Cerrar Debate</a>
+                <a href="{% url 'close_forum' forum.id %}" class="btn btn-danger mt-3 cerr-btn">Cerrar Debate</a>
             {% endif %}
         </div>
     {% else %}
@@ -119,6 +119,7 @@
 
 /* Reducir la altura del campo de comentario */
 textarea, input {
+    margin-top: 20px; 
     width: 100%;
     padding: 8px; /* Reducir el padding para que sea más fino */
     border-radius: 5px;
@@ -175,6 +176,11 @@ img.img-fluid {
     margin-top: 1rem;
     max-height: 400px;
     object-fit: cover;
+}
+
+.cerr-btn{
+    background-color:#D63B2D;
+    width:100%;
 }
 
 </style>

@@ -6,7 +6,7 @@
     <!-- Detalles del Alumno -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <h2 class="card-title">Detalle del Alumno</h2>
+            <h2 class="card-title">Detalles del Alumno</h2>
             <p><strong>Nombre de Usuario:</strong> {{ student.username }}</p>
             <p><strong>Correo Electrónico:</strong> {{ student.email }}</p>
             <p><strong>Grado:</strong> {{ student.degree }}</p>
@@ -16,7 +16,7 @@
     <!-- Chats Archivados -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <h3 class="card-title">Chats Archivados</h3>
+            <h3 class="card-title">Historial de chats archivados</h3>
             {% if archived_chats %}
                 <ul class="list-group list-group-flush">
                     {% for chat in archived_chats %}
@@ -36,7 +36,7 @@
     <!-- Exámenes Archivados -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <h3 class="card-title">Exámenes Archivados</h3>
+            <h3 class="card-title">Historial de exámenes archivados</h3>
             {% if archived_exams %}
                 <ul class="list-group list-group-flush">
                     {% for exam in archived_exams %}

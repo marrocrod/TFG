@@ -7,7 +7,7 @@
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit" class="btn btn-success btn-block mt-3">Crear Debate</button>
+            <button type="submit" class="custom-btn">Crear Debate</button>
         </form>
     </div>
 </div>
@@ -76,6 +76,9 @@ input:focus, select:focus, textarea:focus {
 .card form {
     margin: 0;
     padding: 0;
+}
+.custom-btn{
+    color: white;
 }
 
 

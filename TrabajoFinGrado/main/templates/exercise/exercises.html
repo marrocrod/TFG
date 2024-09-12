@@ -8,7 +8,7 @@
         <div class="col-md-8">
             <h2>Generar Ejercicios</h2>
             <p class="lead">Genera conjuntos de ejercicios personalizados y accede a los que ya has creado.</p>
-            <a href="{% url 'generate_exercises' %}" class="btn btn-success btn-lg my-3">
+            <a href="{% url 'generate_exercises' %}" class="btn btn-success btn-lg my-3 gen-btn">
                 <i class="fas fa-plus-circle"></i> Generar Nuevos Ejercicios
             </a>
         </div>
@@ -36,7 +36,7 @@
                                 <td>{{ exercise_set.created_at|date:"d M Y H:i" }}</td>
                                 <td>{{ exercise_set.exercises.first.topic }}</td>
                                 <td class="text-center">
-                                    <a href="{% url 'exercise_set_detail' exercise_set.set_id %}" class="btn btn-primary">
+                                    <a href="{% url 'exercise_set_detail' exercise_set.set_id %}" class="btn btn-primary view-btn">
                                         <i class="fas fa-eye"></i> Ver Conjunto
                                     </a>
                                 </td>
@@ -50,4 +50,20 @@
         </div>
     </div>
 </div>
+<style>
+    .view-btn{
+        background-color: #38B6C2;
+    }
+    .view-btn:hover{
+        background-color: #29959C;
+    }
+
+    .gen-btn{
+        background-color: #38C29F;
+    }
+
+    .gen-btn:hover{
+        background-color: #0d9595;
+    }
+</style>
 {% endblock %}
