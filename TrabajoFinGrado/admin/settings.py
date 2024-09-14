@@ -13,10 +13,17 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 from django.core.exceptions import ImproperlyConfigured
+import environ
+import os
+
+# Inicializar el entorno de variables
+env = environ.Env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Leer el archivo .env si existe
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -27,7 +34,7 @@ SECRET_KEY = 'django-insecure--e&+gw%v*k-1v76w%21xlui2u+pkv4y%w+belk^@buy(r!kojx
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['34.175.150.77']
 
 
 # Application definition
@@ -87,7 +94,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'saymplexfp',
-        'USER': 'postgres',
+        'USER': 'admin',
         'PASSWORD': 'admin',
         'HOST': 'localhost',
         'PORT': '5432',
@@ -156,7 +163,7 @@ AUTH_USER_MODEL = 'main.User'
 
 
 #API OPENAI
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_API_KEY = env('OPENAI_API_KEY', default=None)
 
 
 #SESION
