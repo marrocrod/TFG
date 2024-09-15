@@ -14,7 +14,13 @@ urlpatterns = [
     path('register/student/', register_student, name='register_student'),
     path('activate/<uidb64>/<token>/', activate, name='activate'),
     path('resend_activation_email/', resend_activation_email, name='resend_activation_email'),
-    path('activation_resent/', TemplateView.as_view(template_name='register/activation_resent.html'), name='activation_resent'),  # Nueva ruta
+    path('activation_resent/', TemplateView.as_view(template_name='register/activation_resent.html'), name='activation_resent'),  
+    path('password_reset/', password_reset_request, name='password_reset'),
+    path('password_reset_done/', auth_views.PasswordResetDoneView.as_view(template_name='recovery/password_reset_done.html'), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', CustomPasswordResetConfirmView.as_view(template_name='recovery/password_reset_confirm.html'), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='recovery/password_reset_complete.html'), name='password_reset_complete'),
+    path('username_recovery/', username_recovery_request, name='username_recovery'),
+    path('username_recovery_done/', TemplateView.as_view(template_name='recovery/username_recovery_done.html'), name='username_recovery_done'),
     path('login/', CustomLoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
     path('session-expired/', session_expired, name='session_expired'),
@@ -37,9 +43,9 @@ urlpatterns = [
     path('exam/<int:exam_id>/archived/', archived_exam, name='archived_exam'),
     path('calendar/', calendar_view, name='calendar'),
     path('calendar/day/<str:date>/', day_view, name='day-view'),
-    path('calendar/edit/<int:event_id>/', edit_event, name='edit-event'),  # Ruta para editar evento
-    path('calendar/delete/<int:event_id>/', delete_event, name='delete-event'),  # Ruta para eliminar evento
-    path('api/calendar-events/', calendar_events, name='calendar-events'),  # API para los eventos
+    path('calendar/edit/<int:event_id>/', edit_event, name='edit-event'),  
+    path('calendar/delete/<int:event_id>/', delete_event, name='delete-event'),  
+    path('api/calendar-events/', calendar_events, name='calendar-events'),  
     path('students/<int:student_id>/', student_detail, name='student_detail'),
     path('teachers/', teacher_list, name='teacher_list'),
     path('forums/', forum_home, name='forum_home'),
@@ -52,4 +58,4 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  # Añadir esta línea
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  

@@ -19,6 +19,11 @@
                     <input type="password" name="password" id="id_password" class="form-control custom-input" placeholder="Password">
                 </div>
 
+                <!-- Enlace para restablecer contraseña o nombre de usuario -->
+                <p class="text-center">
+                    <a href="{% url 'password_reset' %}">¿Ha olvidado su contraseña o nombre de usuario? Pulse aquí.</a>
+                </p>
+
                 <!-- Mostrar mensajes de error aquí, debajo de los campos -->
                 {% if form.errors or messages %}
                     <div class="alert alert-danger">
@@ -45,7 +50,6 @@
                     </div>
                 {% endif %}
 
-                <!-- Botón más abajo -->
                 <button type="submit" class="btn btn-primary btn-block custom-btn mt-5">Iniciar Sesión</button>
             </form>
 

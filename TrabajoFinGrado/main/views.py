@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, PasswordResetConfirmView
 from django.contrib.auth import login, get_user_model, authenticate
+from django.contrib.auth.forms import PasswordResetForm
 from django.conf import settings
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, send_mail
 from django.http import HttpResponseForbidden, JsonResponse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode  
@@ -13,6 +14,7 @@ from django.db.models import Q
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
+from django.urls import reverse_lazy
 
 from datetime import datetime, timedelta
 
@@ -27,7 +29,7 @@ from django.views.decorators.csrf import csrf_exempt
 import openai
 import json
 import markdown
-
+import re
 
 #~~~~~~~~HOME~~~~~~~~
 def home(request):
@@ -45,8 +47,6 @@ def home(request):
             search_query = request.GET.get('search', '')
             degree_filters = request.GET.getlist('degrees')
 
-            # Print para depurar búsqueda y grados seleccionados
-
 
             students = User.objects.filter(user_type='Student').order_by('username')
 
@@ -61,7 +61,6 @@ def home(request):
             if degree_filters:
                 students = students.filter(degree__in=degree_filters)
             
-            # Print de los estudiantes después de aplicar los filtros
 
             context.update({
                 'message': "Bienvenido, Profesor.",
@@ -73,7 +72,6 @@ def home(request):
             })
             
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                print("Renderizando partial con estudiantes filtrados.")
                 return render(request, 'partials/student_list.html', {'students': students})
         
         elif request.user.user_type == 'Teacher' and request.user.verification_status == 'PENDING':
@@ -101,7 +99,6 @@ def home(request):
             'user_type': "Guest"
         }
 
-    print("Renderizando home.html con contexto:", context)
     return render(request, 'home.html', context)
 
 
@@ -198,7 +195,6 @@ def resend_activation_email(request):
         email = request.POST.get('email')
         user_id = request.session.get('user_id')
 
-        print(f"Reenviar correo POST recibido, email: {email}, user_id: {user_id}")
 
         if user_id:
             user = User.objects.get(pk=user_id)
@@ -230,21 +226,17 @@ def resend_activation_email(request):
                 print("Correo de activación reenviado, redirigiendo a página de éxito")
                 return redirect('activation_resent')
         
-        print("No se encontró el user_id en la sesión, redirigiendo a login")
         return redirect('login')
 
     else:
         email = request.GET.get('email')
         user = User.objects.filter(email=email).first()
 
-        print(f"GET recibido, email: {email}")
 
         if user and not user.is_active:
             request.session['user_id'] = user.pk
-            print(f"Usuario encontrado y no activo, user_id: {user.pk}")
             return render(request, 'register/resend_activation_email.html', {'email': email})
 
-    print("Redirigiendo a login desde GET")
     return redirect('login')
 
 #~~~~~~~~LOGIN~~~~~~~~
@@ -256,25 +248,20 @@ class CustomLoginView(LoginView):
 
     def post(self, request, *args, **kwargs):
         delete_unactivated_users()
-        print("POST request received")
     
         form = self.get_form()
         username = request.POST.get('username')
         password = request.POST.get('password')
-        print(f"Username: {username}")
 
         try:
             user = User.objects.get(username=username)
-            print(f"Usuario encontrado: {user.username}, Activo: {user.is_active}")
         
             if not user.is_active:
-                print("Cuenta inactiva detectada")
                 context = self.get_context_data(form=form)
                 context['inactive'] = True
                 context['user_email'] = user.email
                 return self.render_to_response(context)
         except User.DoesNotExist:
-            print("Usuario no encontrado")
             pass
 
         user = authenticate(request, username=username, password=password)
@@ -331,6 +318,76 @@ def edit_profile(request):
         form = UserProfileForm(instance=user)
 
     return render(request, 'edit_profile.html', {'form': form})
+
+def password_reset_request(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return render(request, "recovery/password_reset_form.html", {"error": "El nombre de usuario no existe"})
+
+        form = PasswordResetForm({'email': user.email})
+        if form.is_valid():
+            form.save(
+                request=request,
+                use_https=request.is_secure(),
+                from_email="saympl3xfp@gmail.com",
+                email_template_name="recovery/password_reset_email.html",
+                subject_template_name="recovery/password_reset_subject.txt",
+            )
+            return redirect("password_reset_done")
+    
+    return render(request, "recovery/password_reset_form.html")
+
+
+def username_recovery_request(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        try:
+            user = User.objects.get(email=email)
+            send_mail(
+                'Recuperación de Nombre de Usuario',
+                f'Tu nombre de usuario es: {user.username}',
+                'no-reply@mi-sitio.com',
+                [email],
+                fail_silently=False,
+            )
+            return redirect('username_recovery_done')
+        except User.DoesNotExist:
+            return render(request, "recovery/username_recovery.html", {"error": "No existe un usuario con ese correo electrónico"})
+    
+    return render(request, "recovery/username_recovery.html")
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'recovery/password_reset_confirm.html'
+    success_url = reverse_lazy('password_reset_complete')
+
+    def form_valid(self, form):
+        new_password1 = form.cleaned_data.get('new_password1')
+        new_password2 = form.cleaned_data.get('new_password2')
+
+        if new_password1 != new_password2:
+            form.add_error('new_password2', 'Las contraseñas no coinciden.')
+            return self.form_invalid(form)
+
+        password_error = self.validate_password_strength(new_password1)
+        if password_error:
+            form.add_error('new_password1', password_error)
+            return self.form_invalid(form)
+
+        return super().form_valid(form)
+
+    def validate_password_strength(self, password):
+        if not re.search(r'[a-z]', password):
+            return "La contraseña debe contener al menos una letra minúscula."
+        if not re.search(r'[A-Z]', password):
+            return "La contraseña debe contener al menos una letra mayúscula."
+        if not re.search(r'[0-9\W]', password):
+            return "La contraseña debe contener al menos un número o un símbolo."
+        if len(password) < 8:
+            return "La contraseña debe tener al menos 8 caracteres."
+        return None
 
 #~~~~~~~~FORUM~~~~~~~~
 
@@ -420,6 +477,10 @@ def teacher_list(request):
 
 openai.api_key = settings.OPENAI_API_KEY
 
+def process_message_content(message):
+    """Convierte el contenido markdown a HTML seguro."""
+    return mark_safe(markdown.markdown(message, extensions=['fenced_code', 'codehilite', 'extra']))
+
 @login_required
 def chat_view(request, chat_id=None):
     if chat_id is None:
@@ -432,7 +493,6 @@ def chat_view(request, chat_id=None):
             return redirect('chat', chat_id=chat.chat_id)
     else:
         chat = get_object_or_404(Chat, chat_id=chat_id)
-        print(f"Chat ID: {chat.chat_id}, Conversation at load: {chat.get_conversation()}")
 
         if chat.is_archived:
             return redirect('archived_chat', chat_id=chat_id)
@@ -444,10 +504,8 @@ def chat_view(request, chat_id=None):
         form = ChatForm(request.POST)
         if form.is_valid():
             user_input = form.cleaned_data['user_input']
-            print(f"Chat ID: {chat.chat_id}, Conversation before adding user message: {chat.get_conversation()}")
 
             chat.add_message(role="user", content=user_input)
-            print(f"Chat ID: {chat.chat_id}, Conversation after adding user message: {chat.get_conversation()}")
 
             response = openai.ChatCompletion.create(
                 model="gpt-4o-mini",  
@@ -456,12 +514,21 @@ def chat_view(request, chat_id=None):
             response_text = response['choices'][0]['message']['content']
 
             chat.add_message(role="assistant", content=response_text)
-            print(f"Chat ID: {chat.chat_id}, Updated conversation after adding assistant response: {chat.get_conversation()}")
 
     else:
         form = ChatForm()
 
-    return render(request, 'chat/chat.html', {'form': form, 'chat': chat})
+    conversation = chat.get_conversation()
+    processed_conversation = []
+    
+    for message in conversation:
+        if message['role'] == 'assistant':
+            message['content'] = process_message_content(message['content'])
+        processed_conversation.append(message)
+
+    return render(request, 'chat/chat.html', {'form': form, 'chat': chat, 'conversation': processed_conversation})
+
+
 
 
 @login_required
@@ -478,14 +545,18 @@ def archive_chat(request, chat_id):
 @login_required
 def archived_chat_view(request, chat_id):
     chat = get_object_or_404(Chat, chat_id=chat_id)
+
+    conversation = chat.get_conversation()
+    processed_conversation = []
+    for message in conversation:
+        if message['role'] == 'assistant':
+            message['content'] = process_message_content(message['content'])
+        processed_conversation.append(message)
     
-    if request.user != chat.student and request.user.user_type != 'Teacher':
-        return HttpResponseForbidden("No tienes permiso para acceder a este chat.")
-    
-    context = {
-        'chat': chat
-    }
-    return render(request, 'chat/archived_chat.html', context)
+    return render(request, 'chat/archived_chat.html', {
+        'chat': chat,
+        'conversation': processed_conversation,
+    })
 
 
 @login_required
@@ -497,6 +568,9 @@ def archived_chats_list(request):
 
     return render(request, 'chat/archived_chats_list.html', {'chats': chats})
 
+
+
+
 #~~~~~~~~EXERCISES~~~~~~~~
 
 @login_required
@@ -507,15 +581,15 @@ def generate_exercises(request):
             topic = form.cleaned_data['topic']
             difficulty = form.cleaned_data['difficulty']
             number_of_exercises = int(form.cleaned_data['number_of_exercises'])
-            set_name = form.cleaned_data['set_name']  
+            set_name = form.cleaned_data['set_name']
 
             exercise_set = ExerciseSet.objects.create(student=request.user, name=set_name)
 
             for _ in range(number_of_exercises):
                 prompt = generate_prompt(topic, difficulty)
-                
+
                 response = openai.ChatCompletion.create(
-                    model="gpt-4o-mini",  
+                    model="gpt-4o-mini",
                     messages=[
                         {"role": "system", "content": "You are a helpful assistant."},
                         {"role": "user", "content": prompt}
@@ -525,7 +599,7 @@ def generate_exercises(request):
                 )
                 generated_text = response['choices'][0]['message']['content'].strip()
                 statement, solution = parse_generated_text(generated_text)
-                
+
                 exercise = Exercise.objects.create(
                     exercise_set=exercise_set,
                     student=request.user,
@@ -536,12 +610,13 @@ def generate_exercises(request):
                 )
                 exercise.generate_html_content()
 
-            return redirect('exercise_set_detail', set_id=exercise_set.set_id)  
+            return redirect('exercise_set_detail', set_id=exercise_set.set_id)
 
     else:
         form = ExerciseGenerationForm()
 
     return render(request, 'exercise/generate_exercises.html', {'form': form})
+
 
 
 
@@ -573,16 +648,14 @@ def generate_prompt(topic, difficulty):
 
 
 def parse_generated_text(generated_text):
-    # Buscamos el indicador "Código del programa:" para separar el enunciado de la solución
     solution_split_keyword = "Solución:"
     if solution_split_keyword in generated_text:
         parts = generated_text.split(solution_split_keyword)
         statement = parts[0].strip()
         solution = parts[1].strip() if len(parts) > 1 else ""
     else:
-        # Si no se encuentra la palabra clave, asumimos que todo es parte del enunciado
         statement = generated_text.strip()
-        solution = ""  # No se proporciona solución
+        solution = ""  
 
     return statement, solution
 
@@ -603,10 +676,8 @@ def generate_exercises_view(request):
     if user.user_type != 'Student':
         return redirect('home')
 
-    # Obtener los ExerciseSet relacionados con los ejercicios que están en exámenes
     exam_exercise_sets = Exam.objects.filter(student=request.user).values_list('exercises__exercise_set', flat=True)
 
-    # Excluir los ExerciseSet que están relacionados con exámenes
     exercise_sets = user.exercise_sets.exclude(set_id__in=exam_exercise_sets).order_by('-created_at')
 
     return render(request, 'exercise/exercises.html', {
@@ -618,12 +689,7 @@ def render_exercises(request):
     exercises = Exercise.objects.all()
 
     for exercise in exercises:
-        print(f"Contenido original (Markdown): {exercise.statement}")
-
-        # Convierte Markdown a HTML seguro
         exercise.statement = mark_safe(markdown.markdown(exercise.statement, extensions=['fenced_code', 'codehilite', 'extra']))
-
-        print(f"Contenido convertido (HTML): {exercise.statement}")
 
     return render(request, 'exercise_set.html', {'exercises': exercises})
 
@@ -656,13 +722,10 @@ def generate_exam(request):
             topic_3 = form.cleaned_data['topic_3']
             topic_4 = form.cleaned_data['topic_4']
 
-            # Crear un nuevo examen
             exam = Exam.objects.create(student=request.user, name=exam_name)
 
-            # Crear un nuevo set de ejercicios para este examen
             exercise_set = ExerciseSet.objects.create(student=request.user, name=exam_name)
 
-            # Configuración de los ejercicios con los temas y las dificultades
             exercise_configs = [
                 {'difficulty': 'Easy', 'topic': topic_1},
                 {'difficulty': 'Easy', 'topic': topic_2},
@@ -685,14 +748,13 @@ def generate_exam(request):
                 generated_text = response['choices'][0]['message']['content'].strip()
                 statement, solution = parse_generated_text(generated_text)
 
-                # Crear y guardar el ejercicio dentro del examen y asignar el exercise_set
                 exercise = Exercise.objects.create(
                     student=request.user,
                     statement=statement,
                     solution=solution,
                     difficulty=config['difficulty'],
                     topic=config['topic'],
-                    exercise_set=exercise_set  # Asigna el set de ejercicios
+                    exercise_set=exercise_set  
                 )
                 exercise.generate_html_content()
 
@@ -732,25 +794,19 @@ def exam_detail(request, exam_id):
 
 @login_required
 def submit_exam(request, exam_id):
-    # Imprime los datos POST enviados
-    print("request.POST:", request.POST)  
 
     exam = get_object_or_404(Exam, exam_id=exam_id, student=request.user)
     exam.is_submitted = True
     exam.submission_time = timezone.now()
 
-    # Itera sobre los ejercicios y verifica si se envía la solución del alumno
-    for exercise in exam.exercises.all():
+    for exercise in exam.exercises.all().order_by('exercise_id'):
         student_solution_key = f'student_solution_{exercise.exercise_id}'
         student_solution_value = request.POST.get(student_solution_key)
 
-        # Imprime la solución del alumno para cada ejercicio
-        print(f"Solución recibida para ejercicio {exercise.exercise_id}: {student_solution_value}")
 
         if student_solution_value:
             exercise.student_solution = student_solution_value
 
-            # Proceso de evaluación usando OpenAI, si es necesario
             prompt = f"""Estoy haciendo ejercicios de un examen y quiero evaluar la solución del siguiente ejercicio:
             Enunciado del ejercicio:
             {exercise.statement}
@@ -773,7 +829,6 @@ def submit_exam(request, exam_id):
             )
             evaluation = response['choices'][0]['message']['content'].strip().lower()
 
-            print(f"Evaluación recibida: {evaluation}")
 
             if evaluation.startswith("correcto"):
                 exercise.is_correct = True
@@ -788,19 +843,15 @@ def submit_exam(request, exam_id):
                 exercise.score = 0.0
 
         else:
-            # No se envió solución, marcar como incorrecto
-            print(f"No se recibió solución para el ejercicio {exercise.exercise_id}.")
             exercise.is_correct = False
             exercise.score = 0.0
-            exercise.student_solution = ""  # No hay solución enviada
+            exercise.student_solution = ""  
 
         exercise.save()
 
-    # Guarda el examen con su estado de envío
     exam.save()
     total_score = exam.grade
 
-    print(f"Examen {exam.exam_id} completado. Puntuación total: {total_score}")
 
     return render(request, 'exam/archived_exam.html', {'exam': exam, 'total_score': total_score})
 
@@ -823,6 +874,9 @@ def archived_exam(request, exam_id):
 
 
 #~~~~ CALENDARIO ~~~~~~
+
+
+@login_required
 def calendar_view(request):
     now = timezone.now()
     thirty_days_from_now = now + timedelta(days=30)

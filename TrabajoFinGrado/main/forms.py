@@ -55,14 +55,12 @@ class UserProfileForm(forms.ModelForm):
 class ChatForm(forms.Form):
     user_input = forms.CharField(
         widget=forms.Textarea(attrs={
-            'rows': 3,  # Ajusta el número de filas del textarea
-            'placeholder': 'Escribe tu mensaje aquí...',  # Placeholder de guía
-            'class': 'form-control'  # Clase CSS para aplicar estilos, puedes definir la tuya
+            'rows': 3,  
+            'placeholder': 'Escribe tu mensaje aquí...',  
+            'class': 'form-control'  
         }), 
         label=''
     )
-
-
 
 class ExerciseGenerationForm(forms.Form):
     topic = forms.ChoiceField(
@@ -74,7 +72,7 @@ class ExerciseGenerationForm(forms.Form):
         widget=forms.Select(attrs={'class': 'form-control form-control-lg custom-input'})
     )
     number_of_exercises = forms.ChoiceField(
-        choices=[('', 'Seleccione el número de ejercicios'), (1, '1 ejercicio'), (2, '2 ejercicios'), (3, '3 ejercicios'), (4, '4 ejercicios')],
+        choices=[('', 'Seleccione el número de ejercicios')] + [(i, f'{i} ejercicios') for i in range(1, 11)],
         widget=forms.Select(attrs={'class': 'form-control form-control-lg custom-input'})
     )
     set_name = forms.CharField(
@@ -83,6 +81,7 @@ class ExerciseGenerationForm(forms.Form):
         label="Nombre del Conjunto de Ejercicios",
         widget=forms.TextInput(attrs={'class': 'form-control form-control-lg custom-input', 'placeholder': 'Introduce un nombre para el conjunto de ejercicios'})
     )
+
 
 
 class ExamGenerationForm(forms.Form):
