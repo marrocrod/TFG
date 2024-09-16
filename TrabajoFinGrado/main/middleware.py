@@ -59,52 +59,6 @@ class PendingTeacherMiddleware:
         response = self.get_response(request)
         return response
 
-class AuthorizedAccessMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-        self.restricted_paths = [
-            'logout', 'rejected_teacher', 'pending_teacher',
-            'user_profile', 'edit_profile', 'generate_exercises',
-            'generate_exam', 'calendar', 'calendar-events',
-            'teacher_list', 'forum_home', 'create_forum'
-        ]
-
-        self.restricted_named_paths = [
-            'chat', 'archived_chat', 'archive_chat', 'archived_chats_list',
-            'exercise_set_detail', 'exam_detail', 'submit_exam', 'archived_exam',
-            'day-view', 'edit-event', 'delete-event', 'view_forum', 'close_forum',
-            'student_detail'
-        ]
-
-    def __call__(self, request):
-        path = request.path_info.lstrip('/')  
-
-        if not request.user.is_authenticated:
-            if not path.startswith(reverse('login')):  
-                return redirect('login')
-
-        resolved_url_name = resolve(request.path_info).url_name
-        if resolved_url_name in self.restricted_paths:
-            if not request.user.is_authenticated:
-                return redirect('login')
-
-            if resolved_url_name in ['rejected_teacher', 'pending_teacher'] and request.user.user_type != 'Teacher':
-                return redirect('home')
-
-        for restricted_named_path in self.restricted_named_paths:
-            try:
-                if path.startswith(reverse(restricted_named_path, args=[1]).rsplit('/', 2)[0]):
-                    if not request.user.is_authenticated or request.user.user_type not in ['Teacher', 'Student']:
-                        return redirect('home')
-            except NoReverseMatch:
-                continue
-
-        response = self.get_response(request)
-        return response
-
-
-
 class RejectedTeacherMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
