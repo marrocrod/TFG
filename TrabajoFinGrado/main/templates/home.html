@@ -1,13 +1,14 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}Página Principal{% endblock %}
+{% block title %}SaymplexFP{% endblock %}
 
 {% block content %}
 <div class="container">
     <!-- Título de la página -->
-    <h1 class="mt-4 mb-4 text-center">{{ message }}</h1>
+    
     
     {% if user.user_type == "Teacher" %}
+    <h1 class="mt-4 mb-4 text-center">Bienvenido {{ user.username }}</h1>
     <div class="mb-4">
         <h2>Listado de Alumnos</h2>
 
@@ -16,8 +17,9 @@
             <div class="col-md-8 mb-2">
                 <input type="text" name="search" id="searchInput" class="form-control" placeholder="Buscar por nombre de usuario, nombre, apellidos o correo" value="{{ search_query }}">
             </div>
-            <div class="col-md-4 mb-2">
-                <div class="dropdown">
+            <div class="col-md-4 mb-2 d-flex">
+                <!-- Filtro por Grado -->
+                <div class="dropdown mr-2">
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownDegrees" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Filtrar por Grado
                     </button>
@@ -29,7 +31,20 @@
                         {% endfor %}
                     </div>
                 </div>
-                
+
+                <!-- Filtro por Grupo -->
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownGroups" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Filtrar por Grupo
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownGroups">
+                        {% for group_code, group_name in groups %}
+                            <a class="dropdown-item group-option" href="#" data-value="{{ group_code }}">
+                                <input type="checkbox" {% if group_code in selected_groups %}checked{% endif %}> {{ group_name }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
         </form>
 
@@ -42,79 +57,114 @@
 
     {% elif user.user_type == "Student" %}
     <!-- Contenido específico para estudiantes -->
-    <div class="mb-4">
-        <h2>Temas</h2>
-        <ul>
-            <li>Tema 1</li>
-            <li>Tema 2</li>
-            <li>Tema 3</li>
-        </ul>
+    <h1 class="mt-4 mb-4 text-center">Bienvenido {{ user.username }}</h1>
+    {% block students %}
+    <div class="container mt-4">
+        <h2>Temas Disponibles</h2>
+        <p>¡Hola! Aquí tienes todos los temas de teoría que están disponibles para ti. A continuación tendrás acceso a los diferentes temas de la asignatura Fundamentos de Programación.</p>
+        <div class="topics-container">
+            <a href="{% url 'tema1' %}" class="topic-item">1.- Introducción a Python</a>
+            <a href="{% url 'tema2' %}" class="topic-item">2.- Expresiones, tipos predefinidos y entrada salida</a>
+            <a href="{% url 'tema3' %}" class="topic-item">3.- Instrucciones condicionales y bucles</a>
+            <a href="{% url 'tema4' %}" class="topic-item">4.- Funciones</a>
+            <a href="{% url 'tema5' %}" class="topic-item">5.- Secuencias, listas y tuplas</a>
+            <a href="{% url 'tema6' %}" class="topic-item">6.- Diccionarios y conjuntos</a>
+        </div>
     </div>
+    {% endblock %}
 
-    <div class="mb-4">
-        <h2>Exámenes</h2>
-        <ul>
-            <li>Examen 1</li>
-            <li>Examen 2</li>
-            <li>Examen 3</li>
-        </ul>
-    </div>
+    {% block studentsstyles %}
+    <style>
+        .topics-container {
+            margin-top: 20px;
+        }
+
+        .topic-item {
+            display: block;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #38c19e;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .topic-item:hover {
+            background-color: #2a9d8f;
+            text-decoration: none;
+            color:white;
+        }
+    </style>
+    {% endblock %}
+
 
     {% elif not user.is_authenticated%}
-    <!-- Imagen grande horizontal -->
+
+    <h1 class="mt-4 mb-4 text-center">¡Bienvenido a SaymplexFP!</h1>
+    
+    <!-- Imagen destacada de bienvenida -->
     <div class="mb-4">
-        <img src="{% static 'images/img1.jpg' %}" class="img-fluid" alt="Imagen descriptiva del TFG">
-    </div>
-    <!-- Contenido específico para usuarios no logueados (invitados) -->
-    <div class="mb-4">
-        <p>
-            Bienvenido a nuestra plataforma educativa. Por favor, regístrate o inicia sesión para acceder a todas las funcionalidades de la plataforma.
-        </p>
+        <img src="{% static 'images/Portada.png' %}" class="img-fluid rounded mx-auto d-block" alt="Imagen principal de SaymplexFP">
     </div>
 
-    <div class="mb-4">
-        <p>
-            Bienvenido a la página web de mi Trabajo de Fin de Grado (TFG). Este proyecto ha sido diseñado para facilitar la interacción entre estudiantes y profesores en un entorno académico virtual.
+    <!-- Descripción general de la plataforma -->
+    <div class="mb-5 text-center">
+        <p class="lead">
+            ¡Hola! Bienvenido a la página SyamplexFP, donde podrás disfrutar de un profesor auxiliar sobre la asignatura de Fundamentos de Programación 
+            y sus contenidos. SaymplexFP es una plataforma de apoyo educativo diseñada para mejorar la experiencia de aprendizaje en un entorno académico virtual. 
+            Regístrate o inicia sesión para acceder a todos los recursos y funcionalidades!
         </p>
+
     </div>
 
-    <div class="mb-4 d-flex">
-        <div class="flex-grow-1">
+    <!-- Beneficios y descripción de la plataforma -->
+    <div class="mt-4 mb-4 d-flex align-items-center justify-content-center">
+        <div class="flex-grow-1 pr-3">
+            <h4>¿Qué encontrarás aquí?</h4>
             <p>
-                En esta plataforma, los estudiantes pueden inscribirse en diferentes cursos, acceder a materiales de estudio, realizar exámenes y unirse a grupos de trabajo.
+                En SaymplexFP, los estudiantes pueden inscribirse acceder a los contenidos teóricos respectivos al primer cuatrimestre de Fundamentos de Programación,
+                generar ejercicios relacionados el material de estudio proporcionado, ponerse a prueba realizando simulacros de exámenes, realizar exámenes,
+                consultar con un chat en vivo monitorizable por el profesor, para prestar atención a las dudas de los alumnos, acceso a una propia agenda personal
+                que notifica a los usuarios con antelación para que no se pierdan ningún evento y la participación en debates entre alumnos y profesores, para la resolución de dudas.
+                ¡Es el lugar perfecto para crecer académicamente y lograr tus objetivos!
             </p>
         </div>
-        <div class="ml-4">
-            <img src="{% static 'images/img2.jpg' %}" class="img-fluid" alt="Imagen explicativa">
+        <div>
+            <img src="{% static 'images/img2.jpg' %}" class="img-fluid rounded" style="max-width: 200px;" alt="Imagen explicativa ">
         </div>
     </div>
 
-    <!-- Tercer párrafo con imagen a la izquierda -->
-    <div class="mb-4 d-flex">
-        <div class="mr-4">
-            <img src="{% static 'images/img3.jpg' %}" class="img-fluid" alt="Imagen ilustrativa">
+    <!-- Información sobre el TFG -->
+    <div class="mb-4 d-flex align-items-center justify-content-center">
+        <div class="mr-3">
+            <img src="{% static 'images/img3.jpg' %}" class="img-fluid rounded"  style="max-width: 200px;" alt="Imagen ilustrativa">
         </div>
         <div class="flex-grow-1">
+            <h4>Sobre este proyecto</h4>
             <p>
-                Este TFG tiene como meta principal la creación de una herramienta útil y funcional.
+                Este proyecto, desarrollado Trabajo de Fin de Grado (TFG), tiene como objetivo crear una herramienta útil para estudiantes y profesores,
+                que anime al progreso de los estudiantes en lo que respecta al ámbito de la programación en una asignatura tan clave como lo es Fundamentos de Programación
+                fomentando una experiencia educativa accesible y colaborativa, tanto entre profesor y alumno como entre alumnos.
             </p>
         </div>
     </div>
 
-    {% endif %}
+{% endif %}
 </div>
 
 <script>
     // Evento para el filtro de grados
-document.querySelectorAll('.degree-option').forEach(function(option) {
-    option.addEventListener('click', function(event) {
-        event.preventDefault();
-        const checkbox = this.querySelector('input[type="checkbox"]');
-        checkbox.checked = !checkbox.checked;
-
-        updateStudentList();  // Actualiza la lista cuando se selecciona un grado
+    document.querySelectorAll('.degree-option, .group-option').forEach(function(option) {
+        option.addEventListener('click', function(event) {
+            event.preventDefault();
+            const checkbox = this.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+    
+            updateStudentList();  // Actualiza la lista cuando se selecciona un grado o grupo
+        });
     });
-});
 
 // Evento para la búsqueda dinámica (input)
 document.getElementById('searchInput').addEventListener('input', function() {
@@ -126,13 +176,21 @@ function updateStudentList() {
     const searchQuery = document.getElementById('searchInput').value;
     const selectedDegrees = Array.from(document.querySelectorAll('.degree-option input:checked'))
         .map(checkbox => checkbox.closest('.degree-option').getAttribute('data-value'));
+    const selectedGroups = Array.from(document.querySelectorAll('.group-option input:checked'))
+        .map(checkbox => checkbox.closest('.group-option').getAttribute('data-value'));
 
-    // Crear URL con los parámetros de búsqueda y grados seleccionados
+    // Crear URL con los parámetros de búsqueda y grados/grupos seleccionados
     const url = new URL(window.location.href);
     url.searchParams.set('search', searchQuery);
     url.searchParams.delete('degrees');  // Elimina grados anteriores
+    url.searchParams.delete('groups');  // Elimina grupos anteriores
+
     selectedDegrees.forEach(degree => {
         url.searchParams.append('degrees', degree);  // Agrega cada grado seleccionado
+    });
+    
+    selectedGroups.forEach(group => {
+        url.searchParams.append('groups', group);  // Agrega cada grupo seleccionado
     });
 
     // Llamada AJAX para actualizar la lista de estudiantes dinámicamente
@@ -149,10 +207,6 @@ function updateStudentList() {
         console.error('Error al actualizar la lista de estudiantes:', error);
     });
 }
-
-    
-    
-    
 
 </script>
 

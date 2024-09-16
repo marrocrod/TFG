@@ -1,0 +1,837 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Tema 5{% endblock %}
+{% block content %}
+<h1>Secuencias, listas y tuplas</h1>
+<p><strong>Autor:</strong> Carlos G. Vallejo, Mariano González, José A. Troyano, Fermín Cruz.   <strong>Revisor:</strong> Fermín Cruz, Beatriz Pontes   <strong>Última modificación:</strong> 24 de octubre de 2023</p>
+
+<h2 id="indice">Índice de contenidos</h2>
+<ul>
+    <li><a href="#sec_secuencias">1. Secuencias</a>
+        <ul>
+            <li><a href="#sec_rangos">1.1. Rangos</a></li>
+            <li><a href="#sec_unpacking">1.2. <em>Unpacking</em></a></li>
+            <li><a href="#sec_operadores_sec">1.3. Operadores sobre secuencias</a></li>
+            <li><a href="#sec_slicing_sec">1.4. <em>Slicing</em></a></li>
+            <li><a href="#sec_builtin_sec">1.5. Métodos y funciones predefinidas para secuencias</a></li>
+        </ul>
+    </li>
+    <li><a href="#sec_listas">2. Listas</a>
+        <ul>
+            <li><a href="#sec_creacion">2.1. Creación de una lista</a></li>
+            <li><a href="#sec_acceso">2.2. Acceso a una lista</a></li>
+            <li><a href="#sec_otras">2.3. Otras operaciones con listas</a></li>
+        </ul>
+    </li>
+    <li><a href="#sec_comprension_listas">3. Comprensión de listas</a>
+        <ul>
+            <li><a href="#sec_generadores">3.1. Generadores por comprensión</a></li>
+        </ul>
+    </li>
+    <li><a href="#sec_tuplas">4. Tuplas</a>
+        <ul>
+            <li><a href="#sec_namedtuple">4.1. Tuplas con nombre</a></li>
+        </ul>
+    </li>
+</ul>
+
+<h2 id="sec_secuencias">1. Secuencias</h2>
+<p>Las <strong>secuencias</strong> son todos aquellos tipos contenedores cuyos elementos pueden ser recorridos mediante un bucle <em>for</em>, y accedidos mediante los corchetes. Es decir, si la variable <code>sec</code> es una secuencia, podremos recorrer sus elementos mediante el siguiente código:</p>
+
+<pre><code>for elemento in sec:
+    ...
+</code></pre>
+
+<p>, y acceder a los elementos mediante <code>sec[i]</code>, para valores de <code>i</code> mayores o iguales a 0.</p>
+
+<p>Además de lo anterior, con las secuencias podemos hacer una serie de operaciones, independientemente del tipo de secuencia. En esta sección estudiaremos estas operaciones comunes a todas las secuencias.</p>
+
+<p>Entre otros, tenemos los siguientes tipos de secuencias:</p>
+<ul>
+    <li><strong>Listas:</strong> secuencias <strong>mutables</strong>, habitualmente se usan para representar colecciones ordenadas de objetos homogéneos (aunque no hay problema en que una lista contenga objetos de distintos tipos).</li>
+    <li><strong>Tuplas:</strong> secuencias <strong>inmutables</strong>, habitualmente se usan para representar <em>registros</em> de datos heterogéneos (aunque no hay problema en que todos los elementos de una tupla sean del mismo tipo).</li>
+    <li><strong>Rangos:</strong> representación de una secuencia <strong>inmutable</strong> de números que habitualmente se usan como índices al iterar con un bucle <code>for</code>. Un objeto rango no contiene todos los valores de un rango, solo <em>está preparado para generarlos</em> en el momento en el que se le solicitan (se dice que es una secuencia <strong>perezosa</strong>).</li>
+</ul>
+
+<p>Las <strong>listas</strong> se construyen con corchetes y las <strong>tuplas</strong> con paréntesis:</p>
+
+<pre><code>lista = [1, 2, 3]
+print(lista)
+tupla = (1, 2, 3)
+print(tupla)
+</code></pre>
+
+<p>Para acceder a los elementos de una secuencia se utilizan los corchetes, indicando la posición que nos interesa. La posición es un número entre <code>0</code> (la primera posición) y <code>tamaño-1</code> (la última posición). Si intentamos acceder a una posición no existente provocaremos un error, como en la última instrucción de la siguiente celda:</p>
+
+<pre><code>print(lista[0], lista[2])
+print(tupla[1], tupla[2])
+
+# ERROR: el índice 3 no existe en la variable 'lista' (el máximo es 3)
+print(lista[3])
+</code></pre>
+
+<p>Los índices negativos permiten acceder a una secuencia desde el final. El índice <code>-1</code> accede a la última posición de una secuencia, el <code>-2</code> a la penúltima, y así sucesivamente. Los índices negativos se pueden usar en cualquier tipo de secuencia:</p>
+
+<pre><code>print(lista[-1])
+print((2, 4, 6, 8)[-1])
+</code></pre>
+
+<h3 id="sec_rangos">1.1. Rangos</h3>
+<p>Los <strong>rangos</strong> se construyen con la función <code>range</code>. Si intentamos imprimir un objeto <code>range</code> solo obtendremos la información sobre sus límites. Para visualizar todos los elementos podemos debemos forzar la conversión a un objeto, por ejemplo, de tipo lista, antes de imprimirlo, o bien podríamos recorrer sus elementos en un bucle <code>for</code>:</p>
+
+<pre><code>print("Objeto de tipo rango:", range(10))
+print("Lista obtenida a partir del rango anterior:", list(range(10)))
+
+print("Valores obtenidos al recorrer el rango anterior:", end=" ")
+for x in range(10):
+    print(x, end=" ")
+</code></pre>
+
+<p>Podemos especificar rangos de varias formas:</p>
+<ul>
+    <li>Indicando solo un límite superior: se genera un rango desde <code>0</code> hasta ese límite <strong>menos uno</strong>.</li>
+    <li>Indicando el límite inferior y el límite superior del rango: se genera un rango desde el límite inferior (incluido) hasta el límite superior (<strong>excluido</strong>).</li>
+    <li>Indicando ambos límites y un <em>paso</em>, que determina el incremento de un elemento del rango al siguiente.</li>
+    <li>Indicando un paso negativo, en ese caso el límite izquierdo debe ser mayor que el derecho.</li>
+</ul>
+
+<pre><code>print(list(range(10)))
+print(list(range(10, 20)))
+print(list(range(10, 20, 2)))
+print(list(range(20, 10, -1)))
+</code></pre>
+
+<h3 id="sec_unpacking">1.2. <em>Unpacking</em></h3>
+<p>Se denomina <strong>unpacking</strong> al proceso de extraer valores desde una secuencia y guardarlos en variables independientes. Esto se consigue mediante una asignación en la que en la parte izquierda hay varias variables receptoras.</p>
+
+<p>Podemos aplicar <strong>unpacking</strong> desde cualquier secuencia: listas, tuplas y rangos. El número de elementos de la colección debe coincidir con el número de variables receptoras. Si eso no ocurre provocaremos un error, como en la última instrucción de la siguiente celda:</p>
+
+<pre><code>a, b, c = [1, 2, 3]
+print(a, b, c)
+a, b, c = (4, 5, 6)
+print(a, b, c)
+a, b, c = range(7, 10)
+print(a, b, c)
+
+# ERROR: más elementos que variables receptoras
+a, b, c = [1, 2, 3, 4]
+</code></pre>
+
+<p>El <em>unpacking</em> se utiliza habitualmente en dos situaciones. La primera, para recoger los valores devueltos por una función, cuando la función devuelve una tupla. De esta forma podemos utilizar una variable independiente para cada uno de los valores devueltos por la función:</p>
+
+<pre><code>def busca_alumno_mejor_calificacion(alumnos):
+    '''Devuelve el nombre del alumno con mejor nota, y dicha nota'''
+    # ...
+    # (se omite el código de la función)
+    # ...
+    # Finalmente, se devuelve el nombre y la nota encontrados:
+    return nombre, nota
+    
+# Llamamos a la función anterior, y guardamos el resultado en 
+# dos variables, aprovechando el unpacking:
+alumno, calificacion = busca_alumno_mejor_calificacion(alumnos)
+</code></pre>
+
+<p>Observa que la función devuelve una tupla, por lo que, tras la ejecución de la función, se ejecutará la siguiente asignación, similar a las mostradas anteriormente:</p>
+
+<pre><code>alumno, calificacion = ("Miguelito Gutiérrez", 9.5) # Suponiendo que la función haya devuelto estos valores
+</code></pre>
+
+<p>El <em>unpacking</em> también se utiliza para recorrer los elementos de una secuencia, cuando dichos elementos son a su vez secuencias (generalmente, tuplas). Observa el siguiente ejemplo de código:</p>
+
+<pre><code># La lista alumnos_con_notas es de la forma [(alumno1, nota1), (alumno2,nota2), ...]
+for alumno, calificacion in alumnos_con_notas:
+    ...
+</code></pre>
+
+<p>En cada iteración del bucle, la instrucción <code>for</code> hará una asignación entre las variables <code>alumno, calificacion</code> y uno de los elementos de la lista. Por ejemplo, en la primera vuelta:</p>
+
+<pre><code>alumno, calificacion = (alumno1, nota1)
+</code></pre>
+
+<h3 id="sec_operadores_sec">1.3. Operadores sobre secuencias</h3>
+<p>En esta sección veremos una serie de operadores comunes a los tres tipos de secuencias. Por tanto, pueden ser utilizadas con listas, tuplas, cadenas o rangos.</p>
+
+<p>En muchas de las celdas con las que ilustraremos estos operadores usaremos como base las siguientes listas:</p>
+
+<pre><code>estados = ["nublado", "nublado", "soleado", "soleado", ("soleado","ventoso"), "nublado", ("lluvioso", "ventoso")]
+temperaturas = [23, 23, 28, 29, 25, 24, 20]
+</code></pre>
+
+<p>El operador <code>in</code> evalúa si un determinado elemento <em>pertenece</em> a una colección. Sería el equivalente al operador matemático $\in$. He aquí algunos ejemplos:</p>
+
+<pre><code># Sobre listas
+print("nublado" in estados)
+print(("lluvioso", "ventoso") in estados)
+print(("nublado", "ventoso") in estados)
+
+# Sobre tuplas
+print(1 in (2, 1, 5))
+
+# Sobre rangos
+print(1 in range(10))
+</code></pre>
+
+<p>El operador <code>not in</code> determina si un determinado elemento <em>no pertenece</em> a una colección. Sería el equivalente al operador matemático $\not\in$. He aquí algunos ejemplos:</p>
+
+<pre><code>print(("nublado", "ventoso") not in estados)
+print(1 not in range(10, 20))
+print(1 not in (2, 3, 1))
+</code></pre>
+
+<p>Los operadores aritméticos <code>+</code> y <code>*</code> están definidos para listas, tuplas y cadenas (no para rangos). El significado de cada uno de ellos es el siguiente:</p>
+<ul>
+    <li>El operador <code>+</code>, entre dos secuencias, concatena dos secuencias. No se pueden concatenar secuencias de tipos distintos (por ejemplo, listas con tuplas o con cadenas).</li>
+    <li>El operador <code>*</code>, entre una secuencia y un número, replica la secuencia tantas veces como indique el número.</li>
+</ul>
+
+<pre><code># Sobre listas
+print(temperaturas + [22])
+print(temperaturas * 2)
+
+# Sobre tuplas
+print((1, 2) + (3, 4))
+print((1, 2) * 2)
+</code></pre>
+
+<p>La prioridad de los operadores es similar a la de los operadores aritméticos. De mayor a menor prioridad, este es el orden en el que se aplican los operadores de manejo de secuencias:</p>
+<ul>
+    <li>Operador <code>*</code></li>
+    <li>Operador <code>+</code></li>
+    <li>Operadores <code>in</code>, <code>not in</code></li>
+</ul>
+
+<pre><code>print([1] + [2] * 3)
+print(1 in [2] + [1])
+</code></pre>
+
+<p>Los operadores anteriores se pueden utilizar con cadenas:</p>
+
+<pre><code>print("h" in "Almohada")
+print("in" + "nato")
+print("ja"*3)
+</code></pre>
+
+<h3 id="sec_slicing_sec">1.4. <em>Slicing</em></h3>
+<p>El **slicing** nos permite seleccionar un fragmento de una secuencia. Se usa para ello el operador <code>:</code> dentro de los corchetes, que nos permite especificar un rango de acceso a los elementos de la secuencia. Como en los rangos, se incluye el límite inferior, pero se excluye el límite superior. Se puede aplicar _slicing_ sobre listas, tuplas, cadenas y rangos:</p>
+
+<pre><code># Sobre listas
+print(temperaturas[1:3])
+
+# Sobre tuplas
+print((2, 4, 6, 8, 9)[1:3])
+
+# Sobre rangos
+print(range(10,20)[3:6])
+print(list(range(10,20)[3:6]))
+
+# Sobre cadenas
+print("María Gómez"[0:5])
+</code></pre>
+
+<p>No es obligatorio definir ambos límites al especificar un _slicing_. Si no se especifica el límite inferior, se seleccionan los elementos de la secuencia desde el principio. Si no se especifica el límite superior, se seleccionan los elementos de la secuencia hasta el final:</p>
+
+<pre><code>print(temperaturas[:2])
+print(temperaturas[4:])
+print(temperaturas[:])
+</code></pre>
+
+<p>Se puede hacer _slicing_ tanto con índices positivos como con índices negativos:</p>
+
+<pre><code>print(temperaturas[-3:]) # Los tres últimos elementos
+</code></pre>
+
+<p>Al igual que ocurría en la definición de rangos, a la hora de especificar un _slicing_ se pueden indicar los límites junto con un _paso_. De esta forma, gracias al _paso_, se puede hacer una selección no continua de los elementos de la colección:</p>  
+
+<pre><code>print(temperaturas[0:7:2])
+</code></pre>
+
+<h3 id="sec_builtin_sec">1.5. Métodos y funciones predefinidas para secuencias</h3>
+
+<p>En esta sección veremos algunas funciones predefinidas aplicables a cualquier secuencia, y también algunos métodos que se pueden ejecutar para cualquier secuencia, ya sean mutables o inmutables. </p>
+
+<p>La primera de estas funciones es <strong>len</strong> que calcula el tamaño de una secuencia:</p>
+
+<pre><code>temperaturas = [23, 23, 28, 29, 25, 24, 20]
+
+print(len(temperaturas))
+print(len((2, 4, "seis")))
+print(len(range(10, 20)))
+</code></pre>
+
+<p>La función <strong>sum</strong> devuelve la suma de todos los elementos de una secuencia. La aplicaremos solo para secuencias de números:</p>
+
+<pre><code>print(sum(temperaturas))
+</code></pre>
+
+<p>Las funciones <strong>max</strong> y <strong>min</strong> calculan, respectivamente, el máximo y el mínimo de una secuencia. Estas funciones se pueden aplicar sobre cualquier secuencia siempre que sean homogéneas (todos los elementos sean del mismo tipo) y exista una función de comparación para los elementos. Por ejemplo, los números (<code>int</code> y <code>float</code>) y las cadenas (<code>str</code>) sí tienen esas funciones de comparación. Si los elementos de la secuencia son a su vez secuencias (por ejemplo, es habitual que los elementos de una lista sean tuplas), entonces los elementos se comparan utilizando el primer elemento de las tuplas.</p>
+
+<pre><code># Sobre listas
+print(min(temperaturas))
+print(max(temperaturas))
+
+# Sobre tuplas
+print(max(("rojo", "verde", "azul")))
+
+# Sobre rangos
+print(min(range(10, 20)))
+
+# Sobre listas de tuplas
+lista_tuplas = [(1,20), (2,30), (7,5)]
+print(max(lista_tuplas))
+
+# ERROR: no se puede encontrar el máximo en una secuencia con tipos heterogéneos
+print(max(("rojo", "verde", 1)))
+</code></pre>
+
+<p>La función predefinida <strong>reversed</strong> calcula la inversa de una secuencia. No crea una secuencia, sino un iterador; esto significa que podemos recorrer los elementos, pero no acceder a posiciones arbitrarias mediante los corchetes. Si queremos _materializar_ la secuencia podemos hacerlo, por ejemplo, con la función <code>list</code>:</p>
+
+<pre><code># Sobre listas
+print(reversed(temperaturas))
+print(list(reversed(temperaturas)))
+
+# Sobre tuplas
+print(reversed((1, 2, 3)))
+print(list(reversed((1, 2, 3))))
+
+# Sobre rangos
+print(reversed(range(10, 20)))
+print(list(reversed(range(10, 20))))
+</code></pre>
+
+<p>La función predefinida <strong>sorted</strong> crea una lista ordenada a partir de una secuencia. Se puede aplicar a cualquier secuencia (listas, tuplas o rangos) pero siempre produce una lista como salida. El parámetro <code>reverse</code> nos permite indicar si queremos aplicar un orden ascendente o descendente:</p>
+
+<pre><code># Sobre listas
+print(sorted(temperaturas))
+print(sorted(temperaturas, reverse=True))
+
+# Sobre tuplas
+print(sorted((3, 1, 2)))
+
+# Sobre rangos
+print(sorted(range(20, 10, -1)))
+</code></pre>
+
+<p>Otro parámetro interesante de la función <code>sorted</code> es <code>key</code>. A través de ese parámetro podemos indicar el uso de una función de comparación específica. Por ejemplo, podemos indicarle que utilice la función predefinida <code>len</code>, de manera que primero se pasará cada elemento por dicha función y se ordenará la lista según los valores devueltos por esa función:</p>
+
+<pre><code># Ordena la lista de menor a mayor tamaño de las cadenas de texto
+dias = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+print(sorted(dias, key=len))
+</code></pre>
+
+<p>Un caso típico de aplicación del parámetro <code>key</code> es la ordenación de una lista de tuplas. El criterio de ordenación _por defecto_ de una lista de tuplas se basa en comparar los primeros componentes de las tuplas. En el siguiente ejemplo, se construye una función _lambda_ que permite ordenar las tuplas en función del segundo componente de las mismas:</p>
+
+<pre><code># Ordena las tuplas por el segundo componente
+dias = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+dias_temps = zip(dias, temperaturas)
+# lambda x:x[1] define la función "dada x, devolver x[1]"
+print(sorted(dias_temps, key=lambda x: x[1]))
+</code></pre>
+
+<p>Las secuencias son objetos y, como tales, tienen métodos que permiten realizar ciertas operaciones de consulta. Dos de ellos son <strong>count</strong> e <strong>index</strong>, que permiten, respectivamente, contar el número de elementos de las secuencias y determinar el índice de la primera ocurrencia de un determinado valor. Estas operaciones se pueden aplicar a cualquier tipo de secuencia:</p>
+
+<pre><code># Sobre listas
+estados = ["nublado", "nublado", "soleado", "soleado", ("soleado","ventoso"), "nublado", ("lluvioso", "ventoso")]
+print(estados.count("nublado"))
+print(estados.index("soleado"))
+
+# Sobre tuplas
+print((0, 1, 2, 2, 1, 1).count(1))
+print((0, 1, 2, 2, 1, 1).index(1))
+
+# Sobre cadenas
+texto = "En un lugar de la Mancha de cuyo nombre no quiero acordarme"
+print("Apariciones de la letra a:", texto.count("a"))
+</code></pre>
+
+<p>¡Ahora es tu turno!</p>
+
+<pre><code># Ordena la lista 'dias_nombres' por el día de la semana
+print(sorted(dias_nombres, key=lambda x: x[0]))
+
+# Obtén a partir de la lista anterior las tuplas correspondientes a los 10 últimos viernes
+print([tupla for tupla in sorted(dias_nombres, key=lambda x: x[0]) if tupla[0] == "viernes"][-10:])
+
+# Cambia la lista 'dias_nombres' para que los nombres de los días 1 y 6 pasen a ser 'lunes-festivo' y 'sábado-festivo'
+dias_nombres[1] = ("lunes-festivo", dias_nombres[1][1])
+dias_nombres[6] = ("sábado-festivo", dias_nombres[6][1])
+print(dias_nombres)
+</code></pre>
+
+
+<h3 id="sec_slicing_sec">1.4. <em>Slicing</em></h3>
+<p>El **slicing** nos permite seleccionar un fragmento de una secuencia. Se usa para ello el operador <code>:</code> dentro de los corchetes, que nos permite especificar un rango de acceso a los elementos de la secuencia. Como en los rangos, se incluye el límite inferior, pero se excluye el límite superior. Se puede aplicar _slicing_ sobre listas, tuplas, cadenas y rangos:</p>
+
+<pre><code># Sobre listas
+print(temperaturas[1:3])
+
+# Sobre tuplas
+print((2, 4, 6, 8, 9)[1:3])
+
+# Sobre rangos
+print(range(10,20)[3:6])
+print(list(range(10,20)[3:6]))
+
+# Sobre cadenas
+print("María Gómez"[0:5])
+</code></pre>
+
+<p>No es obligatorio definir ambos límites al especificar un _slicing_. Si no se especifica el límite inferior, se seleccionan los elementos de la secuencia desde el principio. Si no se especifica el límite superior, se seleccionan los elementos de la secuencia hasta el final:</p>
+
+<pre><code>print(temperaturas[:2])
+print(temperaturas[4:])
+print(temperaturas[:])
+</code></pre>
+
+<p>Se puede hacer _slicing_ tanto con índices positivos como con índices negativos:</p>
+
+<pre><code>print(temperaturas[-3:]) # Los tres últimos elementos
+</code></pre>
+
+<p>Al igual que ocurría en la definición de rangos, a la hora de especificar un _slicing_ se pueden indicar los límites junto con un _paso_. De esta forma, gracias al _paso_, se puede hacer una selección no continua de los elementos de la colección:</p>  
+
+<pre><code>print(temperaturas[0:7:2])
+</code></pre>
+
+
+<h3 id="sec_builtin_sec">1.5. <em>Métodos y funciones predefinidas para secuencias</em></h3>
+
+<p>En esta sección veremos algunas funciones predefinidas aplicables a cualquier secuencia, y también algunos métodos que se pueden ejecutar para cualquier secuencia, ya sean mutables o inmutables.</p>
+
+<p>La primera de estas funciones es <strong>len</strong> que calcula el tamaño de una secuencia:</p>
+
+<pre><code>temperaturas = [23, 23, 28, 29, 25, 24, 20]
+
+print(len(temperaturas))  # Devuelve 7
+print(len((2, 4, "seis")))  # Devuelve 3
+print(len(range(10, 20)))  # Devuelve 10
+</code></pre>
+
+<p>La función <strong>sum</strong> devuelve la suma de todos los elementos de una secuencia. La aplicaremos solo para secuencias de números:</p>
+
+<pre><code>print(sum(temperaturas))  # Devuelve 150
+</code></pre>
+
+<p>Las funciones <strong>max</strong> y <strong>min</strong> calculan, respectivamente, el máximo y el mínimo de una secuencia. Estas funciones se pueden aplicar sobre cualquier secuencia siempre que sean homogéneas (todos los elementos sean del mismo tipo) y exista una función de comparación para los elementos. Por ejemplo, los números (<code>int</code> y <code>float</code>) y las cadenas (<code>str</code>) sí tienen esas funciones de comparación. Si los elementos de la secuencia son a su vez secuencias (por ejemplo, es habitual que los elementos de una lista sean tuplas), entonces los elementos se comparan utilizando el primer elemento de las tuplas.</p>
+
+<pre><code># Sobre listas
+print(min(temperaturas))  # Devuelve 20
+print(max(temperaturas))  # Devuelve 29
+
+# Sobre tuplas
+print(max(("rojo", "verde", "azul")))  # Devuelve "verde"
+
+# Sobre rangos
+print(min(range(10, 20)))  # Devuelve 10
+
+# Sobre listas de tuplas
+lista_tuplas = [(1, 20), (2, 30), (7, 5)]
+print(max(lista_tuplas))  # Devuelve (7, 5) ya que se compara por el primer elemento
+
+# ERROR: no se puede encontrar el máximo en una secuencia con tipos heterogéneos
+# print(max(("rojo", "verde", 1)))  # Genera un TypeError
+</code></pre>
+
+<p>La función predefinida <strong>reversed</strong> calcula la inversa de una secuencia. No crea una secuencia, sino un iterador; esto significa que podemos recorrer los elementos, pero no acceder a posiciones arbitrarias mediante los corchetes. Si queremos _materializar_ la secuencia podemos hacerlo, por ejemplo, con la función <code>list</code>:</p>
+
+<pre><code># Sobre listas
+print(reversed(temperaturas))  # Devuelve un iterador
+print(list(reversed(temperaturas)))  # Devuelve [20, 24, 25, 29, 28, 23, 23]
+
+# Sobre tuplas
+print(reversed((1, 2, 3)))  # Devuelve un iterador
+print(list(reversed((1, 2, 3))))  # Devuelve (3, 2, 1)
+
+# Sobre rangos
+print(reversed(range(10, 20)))  # Devuelve un iterador
+print(list(reversed(range(10, 20))))  # Devuelve [19, 18, 17, 16, 15, 14, 13, 12, 11, 10]
+</code></pre>
+
+<p>La función predefinida <strong>sorted</strong> crea una lista ordenada a partir de una secuencia. Se puede aplicar a cualquier secuencia (listas, tuplas o rangos) pero siempre produce una lista como salida. El parámetro <code>reverse</code> nos permite indicar si queremos aplicar un orden ascendente o descendente:</p>
+
+<pre><code># Sobre listas
+print(sorted(temperaturas))  # Devuelve [20, 23, 23, 24, 25, 28, 29]
+print(sorted(temperaturas, reverse=True))  # Devuelve [29, 28, 25, 24, 23, 23, 20]
+
+# Sobre tuplas
+print(sorted((3, 1, 2)))  # Devuelve [1, 2, 3]
+
+# Sobre rangos
+print(sorted(range(20, 10, -1)))  # Devuelve [20, 19, 18, 17, 16, 15, 14, 13, 12, 11]
+</code></pre>
+
+<p>Otro parámetro interesante de la función <code>sorted</code> es <code>key</code>. A través de ese parámetro podemos indicar el uso de una función de comparación específica. Por ejemplo, podemos indicarle que utilice la función predefinida <code>len</code>, de manera que primero se pasará cada elemento por dicha función y se ordenará la lista según los valores devueltos por esa función:</p>
+
+<pre><code># Ordena la lista de menor a mayor tamaño de las cadenas de texto
+dias = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+print(sorted(dias, key=len))  # Devuelve ['lunes', 'martes', 'jueves', 'viernes', 'domingo', 'sábado', 'miércoles']
+</code></pre>
+
+<p>Un caso típico de aplicación del parámetro <code>key</code> es la ordenación de una lista de tuplas. El criterio de ordenación _por defecto_ de una lista de tuplas se basa en comparar los primeros componentes de las tuplas. En el siguiente ejemplo, se construye una función _lambda_ que permite ordenar las tuplas en función del segundo componente de las mismas:</p>
+
+<pre><code># Ordena las tuplas por el segundo componente
+dias = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+dias_temps = zip(dias, temperaturas)
+# lambda x:x[1] define la función "dada x, devolver x[1]"
+print(sorted(dias_temps, key=lambda x: x[1]))  # Devuelve [('sábado', 24), ('lunes', 23), ('martes', 23), ('domingo', 20), ('viernes', 29), ('jueves', 28), ('miércoles', 25)]
+</code></pre>
+
+<p>Las secuencias son objetos y, como tales, tienen métodos que permiten realizar ciertas operaciones de consulta. Dos de ellos son <strong>count</strong> e <strong>index</strong>, que permiten, respectivamente, contar el número de elementos de las secuencias y determinar el índice de la primera ocurrencia de un determinado valor. Estas operaciones se pueden aplicar a cualquier tipo de secuencia:</p>
+
+<pre><code># Sobre listas
+estados = ["nublado", "nublado", "soleado", "soleado", ("soleado", "ventoso"), "nublado", ("lluvioso", "ventoso")]
+print(estados.count("nublado"))  # Devuelve 3
+print(estados.index("soleado"))  # Devuelve 2
+
+# Sobre tuplas
+print((0, 1, 2, 2, 1, 1).count(1))  # Devuelve 3
+print((0, 1, 2, 2, 1, 1).index(1))  # Devuelve 1
+
+# Sobre cadenas
+texto = "En un lugar de la Mancha de cuyo nombre no quiero acordarme"
+print("Apariciones de la letra a:", texto.count("a"))  # Devuelve 7
+</code></pre>
+
+<h4>¡Prueba tú!</h4>
+
+<pre><code># Ordena la lista 'dias_nombres' por el día de la semana
+print(sorted(dias_nombres, key=lambda x: x[0]))
+
+# Obtén a partir de la lista anterior las tuplas correspondientes a los 10 últimos viernes
+print([tupla for tupla in sorted(dias_nombres, key=lambda x: x[0]) if tupla[0] == "viernes"][-10:])
+</code></pre>
+
+<h4>¡Prueba tú!</h4>
+
+<pre><code># Cambia la lista 'dias_nombres' para que los nombres de los días 1 y 6 pasen a ser 'lunes-festivo' y 'sábado-festivo'
+dias_nombres[1] = ("lunes-festivo", dias_nombres[1][1])
+dias_nombres[6] = ("sábado-festivo", dias_nombres[6][1])
+print(dias_nombres)
+</code></pre>
+
+<h2 id="sec_listas">2. <em>Listas</em></h2>
+
+<p>En muchas ocasiones tenemos varios datos que están relacionados entre sí. Las listas nos permiten almacenar todos esos datos en una misma variable, gracias a lo cual podemos realizar operaciones con todos los datos a la vez y no de uno en uno.</p>
+
+<p>Piensa por ejemplo en las temperaturas previstas para los próximos siete días, los nombres de las capitales europeas o las edades de tus amigos. Si almacenas esos datos en una lista, podrás acceder a cada uno de ellos por separado (la temperatura del próximo miércoles, por ejemplo), o realizar operaciones con todos a la vez (por ejemplo, saber cuál es la capital europea que tiene un nombre más largo).</p>
+
+<h3 id="sec_creacion">2.1 <em>Creación de una lista</em></h3>
+
+<p>Para crear una lista escribimos su nombre y le asignamos un valor, que es una secuencia de elementos separados por comas y encerrados entre corchetes. Si solo ponemos los corchetes, estaremos creando una lista vacía, que más tarde podremos rellenar. También podemos crear una lista vacía invocando a la función <code>list()</code>.</p>
+
+<pre><code># Una lista vacía:
+lista_vacia = []
+otra_lista_vacia = list()
+
+# Listas con elementos de distintos tipos:
+colores = ["cyan", "magenta", "amarillo"]
+temperaturas = [25.2, 24.9, 25.2, 26.7, 28.6, 29.5, 29.7]
+</code></pre>
+
+<p>Observa que las listas pueden contener valores repetidos. Por ejemplo, el primer y el tercer elemento de la lista <code>temperaturas</code> tienen el mismo valor, aunque son dos elementos diferentes.</p>
+
+<p>También puedes ver que los elementos de una lista pueden ser de cualquier tipo. Incluso pueden ser tuplas, como en este otro ejemplo:</p>
+
+<pre><code>frecuencia_caracteres = [(23, "e"), (7, "s"), (12, "a")]
+</code></pre>
+
+<p>Podemos incluso crear listas con elementos de tipos diferentes, si bien no es algo muy frecuente:</p>
+
+<pre><code>lista_mix = ["Juan", 23, 75.4]
+</code></pre>
+
+<h4>¡Prueba tú!</h4>
+
+<pre><code># Crea las siguientes listas:
+# * Una lista con los nombres de tus amigos
+# * Una lista con el nombre y la altura de 5 jugadores de baloncesto
+
+amigos = ["Ana", "Luis", "Carlos", "María"]
+jugadores_baloncesto = [("Juan", 1.90), ("Luis", 1.85), ("Ana", 1.80), ("Marta", 1.88), ("Pablo", 1.92)]
+</code></pre>
+
+<h3 id="sec_acceso">2.2 <em>Acceso a una lista</em></h3>
+
+<p>Podemos acceder a una lista escribiendo su nombre. Por ejemplo, para mostrar en pantalla los valores de la lista <code>temperaturas</code> haremos lo siguiente:</p>
+
+<pre><code>print(temperaturas)
+</code></pre>
+
+<p>Al igual que con cualquier secuencia, podemos acceder a un elemento concreto de la lista. Para ello hemos de indicar la posición que ocupa el elemento dentro de la lista, lo cual se hace de la siguiente forma:</p>
+
+<pre><code>print("La temperatura del lunes es:", temperaturas[0])
+</code></pre>
+
+<p>Si la lista está formada por tuplas, al acceder a un elemento tendremos una tupla. Podemos a su vez acceder a un elemento de la tupla indicando su posición. Por ejemplo, si queremos acceder al primer carácter de la lista de tuplas <code>frecuencia_caracteres</code>, haríamos lo siguiente:</p>
+
+<pre><code># Accedemos a la tupla y después al carácter
+tupla = frecuencia_caracteres[0]
+primer_caracter = tupla[1]
+print(primer_caracter)
+
+# O bien, accedemos directamente al carácter:
+primer_caracter = frecuencia_caracteres[0][1]
+print(primer_caracter)
+</code></pre>
+
+<p>En las listas, podemos utilizar el acceso a una posición para cambiar un elemento de la misma, o incluso un trozo de la lista, si usamos <em>slicing</em>:</p>
+
+<pre><code># Modificación de una posición
+temperaturas[3] = 12.0
+print(temperaturas)
+
+# Modificación de un grupo de posiciones
+temperaturas[0:3] = [-1, -1, -1]
+print(temperaturas)
+</code></pre>
+
+<h3 id="sec_otras">2.3 <em>Otras operaciones con listas</em></h3>
+
+<p>Veamos algunas operaciones básicas específicas de las listas. Ten en cuenta que, además de todas estas operaciones, con las listas podemos utilizar el resto de operaciones comunes a todas las secuencias, explicadas en la sección anterior.</p>
+
+<p>Para añadir un elemento a una lista utilizamos el método <strong>append</strong>. El elemento se añade al final de la lista. Fíjate en su funcionamiento ejecutando el código siguiente y observando cómo cambia la lista:</p>
+
+<pre><code>print(colores)
+colores.append("negro")
+print(colores)
+</code></pre>
+
+<p>Si queremos añadir un elemento en una posición distinta al final, podemos hacerlo mediante el método <strong>insert</strong>, indicando la posición donde queremos añadir el elemento como primer parámetro del método:</p>
+
+<pre><code>colores.insert(0, "rojo")
+print(colores)
+
+colores.insert(1, "verde")
+print(colores)
+</code></pre>
+
+<p>La operación contraria a la anterior es la de eliminar un elemento de una lista. Para hacerlo utilizamos la función <strong>del</strong>, a la cual hemos de pasar como parámetro la posición que ocupa en la lista el elemento que queremos eliminar. Observa su funcionamiento en el siguiente ejemplo:</p>
+
+<pre><code>print(temperaturas)
+del(temperaturas[2])
+print(temperaturas)
+</code></pre>
+
+<p>Observa cómo se elimina el tercer elemento de la lista, el que ocupa la posición 2. Fíjate que el primer elemento permanece, aunque su valor sea el mismo que el que hemos eliminado. Solo se elimina el que ocupa la posición indicada. Lógicamente, los elementos que le siguen ven modificada su posición: el elemento 3 pasa a ser ahora el 2, el 4 pasa a ser el 3, y así sucesivamente.</p>
+
+<p>También podemos eliminar todos los elementos de la lista mediante el método <strong>clear</strong>:</p>
+
+<pre><code>temperaturas.clear()
+print(temperaturas)
+</code></pre>
+
+<p>El método <strong>sort</strong> permite modificar el orden de los elementos de una lista, para que dicha lista quede ordenada. Esto también se podía conseguir con la función predefinida <code>sorted</code>, como vimos antes. La diferencia es que en este caso no se obtiene una nueva lista, sino que se altera la posición de los elementos que componen la lista.</p>
+
+<pre><code>temperaturas = [25.2, 24.9, 25.2, 26.7, 28.6, 29.5, 29.7]
+
+temperaturas.sort()
+print(temperaturas)
+</code></pre>
+
+<p>El método <code>sort</code> dispone de los mismos parámetros opcionales de la función <code>sorted</code>, esto es:</p>
+<ul>
+    <li>El parámetro <code>reverse</code>, para indicar que queremos ordenar de mayor a menor.</li>
+    <li>El parámetro <code>key</code>, para indicar una función de comparación específica.</li>
+</ul>
+
+<p>Además de <code>sort</code>, también tenemos el método <strong>reverse</strong>, que invierte la posición de los elementos de una lista:</p>
+
+<pre><code>temperaturas.reverse()
+print(temperaturas)
+</code></pre>
+
+
+<h2 id="sec_comprension_listas">3. <em>Definición de listas por comprensión</em></h2>
+
+<p>Python nos permite crear una lista por comprensión (en inglés, <em>comprehension</em>). Esto tiene mucha relación con la definición de conjuntos por comprensión de las matemáticas. Sea por ejemplo, en matemáticas esta expresión:</p>
+
+<p><code>S = \{x^2 \mid x \in [3, 7), x \ \text{impar}\}</code></p>
+
+<p>Esta expresión matemática se podría leer así: <strong>Sea el conjunto S formado por el cuadrado de x para todas las x del intervalo [3, 7) tales que x sea impar</strong>. El conjunto del ejemplo contiene por tanto los valores 9 y 25.</p>
+
+<p>En Python, podemos obtener una lista con los elementos del conjunto anterior usando la definición por comprensión de listas de la siguiente forma:</p>
+
+<pre><code>s = [x**2 for x in range(3, 7) if x % 2 == 1]
+print(s)
+</code></pre>
+
+<p>Compara esta definición del conjunto en Python con la definición matemática anterior. En realidad, esta definición por comprensión es equivalente al siguiente código:</p>
+
+<pre><code>s = list()
+for x in range(3, 7):
+    if x % 2 == 1:
+        s.append(x**2)
+print(s)
+</code></pre>
+
+<p>Generalizando lo anterior, si tenemos un trozo de código que construye una lista de esta forma:</p>
+
+<pre><code>nueva_lista = []
+for e in vieja_lista:
+    if filtro(e):
+        nueva_lista.append(transformacion(e))
+</code></pre>
+
+<p>Se puede escribir, usando comprensión, como:</p>
+
+<pre><code>nueva_lista = [transformacion(e) for e in vieja_lista if filtro(e)]
+</code></pre>
+
+<p>Vamos a ver esto con un ejemplo. Supongamos que de la lista <code>edades</code> anterior queremos obtener una nueva lista, <code>mayores_edad</code> con las que sean mayores o iguales que 21. Escribiríamos:</p>
+
+<pre><code>print(edades)
+mayores_edad = [e for e in edades if e >= 21]
+print(mayores_edad)
+</code></pre>
+
+<h3 id="sec_generadores">3.1. <em>Generadores por comprensión</em></h3>
+
+<p>Si utilizamos la misma sintaxis de la definición de listas por comprensión pero obviando los corchetes de inicio y fin, diremos que tenemos un generador por comprensión. Sin entrar en muchos detalles, un generador por comprensión define una manera de obtener una secuencia, pero sin almacenar cada uno de esos elementos en la memoria del ordenador (como sí ocurría al definir una lista por comprensión). La utilidad de estos generadores es que podemos usarlos en cualquier sitio donde usaríamos una estructura de datos iterable (por ejemplo, una lista).</p>
+
+<p>Observa este ejemplo:</p>
+
+<pre><code>def suma_numeros(lista):
+    suma = 0
+    for e in lista:
+        suma += e
+    return suma
+
+
+numeros = [12, 14, 15, 23, 76, 54, 32, 81]
+print("Suma de los numeros:",
+       suma_numeros(numeros)
+       )
+
+numeros_pares = [n for n in numeros if n % 2 == 0]
+print("Suma de los numeros pares:", 
+      suma_numeros(numeros_pares)
+      )
+</code></pre>
+
+<p>Para poder usar la función <code>suma_numeros</code> para calcular la suma de los números de la lista <code>numeros</code> que sean pares, hemos creado una lista intermedia <code>numeros_pares</code>. Le pasamos esta nueva lista a la función y obtenemos la suma de los números pares de la lista <code>numeros</code>.</p>
+
+<p>Pero, ¿es necesario crear una nueva lista con esos elementos pares? Usando un generador por comprensión, no lo es:</p>
+
+<pre><code>print("Suma de los numeros pares:", 
+      suma_numeros(n for n in numeros if n % 2 == 0)
+      )
+</code></pre>
+
+<p>Aunque ambas soluciones obtienen el mismo resultado, la ventaja principal de esta última es que no se está creando una segunda lista en memoria con los números pares. Es, por tanto, una solución más eficiente.</p>
+
+<p>Por supuesto, no es necesario definir ninguna función <code>suma_numeros</code> para resolver el problema anterior. Podemos usar la función predefinida <code>sum()</code>:</p>
+
+<pre><code>print("Suma de los numeros pares:", 
+      sum(n for n in numeros if n % 2 == 0)
+      )
+</code></pre>
+
+<p>Podemos usar los generadores por comprensión como parámetro de cualquier función que realice cálculos sobre secuencias:</p>
+
+<pre><code>print("Números de la lista mayores a 30, ordenados de menor a mayor:",
+      sorted(n for n in numeros if n > 30)
+      )
+</code></pre>
+
+
+<h2 id="sec_tuplas">4. <em>Tuplas</em></h2>
+
+<p>Una tupla es un tipo de secuencia similar a las listas pero que es inmutable. Esto quiere decir que, una vez creada, no podemos añadir, eliminar ni modificar elementos.</p>
+
+<p>Así como las listas se pueden definir por sus elementos colocados entre corchetes y separados por comas, las tuplas se pueden definir por sus elementos colocados entre paréntesis y separados también por comas:</p>
+
+<pre><code>t = (1, 2, 3)
+
+t = 4, 5, 6   # En algunos casos, los paréntesis son opcionales...
+
+lista_tuplas = [(1,2), (3,4), (5,6)] # ... salvo que las tuplas sean elementos de otras secuencias...
+lista_tuplas.append((7,8)) # ... o le pasemos una tupla como parámetro a una función
+
+t = (1)  # Esto NO es una tupla de un elemento
+print(type(t))
+
+t = (1,) # Hay que añadir una coma al final para definir tuplas de un solo elemento
+print(type(t))
+</code></pre>
+
+<p>Podemos construir tuplas a partir de otras secuencias usando la función predefinida <code>tuple</code>:</p>
+
+<pre><code>tupla_pares_menores_20 = tuple(edades)
+print(tupla_pares_menores_20)
+</code></pre>
+
+<p>Las tuplas, a diferencia de las listas, sí suelen usarse con elementos no homogéneos; pueden usarse, por ejemplo, para modelar diferentes características de un objeto. Por ejemplo, podemos definir las tuplas:</p>
+
+<pre><code>persona1 = "John", "Doe", "varón", 23, 1.83, 87.3
+persona2 = ("Jane", "Doe", "mujer", 25, 1.62, 64.0)
+print(persona1, persona2)
+</code></pre>
+
+<p>Podemos referenciar cada uno de los elementos de una tupla mediante una variable (aplicando <strong>unpacking</strong>) y tratarlos posteriormente como variables independientes:</p>
+
+<pre><code>nombre, apellidos, sexo, edad, estatura, peso = persona1
+print(nombre, apellidos)
+edad += 1
+print(edad)
+print(persona1)
+</code></pre>
+
+<p>Las tuplas se usan frecuentemente para devolver varios valores en una función. Por ejemplo:</p>
+
+<pre><code>def devuelve_dos_mayores(lista):
+    mayor = max(lista)
+    lista.remove(mayor)
+    segundo_mayor = max(lista)
+    return mayor, segundo_mayor
+
+mayores = devuelve_dos_mayores([6, 2, 54, 1, 653, 32, 53])
+print(mayores)
+</code></pre>
+
+<p>Y se suele combinar con el <em>unpacking</em>, como vimos antes:</p>
+
+<pre><code>mayor1, mayor2 = devuelve_dos_mayores([6, 2, 54, 1, 653, 32, 53])
+print(mayor1, mayor2)
+</code></pre>
+
+<h3>¡Prueba tú!</h3>
+<p>Escribe una función <code>calcula_estadisticos</code> que reciba una secuencia de números y devuelva el máximo, el mínimo y la media.</p>
+
+<pre><code># In[ ]:
+</code></pre>
+
+
+<h3 id="sec_namedtuple">4.1 <em>Tuplas con nombre</em></h3>
+
+<p>El uso de tuplas para representar una entidad mediante una serie de campos de datos es habitual y práctico, pero el uso del operador de acceso habitual de las secuencias (es decir, el uso de corchetes e índices) a veces puede comprometer la legibilidad del código, y por tanto, su mantenimiento. Y, además, son frecuentes los errores, por ejemplo al usar un índice que no se corresponda con el campo al que queremos acceder.</p>
+
+<p>Una solución elegante es la utilización del tipo <code>namedtuple</code>. Para ello, lo primero que hacemos es crearnos un tipo tupla personalizado, poniendo un nombre tanto al tipo de tupla que estamos creando como a cada uno de los campos:</p>
+
+<pre><code>from collections import namedtuple
+
+Persona = namedtuple("Persona", "nombre, apellidos, sexo, edad, altura, peso")
+# Otra opción es pasar los nombres de los campos como una lista:
+# Persona = namedtuple("Persona", ["nombre", "apellidos", "sexo", "edad", "altura", "peso"])
+</code></pre>
+
+<p>La llamada a <code>namedtuple</code> nos devuelve una función de construcción de tuplas. Usando esta función (que hemos almacenado en el ejemplo anterior en la variable <code>Persona</code>), podemos crear tuplas con los campos que hemos especificado anteriormente:</p>
+
+<pre><code>persona1 = Persona("John", "Doe", "varón", 23, 1.83, 87.3)
+print(persona1)
+</code></pre>
+
+<p>Una vez hecho esto, podemos acceder a los campos indicando sus nombres, de esta forma:</p>
+
+<pre><code>print("Nombre y apellidos:", persona1.nombre, persona1.apellidos)
+print("Edad:", persona1.edad)
+print("Sexo:", persona1.sexo)
+
+# Se pueden seguir usando los índices para acceder a los elementos,
+# aunque no es lo recomendable
+print("Altura:", persona1[4])
+</code></pre>
+
+{% endblock %}
+
+
+

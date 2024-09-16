@@ -46,6 +46,7 @@ def home(request):
         if user.user_type == "Teacher" and request.user.verification_status == 'APPROVED':
             search_query = request.GET.get('search', '')
             degree_filters = request.GET.getlist('degrees')
+            group_filters = request.GET.getlist('groups')  
 
 
             students = User.objects.filter(user_type='Student').order_by('username')
@@ -61,6 +62,8 @@ def home(request):
             if degree_filters:
                 students = students.filter(degree__in=degree_filters)
             
+            if group_filters:
+                students = students.filter(group__in=group_filters)
 
             context.update({
                 'message': "Bienvenido, Profesor.",
@@ -68,7 +71,10 @@ def home(request):
                 'students': students,
                 'degrees': User.DegreeChoices.choices,  
                 'selected_degrees': degree_filters,  
-                'search_query': search_query  
+                'search_query': search_query,
+                'groups': User.GroupChoices.choices, 
+                'selected_groups': group_filters, 
+
             })
             
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -83,7 +89,7 @@ def home(request):
             exercise_sets = user.exercise_sets.all().order_by('-created_at')
 
             context.update({
-                'message': "Bienvenido, Estudiante.",
+                'message': "Bienvenido, {{ user.username }}.",
                 'user_type': "Student",
                 'exercise_sets': exercise_sets,
                 'exams': exams
@@ -1046,4 +1052,26 @@ def student_detail(request, student_id):
 
 
 
-
+#############################################################
+#############################################################
+################### ---- TEORIA ---- ########################
+#############################################################
+#############################################################
+@login_required
+def view_tema1(request):
+    return render(request, 'tm/tema1.html')
+@login_required
+def view_tema2(request):
+    return render(request, 'tm/tema2.html')
+@login_required
+def view_tema3(request):
+    return render(request, 'tm/tema3.html')
+@login_required
+def view_tema4(request):
+    return render(request, 'tm/tema4.html')
+@login_required
+def view_tema5(request):
+    return render(request, 'tm/tema5.html')
+@login_required
+def view_tema6(request):
+    return render(request, 'tm/tema6.html')

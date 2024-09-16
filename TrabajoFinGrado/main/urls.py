@@ -52,7 +52,12 @@ urlpatterns = [
     path('forums/create/', create_forum, name='create_forum'),
     path('forums/<int:forum_id>/', view_forum, name='view_forum'),
     path('forums/<int:forum_id>/close/', close_forum, name='close_forum'),
-
+    path('tema-1/', view_tema1, name='tema1'),
+    path('tema-2/', view_tema2, name='tema2'),
+    path('tema-3/', view_tema3, name='tema3'),
+    path('tema-4/', view_tema4, name='tema4'),
+    path('tema-5/', view_tema5, name='tema5'),
+    path('tema-6/', view_tema6, name='tema6'),
 ]
 
 

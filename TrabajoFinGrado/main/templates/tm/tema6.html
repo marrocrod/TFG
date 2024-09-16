@@ -1,0 +1,562 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Tema 6{% endblock %}
+{% block content %}
+<h1>Diccionarios y conjuntos</h1>
+<p><strong>Autor</strong>: Fermín Cruz   <strong>Revisor</strong>: Carlos G. Vallejo, Mariano González, José A. Troyano, Fernando Enríquez.  <strong>Última modificación</strong>: 24 de octubre de 2023</p>
+
+<h2>Índice de contenidos</h2>
+<ul>
+  <li><a href="#sec_conjuntos">1. Conjuntos</a>
+    <ul>
+      <li><a href="#sec_operaciones_conjuntos">1.1. Operaciones sobre conjuntos</a></li>
+      <li><a href="#sec_operaciones_entre_conjuntos">1.2. Operaciones entre conjuntos</a></li>
+    </ul>
+  </li>
+  <li><a href="#sec_diccionarios">2. Diccionarios</a>
+    <ul>
+      <li><a href="#sec_inicializacion">2.1. Inicialización de diccionarios</a></li>
+      <li><a href="#sec_operaciones">2.2. Operaciones con diccionarios</a></li>
+      <li><a href="#sec_recorrido">2.3. Recorrido de diccionarios</a></li>
+      <li><a href="#sec_definicion">2.4. Definición de diccionarios por comprensión</a></li>
+      <li><a href="#sec_counter">2.5. El tipo <em>Counter</em></a></li>
+      <li><a href="#sec_defaultdict">2.6. El tipo <em>defaultdict</em></a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="sec_conjuntos">1. Conjuntos</h2>
+
+<p>Los conjuntos son un tipo de contenedor, igual que lo son las listas o las tuplas, pero con importantes diferencias. Sus principales características son:</p>
+<ul>
+  <li>Son <strong>mutables</strong>.</li>
+  <li><strong>No admiten duplicados</strong>. Si insertamos un nuevo elemento que ya existía en el conjunto, simplemente no se añade.</li>
+  <li><strong>Los elementos no tienen una posición asociada</strong>, como sí la tenían en las listas o en las tuplas. Por tanto, podemos recorrer los elementos de un conjunto, o preguntar si contiene a un elemento determinado, pero no acceder a una posición concreta.</li>
+</ul>
+
+<p>Además, una propiedad muy interesante de los conjuntos es que su operación de pertenencia (es decir, el operador <code>in</code> usado sobre conjuntos) es mucho más eficiente que el de las listas. Esta es la razón para usar conjuntos en lugar de listas en algunas ocasiones, cuando la principal utilidad que le vamos a dar al conjunto es preguntarle muchas veces a lo largo de la ejecución de algún algoritmo si contiene o no a determinados elementos.</p>
+
+<h3 id="sec_operaciones_conjuntos">1.1. Operaciones sobre conjuntos</h3>
+
+<p>Para inicializar un conjunto, podemos hacerlo usando las llaves, o la función <code>set()</code>:</p>
+
+<pre><code># 1. Inicializar un conjunto vacío
+# NO SE PUEDEN USAR LAS LLAVES, puesto que entonces Python entiende que estamos inicializando un diccionario.
+conjunto = set()
+print("1. Conjunto vacío:", conjunto)
+
+# 2. Inicializar un conjunto explícitamente
+conjunto = {1, 2, 3}
+print("2. Conjunto explícito:", conjunto)
+
+# 3. Inicializar un conjunto a partir de los elementos de una secuencia
+lista = [1, 5, 5, 2, 2, 4, 3, -4, -1]
+conjunto = set(lista)
+print("3. Conjunto a partir de secuencia:", conjunto)
+</code></pre>
+
+<p>Observa que en el ejemplo anterior, al inicializar un conjunto a partir de una secuencia, se eliminan los duplicados. Precisamente este es <strong>uno de los usos más habituales de los conjuntos: obtener los valores distintos contenidos en una secuencia</strong>.</p>
+
+<p>Los conjuntos también se pueden definir por <strong>comprensión</strong>, como vimos para las listas. La única diferencia es que usaremos las llaves en lugar de los corchetes. Por ejemplo, podemos definir el conjunto de los elementos pares de la variable <code>lista</code> así:</p>
+
+<pre><code>conjunto_pares = {e for e in lista if e % 2 == 0}
+print(conjunto_pares)
+</code></pre>
+
+<p>Los conjuntos <strong>son iterables</strong> mediante un <code>for</code>. A diferencia de las listas, no podemos saber en qué orden se recorrerán sus elementos:</p>
+
+<pre><code>for elemento in conjunto:
+    print(elemento)
+</code></pre>
+
+<p>También podemos utilizar el <strong>operador de pertenencia</strong> <code>in</code> para preguntar por la pertenencia de un elemento al conjunto. Aunque esto es algo que podíamos hacer con las listas, en el caso de los conjuntos la operación es mucho más eficiente. Por tanto, si en un algoritmo se realizan una gran cantidad de operaciones de pertenencia, puede ser apropiado volcar los elementos en un conjunto en lugar de en una lista.</p>
+
+<p>Vamos a comprobarlo experimentalmente:</p>
+
+<pre><code># Importamos este módulo para hacer mediciones del tiempo de ejecución
+import time
+import random
+
+# Creamos una lista con los números del 0 al 9999
+lista_numeros = list(range(10000)) 
+
+# Guardamos una marca de tiempo del momento
+# en que comienza la ejecución del siguiente
+# bucle
+inicio = time.time()
+
+# Repetimos un millón de veces
+# la operación de pertenencia
+# sobre una lista
+for i in range(1000000):
+    numero = random.randint(0,20000)  # Generamos un número aleatorio
+    if numero in lista_numeros:  # Ejecutamos operación de pertenencia sobre la lista
+        pass  # No hacemos nada, sólo queremos medir cuánto tarda la operación in
+
+# Obtenemos otra marca de tiempo del momento
+# en que finaliza el bucle
+fin = time.time()
+
+# Restando ambas marcas de tiempo, sabemos el tiempo
+# que ha tardado en ejecutarse el bucle anterior
+print("Tiempo de ejecución con lista:", fin - inicio, "segundos.")
+
+# Ahora repetimos el mismo procedimiento, pero usaremos
+# un conjunto en lugar de una lista
+conjunto_numeros = set(lista_numeros)
+inicio = time.time()
+for i in range(1000000):
+    numero = random.randint(0,1000) # Generamos un número aleatorio
+    if numero in conjunto_numeros:  # Ejecutamos operación de pertenencia sobre el conjunto
+        pass
+fin = time.time()
+print("Tiempo de ejecución con conjunto:", fin - inicio, "segundos.")
+</code></pre>
+
+<h3 id="sec_operaciones_entre_conjuntos">1.2. Operaciones entre conjuntos</h3>
+
+<p>Todas las operaciones matemáticas entre conjuntos están implementadas en Python mediante operadores. En concreto, podemos hacer:</p>
+<ul>
+  <li><a href="http://www.google.es/search?q=union+de+conjuntos">Unión de conjuntos</a>, mediante el operador <code>|</code>.</li>
+  <li><a href="http://www.google.es/search?q=interseccion+de+conjuntos">Intersección de conjuntos</a>, mediante el operador <code>&</code>.</li>
+  <li><a href="http://www.google.es/search?q=diferencia+de+conjuntos">Diferencia de conjuntos</a>, mediante el operador <code>-</code>.</li>
+  <li><a href="http://www.google.es/search?q=diferencia+simetrica+de+conjuntos">Diferencia simétrica de conjuntos</a>, mediante el operador <code>^</code>.</li>
+</ul>
+
+<p>Puedes experimentar cómo funcionan estas operaciones en el siguiente ejemplo, modificando los elementos de los conjuntos iniciales:</p>
+
+<pre><code>a = {1, 2, 3, 4, 5}
+b = {4, 5, 6, 7, 8}
+
+print("Unión:", a | b)
+print("Intersección:", a & b)
+print("Diferencia:", a - b)
+print("Diferencia simétrica:", a ^ b)
+</code></pre>
+
+<p>Aunque también podemos utilizar métodos para realizar las mismas operaciones. Observa el siguiente código:</p>
+
+<pre><code>a = {1, 2, 3, 4, 5}
+b = {4, 5, 6, 7, 8}
+
+print("Unión:", a.union(b))
+print("Intersección:", a.intersection(b))
+print("Diferencia:", a.difference(b))
+print("Diferencia simétrica:", a.symmetric_difference(b))
+</code></pre>
+
+<p>También es posible interpelar a Python acerca de si un conjunto es un subconjunto de otro, con el operador <code>&lt;=</code> (o con el operador <code>&lt;</code>, para preguntar si es un subconjunto propio). Igualmente podemos usar los operadores <code>&gt;</code> y <code>&gt;=</code> para averiguar si un conjunto es un superconjunto o un superconjunto propio de otro:</p>
+
+<pre><code>a = {1, 2, 3, 4, 5, 6}
+b = {1, 2, 3}
+
+print("¿Es a un subconjunto de b?", a <= b)
+print("¿Es b un subconjunto de a?", b <= a)
+print("¿Es a un subconjunto de sí mismo?", a <= a)
+print("¿Es a un subconjunto propio de sí mismo?", a < a)
+</code></pre>
+
+<h4>¡Prueba tú!</h4>
+
+<p>Los operadores <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code> y <code>&gt;=</code> también se pueden usar entre listas. Haz pruebas y trata de explicar cómo funcionan estos operadores cuando trabajan con listas:</p>
+
+<pre><code>lista1 = [1,2,3,4]
+lista2 = [1,2]
+lista3 = [3,4]
+lista4 = []
+
+print(lista2 < lista1)
+
+# Añade más pruebas:
+</code></pre>
+
+<p>Además de las operaciones propias de conjuntos, también pueden usarse algunas de las operaciones para secuencias que vimos en el notebook sobre secuencias (a pesar de que los conjuntos <strong>no</strong> son secuencias):</p>
+
+<pre><code>print("Tamaño del conjunto a:", len(a))
+print("Suma de elementos de a:", sum(a))
+print("Mínimo de a:", min(a))
+print("Máximo de a:", max(a))
+print("Elementos de a, ordenados:", sorted(a)) # sorted devuelve siempre una lista, aunque le pasemos un conjunto
+</code></pre>
+
+<h3 id="sec_diccionarios">2. Diccionarios</h3>
+
+<p>Los <strong>diccionarios</strong> son un tipo contenedor, como lo son las listas o las tuplas. La principal característica que los diferencia de otros tipos contenedor es que los valores contenidos en un diccionario están <em>indexados</em> mediante claves. Esto significa que para acceder a un valor contenido en un diccionario, debemos conocer la clave correspondiente, de manera parecida a como para acceder a un elemento concreto de una lista o una tupla necesitamos conocer la posición que ocupa dicho elemento.</p>
+
+<p>A diferencia de las listas y las tuplas, en las que las posiciones que ocupan los elementos están implícitas en la propia definición de la lista, en los diccionarios debemos especificar explícitamente una clave para cada elemento.</p>
+
+<p>Veamos algunos ejemplos de inicialización y acceso a elementos de un diccionario, comparándolo con una tupla:</p>
+
+<pre><code>datos_personales_tupla = ("Miguel", "González Buendía", 24, 1.75, 72.3)
+# Acceso al elemento indexado en la posición 0
+print(datos_personales_tupla[0])
+
+datos_personales_diccionario = {"nombre": "Miguel", "apellidos": "González Buendía", "edad": 24, "altura": 1.75, "peso": 72.3}
+# Acceso al elemento indexado con la clave "nombre"
+print(datos_personales_diccionario["nombre"])
+</code></pre>
+
+<p>Tal como se ve en el ejemplo, los diccionarios son una alternativa al uso de tuplas para representar información heterogénea sobre algún tipo de entidad. Pero son mucho más potentes que eso, porque tienen importantes diferencias:</p>
+<ul>
+  <li>Los diccionarios son <strong>mutables</strong>, lo que significa que podemos añadir o eliminar parejas clave-valor en cualquier momento.</li>
+  <li>Los valores pueden ser de cualquier tipo. Incluso pueden ser listas u otros diccionarios.</li>
+  <li>Sin embargo, <strong>las claves deben ser obligatoriamente de algún tipo inmutable</strong>. Lo más frecuente es que sean cadenas, números o fechas, o bien tuplas formadas por estos tipos.</li>
+</ul>
+
+<p>Es frecuente visualizar los diccionarios como una tabla de dos columnas, donde representamos las claves y los valores asociados a dichas claves:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>clave</th>
+      <th>valor</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>"nombre"</td>
+      <td>"Miguel"</td>
+    </tr>
+    <tr>
+      <td>"apellidos"</td>
+      <td>"González Buendía"</td>
+    </tr>
+    <tr>
+      <td>"edad"</td>
+      <td>24</td>
+    </tr>
+    <tr>
+      <td>"altura"</td>
+      <td>1.75</td>
+    </tr>
+    <tr>
+      <td>"peso"</td>
+      <td>72.3</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="sec_inicializacion">2.1. Inicialización de diccionarios</h4>
+
+<p>Existen múltiples opciones para inicializar un diccionario. A continuación se muestran distintos ejemplos:</p>
+
+<pre><code># 1. Diccionario vacío, mediante función dict
+diccionario = dict()  
+print("1:", diccionario)
+
+# 2. Diccionario vacío, mediante llaves
+diccionario = {}      # Diccionario vacío
+print("2:", diccionario)
+
+# 3. Mediante una secuencia de tuplas, de dos elementos cada tupla (cada tupla representa una pareja clave-valor)
+diccionario = dict([("clave1", "valor1"), ("clave2", "valor2"), ("clave3", "valor3")])
+print("3:", diccionario)
+
+# 4. También podemos pasar cada pareja clave-valor como un parámetro por nombre a la función dict.
+# En este caso, las claves siempre serán cadenas
+diccionario = dict(clave1 = "valor1", clave2 = "valor2", clave3 = "valor3")
+print("4:", diccionario)
+
+# 5. Si tenemos las claves y las tuplas en dos secuencias, podemos usar zip
+claves = ["clave1", "clave2", "clave3"]
+valores = ["valor1", "valor2", "valor3"]
+diccionario = dict(zip(claves, valores))
+print("5:", diccionario)
+
+# 6. Mediante las llaves, podemos especificar una serie de parejas clave-valor
+# Esta es quizás la opción más frecuente cuando se quiere inicializar un diccionario con unos valores conocidos.
+diccionario = {"clave1": "valor1", "clave2": "valor2", "clave3": "valor3"}
+print("6:", diccionario)
+</code></pre>
+
+<p>Aunque al mostrar los diccionarios las claves y valores asociados aparecen en el mismo orden en que fueron escritos al inicializar el diccionario, dichas parejas clave-valor (también llamadas <strong>items</strong>) no tienen un orden determinado dentro del diccionario. Por tanto, <strong>dos diccionarios serán iguales si tienen las mismas parejas</strong>, independientemente del orden en que fueran insertadas en el diccionario:</p>
+
+<pre><code>diccionario2 = {"clave2": "valor2", "clave3": "valor3", "clave1": "valor1"}
+print("¿Son iguales diccionario y diccionario2?", diccionario==diccionario2)
+</code></pre>
+
+<p>En los ejemplos anteriores tanto las claves como los valores son de tipo cadena. Por supuesto, podemos usar otros tipos, tanto para las claves como para los valores (recordando que los tipos de las claves deben ser inmutables, como señalamos antes). Es frecuente que los valores sean a su vez de algún tipo contenedor. Por ejemplo:</p>
+
+<pre><code># Glosario de un libro, indicando las páginas en las que aparecen distintos conceptos
+# Las claves son de tipo cadena y los valores de tipo lista
+glosario = {'programación estructurada': [14,15,18,24,85,86], 'funciones': [2,3,4,8,9,10,11,14,15,18], ...}
+</code></pre>
+
+<h3 id="sec_operaciones">2.2. Operaciones con diccionarios</h3>
+
+<p>Repasaremos en esta sección las operaciones más comunes con diccionarios.</p>
+
+<p>Para <strong>acceder a un valor a partir de una clave</strong>, podemos utilizar los corchetes (de forma parecida a como accedemos a los elementos de una lista) o el método get:</p>
+
+<pre><code>diccionario = {"clave1": "valor1", "clave2": "valor2", "clave3": "valor3"}
+
+# 1. Acceso a un valor a partir de una clave mediante corchetes o mediante método get
+print("1. El valor asociado a clave1 es", diccionario["clave1"])
+print("1. El valor asociado a clave1 es", diccionario.get("clave1"))
+
+# 2. Si utilizo en los corchetes una clave que no existe en el diccionario, se produce un error
+# Descomenta la instrucción de abajo si quieres comprobarlo
+# print("2. El valor asociado a clave4 es", diccionario["clave4"])
+
+# 3. Sin embargo, si utilizo el método get con una clave no existente, obtengo un valor por defecto (None):
+print("3. El valor asociado a clave4 es", diccionario.get("clave4"))
+
+# 4. Podemos cambiar el valor por defecto que devuelve get cuando no encuentra una clave, mediante un segundo parámetro:
+print("4. El valor asociado a clave4 es", diccionario.get("clave4","noexiste"))
+</code></pre>
+
+<p>Para <strong>añadir una nueva pareja clave-valor</strong> o <strong>modificar el valor para una clave ya existente</strong> podemos usar una instrucción de asignación, junto con el operador de acceso anterior (los corchetes):</p>
+
+<pre><code># Inserción de una nueva pareja
+diccionario["clave4"] = "valor4"
+
+# Modificación del valor para una clave existente
+diccionario["clave1"] = "valor1_modificado"
+
+print(diccionario)
+</code></pre>
+
+<p>Si queremos <strong>volcar toda la información contenida en un diccionario en otro diccionario</strong>, usaremos el método <em>update</em>. Debemos tener en cuenta que al hacer esto puede que estemos sobrescribiendo los valores asociados a algunas claves del diccionario que estamos actualizando; esto ocurrirá cuando en el diccionario que estamos volcando haya claves iguales a las claves del diccionario que estamos actualizando:</p>
+
+<pre><code>diccionario2 = {"clave4": "valor4_modificado", "clave5": "valor5", "clave6": "valor6"}
+
+diccionario.update(diccionario2)
+print(diccionario)
+</code></pre>
+
+<p>Si usamos la función predefinida <em>len</em> sobre un diccionario, <strong>obtenemos el número de parejas clave-valor que contiene el diccionario</strong>:</p>
+
+<pre><code>print("Número de items que tiene el diccionario:", len(diccionario))
+</code></pre>
+
+<p>Para <strong>eliminar una pareja clave-valor</strong>, utilizamos la instrucción <em>del</em>:</p>
+
+<pre><code># Borrado de una pareja clave-valor
+del diccionario["clave4"]
+print(diccionario)
+
+# Si intento borrar una clave inexistente, obtengo un error
+del diccionario["clave4"]
+</code></pre>
+
+<p>Podemos <strong>borrar todo el contenido de un diccionario</strong>, mediante el método <em>clear</em>:</p>
+
+<pre><code>diccionario.clear()
+print(diccionario)
+</code></pre>
+
+<p>En ocasiones necesitaremos realizar alguna tarea utilizando únicamente las claves o los valores de un diccionario. Para <strong>obtener todas las claves o los valores</strong> de un diccionario usaremos los métodos <em>keys</em> y <em>values</em>:</p>
+
+<pre><code>diccionario = {"clave1": "valor1", "clave2": "valor2", "clave3": "valor3"}
+print(diccionario.keys())
+print(diccionario.values())
+</code></pre>
+
+<p>Las claves o los valores se obtienen encapsulados en un objeto especial. Lo único que debemos saber de estos objetos es que son iterables, es decir, que podemos recorrerlos en un bucle <em>for</em> (lo veremos más adelante), o utilizarlos para inicializar una lista, por ejemplo:</p>
+
+<pre><code>print(list(diccionario.keys()))
+</code></pre>
+
+<p>También podemos <strong>obtener las parejas clave-valor o items</strong>, en forma de tuplas, mediante el método <em>items</em>:</p>
+
+<pre><code>print(diccionario.items())
+</code></pre>
+
+<p>Para acabar con las operaciones básicas, podemos consultar la pertenencia de una clave a un diccionario mediante el operador <em>in</em>, que puede aparecer combinado con el operador <em>not</em>:</p>
+
+<pre><code>if "clave1" in diccionario:
+    print("Existe clave1")
+
+if "clave4" not in diccionario:
+    print("No existe clave4")
+</code></pre>
+
+<h3 id="sec_recorrido">2.3. Recorrido de diccionarios</h3>
+
+<p>Si utilizamos un diccionario en una instrucción <code>for ... in ...</code>, obtendremos en cada iteración una clave del diccionario:</p>
+
+<pre><code>for clave in diccionario:
+    print(clave)
+</code></pre>
+
+<p>Si queremos acceder en cada paso del bucle también al valor correspondiente, podemos hacerlo así:</p>
+
+<pre><code>for clave in diccionario:
+    valor = diccionario[clave]
+    print(clave, valor)
+</code></pre>
+
+<p>O usando el método <em>items</em>, lo cual queda más compacto y legible:</p>
+
+<pre><code>for clave, valor in diccionario.items():
+    print(clave, valor)
+</code></pre>
+
+<p>Si no necesitamos la información de las claves para el tratamiento que estamos implementando, es posible iterar únicamente sobre los valores:</p>
+
+<pre><code>for valor in diccionario.values():
+    print(valor)
+</code></pre>
+
+<h3 id="sec_definicion">2.4. Definición de diccionarios por comprensión</h3>
+
+<p>Al igual que con las listas, es posible definir un diccionario por comprensión. La sintaxis es parecida a la de la definición de listas por comprensión, con dos diferencias:</p>
+<ul>
+    <li>Se usan las llaves en lugar de los corchetes.</li>
+    <li>En donde escribíamos la expresión generadora, ahora debemos escribir dos expresiones, separadas por dos puntos. La primera de ellas indica cómo se generan las claves, y la segunda cómo se generan los valores.</li>
+</ul>
+
+<p>En el siguiente ejemplo construimos un diccionario a partir de una lista de nombres. Las claves serán cada uno de los nombres de la lista, y el valor asociado será la posición que ocupa ese nombre en la lista, empezando en 1:</p>
+
+<pre><code>nombres = ["Miguel", "Ana", "José María", "Guillermo", "María", "Luisa"]
+ranking = {nombre: nombres.index(nombre) + 1 for nombre in nombres}
+
+print(ranking)
+</code></pre>
+
+<p>Este otro ejemplo muestra cómo construir un diccionario que almacene la frecuencia de aparición de cada carácter de un texto de entrada:</p>
+
+<pre><code>texto = "este es un pequeño texto para probar la siguiente definición por comprensión"
+# Iteramos sobre set(texto) para no repetir los cálculos varias veces para la misma letra
+frecuencias_caracteres = {caracter: texto.count(caracter) for caracter in set(texto) if caracter!=" "}
+print(frecuencias_caracteres)
+</code></pre>
+
+<p>Un último ejemplo, en el que a partir de un texto construimos un diccionario con las palabras indexadas por sus iniciales:</p>
+
+<pre><code>texto = "este es un pequeño texto para probar la siguiente definición por comprensión"
+iniciales = {palabra[0] for palabra in texto.split()}
+palabras_por_iniciales = {inicial: [palabra for palabra in texto.split() 
+                                    if palabra[0]==inicial] 
+                          for inicial in iniciales}
+print(palabras_por_iniciales)
+</code></pre>
+
+<h3 id="sec_counter">2.5. El tipo <code>Counter</code></h3>
+
+<p>El tipo <code>Counter</code> es una especialización del tipo diccionario <code>dict</code>, en la que los valores siempre son de tipo entero. Están pensados para representar conteos.</p>
+
+<p>Supongamos que queremos saber cuántas veces aparecen en una lista cada uno de los elementos que la componen. Este problema se puede resolver con un diccionario, en el que las claves serán los distintos elementos que aparecen en la lista y los valores serán dichos conteos. Dicho diccionario puede crearse de esta forma:</p>
+
+<pre><code>lista = [1, 6, 6, 3, 5, 9, 6, 6, 1, 2, 2, 0, 9, 4, 0]
+contador = {}
+for elemento in lista:
+    contador[elemento] = contador.get(elemento, 0) + 1
+print(contador)
+
+# Puedo acceder al conteo de un elemento concreto preguntándole al contador por esa clave
+print("¿Cuántas veces aparece el 6?:", contador[6], "veces.")
+
+# Cuidado con preguntar por un elemento que no existía en la lista original
+print("¿Cuántas veces aparece el 7?:", contador[7], "veces.")
+</code></pre>
+
+<p>Este problema aparece frecuentemente de una forma u otra como paso intermedio para resolver muchos algoritmos. Es por ello que ya viene resuelto por el tipo <code>Counter</code>. Observa cómo se utiliza:</p>
+
+<pre><code>from collections import Counter
+
+contador = Counter(lista)
+print(contador)
+
+# Puedo acceder al conteo de un valor concreto preguntándole al contador por esa clave
+print("¿Cuántas veces aparece el 6?:", contador[6], "veces.")
+
+# A diferencia de los diccionarios, si pregunto por una clave que no existe no obtengo KeyError,
+# sino que me devuelve el valor 0
+print("¿Cuántas veces aparece el 7?:", contador[7], "veces.")
+</code></pre>
+
+<p>Además de ser mucho más sencilla su inicialización, pues se encarga de implementar el algoritmo de conteo, y de permitir la consulta de elementos no observados (devolviéndonos cero en dichos casos), también nos permite actualizar los conteos de manera sencilla. Una opción es actualizar los conteos a partir de nuevas observaciones de elementos:</p>
+
+<pre><code># Contador vacío
+contador = Counter()
+
+# Actualiza los valores del contador a partir de una lista
+# (acumula los nuevos conteos)
+contador.update(lista)
+print(contador)
+contador.update([7,8,9])
+print(contador)
+</code></pre>
+
+<p>Otra opción es actualizar los conteos a partir de otro diccionario con conteos. Fíjate en que no es necesario que este otro diccionario sea un <code>Counter</code>, sino que puede ser un diccionario normal, siempre y cuando cumpla que sus valores sean de tipo entero:</p>
+
+<pre><code>votos_almeria = {'PP':27544, 'PSOE':20435}
+votos_sevilla = {'PP':23544, 'PSOE':29435}
+
+contador = Counter(votos_almeria)
+contador.update(votos_sevilla)
+print(contador)
+</code></pre>
+
+<p>El código anterior en realidad está "sumando" los conteos expresados en los diccionarios <code>votos_almeria</code> y <code>votos_sevilla</code>. El tipo <code>Counter</code> también nos permite usar el operador + para realizar la misma tarea:</p>
+
+<pre><code>contador1 = Counter(votos_almeria)
+contador2 = Counter(votos_sevilla)
+print(contador1+contador2)
+</code></pre>
+
+<p>La diferencia es que ahora se obtiene un nuevo objeto <code>Counter</code>, cada vez que se realiza la operación +. Por tanto, si necesitamos acumular muchos contadores en un solo, siempre será más eficiente utilizar el método <code>update</code>.</p>
+
+<p>El método <code>most_common</code> de <code>Counter</code> devuelve los elementos más frecuentes junto con sus conteos. En el siguiente ejemplo se obtienen las 10 palabras más frecuentes del texto de Alicia en el País de las Maravillas:</p>
+
+<pre><code>import re
+
+with open('alicia.txt', encoding='utf-8') as f:
+    texto = f.read()
+    contador_palabras = Counter(re.findall(r"\w+",texto))
+    print("Los cinco palabras más comunes:",contador_palabras.most_common(10))
+</code></pre>
+
+<h3 id="sec_defaultdict">2.6. El tipo <code>defaultdict</code></h3>
+
+<p>En algunas ocasiones, cuando construimos diccionarios que agrupan elementos en colecciones, o que realizan sumas u otros cálculos para grupos de elementos con una misma clave, puede sernos útil el tipo <code>defaultdict</code>. Se trata de una especialización de los diccionarios que se comporta de una forma peculiar cuando se accede a una clave que no existe: en lugar de producirse un error, <code>defaultdict</code> añade la clave en cuestión al diccionario, asociándole un valor inicial predefinido y devolviendo dicho valor.</p>
+
+<p>La utilidad de esto se ve mejor con un ejemplo. Supongamos que queremos agrupar los nombres de una lista en un diccionario, usando como clave las iniciales de los nombres. Construiremos un diccionario en el que las claves serán cadenas (iniciales) y los valores serán listas de cadenas (los nombres correspondientes a cada inicial):</p>
+
+<pre><code>nombres = ["Miguel", "Ana", "José María", "Guillermo", "María", "Luisa", "Alicia", "Manuel"]
+
+# Agrupemos los nombres anteriores según la inicial
+nombres_por_inicial = {}
+for nombre in nombres:
+    inicial = nombre[0]
+    # Si la inicial aún no es una clave del diccionario,
+    # añadimos al diccionario una lista vacía.
+    # Si no lo hiciéramos, la instrucción de más abajo
+    # daría un error al tratar de acceder al valor 
+    # asociado a dicha clave.
+    if inicial not in nombres_por_inicial:
+        nombres_por_inicial[inicial] = []
+    
+    nombres_por_inicial[inicial].append(nombre)
+
+nombres_por_inicial
+</code></pre>
+
+<p>Veamos cómo quedaría el mismo código usando <code>defaultdict</code>. Observa que desaparece la instrucción if y la inicialización del valor de la clave con la lista vacía:</p>
+
+<pre><code>from collections import defaultdict
+
+# Al crear defaultdict, le indicamos de qué tipo serán los valores 
+#del diccionario
+nombres_por_inicial = defaultdict(list)
+for nombre in nombres:
+    inicial = nombre[0]    
+    nombres_por_inicial[inicial].append(nombre)
+    
+nombres_por_inicial
+</code></pre>
+
+<p>También podemos usar <code>defaultdict</code> cuando necesitemos construir un diccionario que acumule sumas. Por ejemplo, supongamos que queremos obtener un diccionario con la suma de las cantidades gastadas por cada persona, a partir de una lista en la que tenemos cada uno de los gastos registrados:</p>
+
+<pre><code>gastos = [("Miguel", 12), ("Ana", 16), ("José", 18.5), ("Miguel", 5.95), ("José", 7.6), ("Miguel", 31)]
+
+gastos_por_persona = defaultdict(float)
+for nombre, gasto in gastos:
+    gastos_por_persona[nombre] += gasto
+    
+gastos_por_persona
+</code></pre>
+
+
+{% endblock %}
