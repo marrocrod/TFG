@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+from decouple import config
 from pathlib import Path
 import os
 from django.core.exceptions import ImproperlyConfigured
@@ -34,7 +34,7 @@ SECRET_KEY = 'django-insecure--e&+gw%v*k-1v76w%21xlui2u+pkv4y%w+belk^@buy(r!kojx
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['34.175.150.77']
+ALLOWED_HOSTS = ['34.175.150.77','saymplex.es']
 
 # Application definition
 
@@ -162,7 +162,7 @@ AUTH_USER_MODEL = 'main.User'
 
 
 #API OPENAI
-OPENAI_API_KEY = env('OPENAI_API_KEY', default=None)
+OPENAI_API_KEY = config('OPENAI_API_KEY')
 
 
 #SESION
@@ -178,5 +178,3 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'saympl3xfp@gmail.com'  # Reemplaza con tu dirección de correo de Hotmail
 EMAIL_HOST_PASSWORD = 'nppp qtoa ifhm gcky'  # Reemplaza con tu contraseña correcta
-
-

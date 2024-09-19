@@ -175,7 +175,8 @@
     {% endif %}
 
     <!-- Botón para ver el historial de chats, alineado a la derecha -->
-    <button href="{% url 'archived_chats_list' %}" class="history-btn">Ver Historial</button>
+    <button type="button" onclick="window.location.href='{% url 'archived_chats_list' %}'" class="history-btn">Ver Historial</button>
+
 </form>
 
 <!-- Indicador de carga (spinner), oculto por defecto -->

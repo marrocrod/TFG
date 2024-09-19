@@ -71,10 +71,20 @@ class ExerciseGenerationForm(forms.Form):
         choices=[('', 'Seleccione la dificultad'), ('Easy', 'Fácil'), ('Medium', 'Media'), ('Hard', 'Difícil')],
         widget=forms.Select(attrs={'class': 'form-control form-control-lg custom-input'})
     )
-    number_of_exercises = forms.ChoiceField(
-        choices=[('', 'Seleccione el número de ejercicios')] + [(i, f'{i} ejercicios') for i in range(1, 11)],
-        widget=forms.Select(attrs={'class': 'form-control form-control-lg custom-input'})
+
+    number_of_exercises = forms.IntegerField(
+        min_value=1,
+        max_value=8,
+        required=True,
+        label="Número de Ejercicios",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control form-control-lg custom-input',
+            'placeholder': 'Introduce el número de ejercicios entre 1 y 8',
+            'min': 1,
+            'max': 8
+        })
     )
+
     set_name = forms.CharField(
         max_length=100,
         required=True,
