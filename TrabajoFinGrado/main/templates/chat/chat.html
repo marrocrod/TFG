@@ -3,7 +3,6 @@
 {% block title %}Chat{% endblock %}
 
 {% block content %}
-<!-- Estilos adicionales para el chat tipo ChatGPT con los ajustes pedidos -->
 <style>
     #chat-container {
         background-color: #ffffff;
@@ -15,6 +14,16 @@
         margin: 0 auto;
         margin-bottom: 20px;
         width: 80%;
+    }
+
+    .advertencia {
+        background-color: #f8f9fa; /* Color de fondo muy claro */
+        color: #6c757d; /* Color de texto gris */
+        padding: 10px;
+        margin-bottom: 30px; /* Padding inferior más amplio */
+        margin-top: 10px;
+        border-left: 4px solid #ccc; /* Una pequeña barra para dar énfasis sin ser muy llamativa */
+        font-size: 0.9em; /* Un poco más pequeño que el texto normal */
     }
 
     .user-message, .assistant-message {
@@ -139,10 +148,12 @@
     }
 </style>
 
-<!-- Título del chat -->
 <h1 class="text-center mb-4">Chat</h1>
 
-<!-- Incluye Highlight.js para resaltar el código -->
+<div class="advertencia">
+    <p>Este Chat es una implementación de la API de OpenAI, por lo tanto estará hablando con una IA. La conversación podrá ser revisada por un profesor en cualquier momento.</p>
+</div>
+
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
 <script>hljs.highlightAll();</script>

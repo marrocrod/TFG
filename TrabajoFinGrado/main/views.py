@@ -107,20 +107,6 @@ def home(request):
 
     return render(request, 'home.html', context)
 
-
-#~~~~~~~~PERMISSONS~~~~~~~~
-
-def no_permission(request):
-    return render(request, 'no_permission.html', {
-        'message': 'No tienes permiso para acceder a este contenido.'
-    })
-
-def content_for_students_only(request):
-    return render(request, 'content_for_students_only.html', {
-        'message': 'Este contenido es solo para alumnos.'
-    })
-
-
 #~~~~~~~~REGISTERS~~~~~~~~
 
 def register(request):
@@ -594,7 +580,7 @@ def generate_exercises(request):
             for _ in range(number_of_exercises):
                 prompt = generate_prompt(topic, difficulty)
 
-		response = openai.Completion.create(
+                response = openai.Completion.create(
                     model="gpt-3.5-turbo-instruct", 
                     prompt=prompt, 
                     max_tokens=600,

@@ -64,14 +64,16 @@ class RejectedTeacherMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.user.is_authenticated and request.user.user_type == 'Teacher' and request.user.verification_status == 'REJECTED':
-            allowed_paths = [
-                reverse('logout'),  
-                reverse('rejected_teacher'),  
-            ]
+        if request.user.is_authenticated:
+            if request.user.user_type == 'Teacher' and request.user.verification_status == 'REJECTED':
+                rejected_url=reverse('rejected_teacher')
+                allowed_paths = [
+                    reverse('logout'),
+                    rejected_url,
+                ]
             
-            if request.path not in allowed_paths:
-                return redirect('rejected_teacher') 
+                if request.path != rejected_url and request.path not in allowed_paths:
+                    return redirect('rejected_teacher')
 
         response = self.get_response(request)
         return response
