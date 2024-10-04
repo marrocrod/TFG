@@ -66,17 +66,18 @@ class RejectedTeacherMiddleware:
     def __call__(self, request):
         if request.user.is_authenticated:
             if request.user.user_type == 'Teacher' and request.user.verification_status == 'REJECTED':
-                rejected_url=reverse('rejected_teacher')
                 allowed_paths = [
-                    reverse('logout'),
-                    rejected_url,
+                    reverse('home'),
+                    reverse('rejected_teacher'),  
+                    reverse('logout'),  
                 ]
-            
-                if request.path != rejected_url and request.path not in allowed_paths:
-                    return redirect('rejected_teacher')
 
+                if request.path not in allowed_paths:
+                    return redirect('home')  
+        
         response = self.get_response(request)
         return response
+
 
 
 class TeacherAccessMiddleware:
@@ -87,6 +88,7 @@ class TeacherAccessMiddleware:
         allowed_teacher_paths = [
             reverse('home'),
             reverse('logout'),
+            reverse('rejected_teacher'),
             reverse('pending_teacher'),
             reverse('user_profile'),
             reverse('edit_profile'),

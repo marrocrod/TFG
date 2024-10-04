@@ -83,6 +83,9 @@ def home(request):
         elif request.user.user_type == 'Teacher' and request.user.verification_status == 'PENDING':
             return redirect('pending_teacher')
 
+        elif request.user.user_type == 'Teacher' and request.user.verification_status == 'REJECTED':
+            return redirect('rejected_teacher')
+
         elif user.user_type == "Student":
             exams = user.exams.all().order_by('-created_at')
 
@@ -1017,7 +1020,9 @@ def pending_teacher(request):
 
 @login_required
 def rejected_teacher(request):
-    return render(request, 'rejected_teacher.html')
+    if request.user.verification_status == 'REJECTED' and request.user.user_type == 'Teacher':
+        return render(request, 'rejected_teacher.html')
+    return redirect('home')
 
 
 @login_required
