@@ -16,11 +16,7 @@
         <li><a href="#ficheros">8. Ficheros</a></li>
         <li><a href="#principal">9. Función principal</a></li>
     </ul>
-    
-    <p>Debes ir ejecutando cada una de las celdas de código* que vayas encontrando. Para hacer esto, puedes hacer clic en la celda en cuestión y luego en el botón con el icono de "play" que aparece en la barra de herramientas; también puedes pulsar las teclas "Mayúsculas" y "Entrar" al mismo tiempo. Si empiezas en la primera celda, puedes ir usando el mismo icono de "play" para ir ejecutando y avanzando a lo largo del notebook. Si "ejecutas" una celda como esta, que no contiene código, simplemente pasarás a la siguiente. <strong>Debes ejecutar todas las celdas que contienen código</strong>, si no lo haces es posible que algunos ejemplos de código* no funcionen.</p>
-    
-    <p>Los apartados marcados con el título <strong>¡Prueba tú!</strong> están pensados para que escribas pequeños trocitos de código*, de manera que compruebes si has comprendido lo que se te acaba de explicar. Es importante que no continúes leyendo hasta que no hayas resuelto lo que se te está pidiendo. Si no consigues resolver alguno de estos apartados, ya sabes: <strong>pide ayuda a tu profesor</strong>.</p>
-    
+            
     <p>* Cuando hablamos de "código" nos referimos a un trozo de texto sacado de un programa informático. En inglés, es frecuente usar el término <strong>coding</strong> para referirse al acto de escribir programas informáticos. Por cierto, ¿qué tal andas de inglés? Verás que gran parte de la información que hay que consultar para programar está en inglés, así que es mejor que te vayas acostumbrando...</p>
     
     <h3>¿Empezamos?</h3>
@@ -37,21 +33,14 @@
 print("Adiós, mundo!")</code></pre>
     
     <p>La instrucción que hemos usado en los ejemplos anteriores, <strong>print</strong> (que significa imprimir en inglés), es una <strong>función predefinida</strong> (built-in function). Una función puede ser "llamada" (también se dice "invocada") desde un programa escribiendo su nombre y a continuación unos paréntesis de apertura y cierre. En ocasiones, las funciones reciben <strong>parámetros</strong>, que se escriben en la llamada dentro de los paréntesis, separados por comas si hay más de uno.</p>
-    
-    <h4>¡Prueba tú!</h4>
-    <pre><code># Escribe una llamada a la función print para mostrar algún mensaje en pantalla.</code></pre>
-    
+
     <p>Hay muchas funciones predefinidas, por ejemplo la función <strong>help</strong> nos proporciona ayuda sobre cualquier otra función.</p>
     
     <pre><code>help(print)   # Nos muestra información de ayuda sobre la función predefinida print</code></pre>
     
     <p>Por supuesto, la ayuda está en inglés. Habrá que acostumbrarse, porque la inmensa mayoría de documentación y ayudas que vas a encontrar para programar estará también en inglés...</p>
     
-    <h4>¡Prueba tú!</h4>
-    <pre><code># Haz que se muestre la ayuda disponible sobre la propia función help
-help(help)</code></pre>
-    
-    <p>En el ejemplo anterior hemos usado el carácter almohadilla (#) para escribir un <strong>comentario</strong> sobre el código. Los comentarios se usan en los programas para hacer aclaraciones, explicar el funcionamiento y, en general, hacer más fácil de entender nuestros programas.</p>
+    <p>Podemos usar el carácter almohadilla (#) para escribir un <strong>comentario</strong> sobre el código. Los comentarios se usan en los programas para hacer aclaraciones, explicar el funcionamiento y, en general, hacer más fácil de entender nuestros programas.</p>
     
     <p>Las funciones anteriores se llaman funciones predefinidas porque ya vienen incluidas "por defecto" en Python. Por contra, los programadores pueden <strong>definir</strong> sus propias <strong>funciones</strong>, como se muestra a continuación.</p>
     
@@ -76,19 +65,6 @@ saluda("Paul")
 saluda("George")
 saluda("Ringo")</code></pre>
     
-    <h4>¡Prueba tú!</h4>
-    <p>Define una función llamada <em>saluda_educado</em> que reciba un nombre como parámetro, imprima el mismo saludo personalizado que la función saluda, y a continuación imprima el texto "Encantado de conocerle".</p>
-    <p><strong>¡Truco!:</strong> puedes llamar a la función anterior <em>saluda</em> desde el cuerpo de la nueva función <em>saluda_educado</em>.</p>
-    
-    <pre><code># Define la función saluda_educado aquí</code></pre>
-
-
-
-
-
-
-
-
 <h2><a id="expresiones"></a>2. Expresiones y tipos</h2>
     
     <p>En la instrucción que hemos escrito al definir la función <em>saluda</em>:</p>
@@ -108,9 +84,6 @@ saluda("Ringo")</code></pre>
     
     <pre><code>(3 + 5) * 8 / 14</code></pre>
     
-    <h4>¡Prueba tú!</h4>
-    <pre><code># Escribe alguna expresión usando operadores aritméticos. Además de los anteriores tienes los siguientes:
-# - // % **</code></pre>
     
     <p>En las expresiones también podemos usar llamadas a funciones, siempre que sean funciones que devuelvan algún resultado. Para que una función devuelva un valor cuando sea invocada, usaremos la instrucción <strong>return</strong> en algún punto del cuerpo de la función (casi siempre, al final del cuerpo de la función). Por ejemplo:</p>
     
@@ -125,16 +98,7 @@ doble(10)</code></pre>
 print(resultado / 5)</code></pre>
     
     <p>Hemos <strong>asignado</strong> a la variable <em>resultado</em> el valor de la expresión que hemos escrito a la derecha del carácter igual (=), de manera que más adelante en el programa podremos utilizar ese valor haciendo mención a la variable. A este carácter igual lo llamamos instrucción de <strong>asignación</strong>.</p>
-    
-    <h4>¡Prueba tú!</h4>
-    <p>Intenta definir una función de nombre <em>descuento</em> que reciba como parámetro un valor y un porcentaje y devuelva el resultado de aplicar el descuento correspondiente al porcentaje sobre el valor indicado.</p>
-    
-    <pre><code># Define aquí la función</code></pre>
-    
-    <p>Cuando la termines de escribir, puedes ejecutar esta prueba:</p>
-    
-    <pre><code>precio = 200
-print("Precio con 10% de descuento:", descuento(precio, 10))</code></pre>
+
     
     <p>En los ejemplos anteriores, hemos utilizado <strong>literales</strong> de tipo <strong>cadena de caracteres</strong> (por ejemplo, <em>"Hola, mundo!"</em>) y literales de tipo número <strong>entero</strong> (por ejemplo, <em>3</em>, <em>5</em> y <em>8</em>). Hay más tipos de literales, por ejemplo literales de tipo número <strong>real</strong> o de tipo <strong>lógico</strong>:</p>
     
@@ -146,7 +110,7 @@ print("El área del círculo es", area)
 umbral = 100.0
 area_superior_umbral = area > umbral  
 # El carácter > es un operador relacional, se evalúa como True (verdadero) o False (falso)
-print("¿Es el área superior al umbral?", area_superior_umbral)</code></pre>
+</code></pre>
 
 
 <h2><a id="listas"></a>3. Listas y tuplas</h2>
@@ -158,8 +122,7 @@ print(temperaturas)</code></pre>
     
     <p>O, a veces, de tipo <strong>tupla</strong>, que se escriben igual pero usando paréntesis en lugar de corchetes:</p>
     
-    <pre><code>usuario = ("Mark", "Lenders")
-print(usuario)</code></pre>
+    <pre><code>usuario = ("Mark", "Lenders")</code></pre>
     
     <p>Ambos, listas y tuplas, se parecen mucho (ya veremos algunas diferencias más adelante). Podemos acceder a un elemento concreto, indicando el <strong>índice</strong> de dicho elemento (es decir, la posición que ocupa dentro de la lista o tupla, contando desde la izquierda):</p>
     
@@ -194,18 +157,6 @@ print(temperaturas)</code></pre>
     
     <img src="{% static 'images/img001.png' %}" class="img-fluid" alt="Error en el tiempo de ejecución">
     
-    <h4>¡Prueba tú!</h4>
-    <p>Los elementos de la lista <em>temperaturas</em> son números reales. Pero una lista puede contener elementos del tipo que quieras. Intenta definir una lista <em>usuarios</em>, en la que cada elemento sea una tupla <em>(nombre, apellido)</em>, como la tupla <em>usuario</em> que hemos definido anteriormente. Aquí tienes algunos pares nombre-apellido que puedes meter en la lista:</p>
-    
-    <ul>
-        <li>Mark Lenders</li>
-        <li>Oliver Atom</li>
-        <li>Benji Price</li>
-    </ul>
-    
-    <pre><code># Completa la instrucción siguiente:
-usuarios = [("Mark", "Lenders"), ("Oliver", "Atom"), ("Benji", "Price")]</code></pre>
-
     <h2><a id="diccionarios"></a>4. Diccionarios</h2>
     
     <p>Existen más tipos como las listas y las tuplas, que permiten almacenar conjuntos de datos. Uno muy utilizado es el <strong>diccionario</strong>. En un diccionario, cada valor almacenado se asocia a una clave, de manera que para acceder a los <strong>valores</strong> se utilizan dichas <strong>claves</strong> (de forma parecida a como para acceder a los valores de una lista se utilizan los índices).</p>
@@ -267,12 +218,6 @@ print(temperatura_media)</code></pre>
 temperatura_media['Sevilla'] += 1.0   # ¡Cambio climático!
 print("Temperatura actual:", temperatura_media['Sevilla'])</code></pre>
     
-    <h4>¡Prueba tú!</h4>
-    <p>Intenta definir un diccionario en el que las claves sean los usuarios que definiste en el ejercicio anterior, y los valores asociados sean las contraseñas de acceso a un sistema.</p>
-    
-    <pre><code># Completa la instrucción siguiente:
-contraseñas = {"Mark Lenders": "contraseña123", "Oliver Atom": "pass456", "Benji Price": "password789"}</code></pre>
-
 
 <h2><a id="objetos"></a>5. Objetos</h2>
     
@@ -296,14 +241,6 @@ print(len(temperaturas))</code></pre>
     
     <pre><code>help(temperaturas)</code></pre>
     
-    <h4>¡Prueba tú!</h4>
-    <p>Intenta utilizar algunos de los métodos del objeto <code>temperaturas</code>:</p>
-    
-    <pre><code># Intenta usar algunos métodos de la lista temperaturas aquí</code></pre>
-
-
-
-
 
 
 <h2><a id="control"></a>6. Control del flujo de ejecución</h2>
@@ -369,10 +306,6 @@ else:  # En otro caso
     
     <p>Para escribir las expresiones lógicas se usan distintos <strong>operadores lógicos</strong> (como el operador <code>and</code>) y <strong>operadores relacionales</strong> (como los operadores <code>&gt;</code> o <code>==</code>). Iremos viendo más operadores de estos tipos a medida que los vayamos necesitando.</p>
     
-    <h4>¡Prueba tú!</h4>
-    <p>Escribe un bucle <code>for</code> para llamar a la función <code>acceso_restringido</code> pasándole cada uno de los elementos de la lista <code>usuarios</code>.</p>
-    
-    <pre><code># Completa el código aquí:</code></pre>
 
 <h2><a id="modulos"></a>7. Módulos y paquetes</h2>
     
@@ -427,33 +360,6 @@ pyplot.plot(x, y, "o")</code></pre>
     
     <p>Todos los paquetes, módulos y librerías más usados están ampliamente documentados en Internet: sólo tienes que hacer una consulta a tu buscador favorito. Por ejemplo, si quieres ver qué otras cosas se pueden hacer con la función <code>plot</code>, puedes verlo aquí: <a href="https://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.plot" target="_blank">matplotlib.pyplot.plot</a></p>
     
-    <h4>¡Prueba tú!</h4>
-    <p>Intenta completar el siguiente código para mostrar una gráfica de la función coseno para los valores de la x contenidos en el intervalo [-10,10]. Busca documentación sobre el módulo <strong>math</strong> para ver cómo calcular el coseno de un número <a href="https://www.google.es/search?q=math+Python+3" target="_blank">prueba buscando en Google "math Python 3"</a>.</p>
-    
-    <pre><code>get_ipython().run_line_magic('matplotlib', 'inline')
-import math
-
-lista_x = []  # En esta lista guardaremos los valores para los que vamos a calcular el coseno
-for i in range(-100, 101):
-    pass # ESCRIBE AQUÍ una instrucción para "añadir a lista_x el valor i / 10"
-    
-lista_y = []  # En esta lista guardaremos los cosenos de los valores anteriores
-for x in lista_x:
-    pass # ESCRIBE AQUÍ una instrucción para "añadir a lista_y el valor coseno(x)"
-    
-
-# ESCRIBE AQUÍ una instrucción para dibujar la gráfica correspondiente a las coordenadas lista_x y lista_y.
-# Elige las opciones de formato de la representación gráfica que quieras</code></pre>
-    
-    <p>Cuando construimos una lista a partir de otra, como ocurre con <code>lista_y</code> en el código que acabas de completar, podemos hacerlo de una forma muy compacta llamada <strong>definición de listas por comprensión</strong>. Observa el siguiente ejemplo:</p>
-    
-    <pre><code>lista_y = [math.cos(x) for x in lista_x]
-print(lista_y)</code></pre>
-
-
-
-
-
 <h2><a id="ficheros"></a>8. Ficheros</h2>
     
     <p>Es muy habitual trabajar con <strong>ficheros</strong> (quizás estés acostumbrado a referirte a ellos como "archivos", que es un sinónimo). Aunque los ficheros pueden contener todo tipo de datos, nosotros trabajaremos con ficheros de texto. Al igual que haces tú mismo cuando quieres trabajar con un documento en el ordenador, para trabajar con un fichero en Python primero tenemos que abrirlo; después podemos leer o escribir datos en el mismo, y finalmente hemos de cerrarlo. Aquí tienes un pequeño ejemplo que abre un fichero de texto y muestra su contenido en pantalla:</p>
@@ -527,12 +433,7 @@ def saluda(nombre, hora):
 
 if __name__ == '__main__':
     main()</code></pre>
-    
-    <p><strong>¡Prueba tú!</strong></p>
-    <p>Escribe el código anterior en un fichero de texto llamado "saluda.py", y trata de ejecutarlo desde el terminal o ventana de comandos de tu sistema operativo.</p>
-    
-    <hr>
-    
+        
     <p>Ya sabes lo básico para entender programas simples escritos en Python y para escribir los tuyos propios. <strong>¡Feliz programación!</strong></p>
     
     <pre><code># ¿Conoces el "Zen de Python"?
