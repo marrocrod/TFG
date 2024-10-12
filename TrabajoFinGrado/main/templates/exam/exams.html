@@ -25,7 +25,6 @@
                         <tr>
                             <th scope="col">Nombre del Examen</th>
                             <th scope="col">Fecha de Generación</th>
-                            <th scope="col" >Número de Ejercicios</th>
                             <th scope="col" >Calificación</th>
                             <th scope="col" class="text-center">Acciones</th>
                         </tr>
@@ -35,7 +34,6 @@
                             <tr>
                                 <td>{{ exam.name }}</td>
                                 <td>{{ exam.created_at|date:"d M Y H:i" }}</td>
-                                <td class="text-center">{{ exam.exercises.count }}</td>
                                 <td class="text-center">{{ exam.grade }}</td>
                                 <td class="text-center">
                                     <a href="{% url 'exam_detail' exam.exam_id %}" class="btn btn-primary view-btn">

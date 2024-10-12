@@ -64,17 +64,27 @@ class ChatForm(forms.Form):
 
 class ExerciseGenerationForm(forms.Form):
     topic = forms.ChoiceField(
-        choices=[('', 'Seleccione un tema'), (1, 'Tema 1'), (2, 'Tema 2'), (3, 'Tema 3'), (4, 'Tema 4'), (5, 'Tema 5'), (6, 'Tema 6'), (7, 'Tema 7')],
+        choices=[('', 'Seleccione un tema'), (1, 'Tema 1'), (2, 'Tema 2'), (3, 'Tema 3'), (4, 'Tema 4'), (5, 'Tema 5'), (6, 'Tema 6')],
         widget=forms.Select(attrs={'class': 'form-control form-control-lg custom-input'})
     )
     difficulty = forms.ChoiceField(
         choices=[('', 'Seleccione la dificultad'), ('Easy', 'Fácil'), ('Medium', 'Media'), ('Hard', 'Difícil')],
         widget=forms.Select(attrs={'class': 'form-control form-control-lg custom-input'})
     )
-    number_of_exercises = forms.ChoiceField(
-        choices=[('', 'Seleccione el número de ejercicios')] + [(i, f'{i} ejercicios') for i in range(1, 11)],
-        widget=forms.Select(attrs={'class': 'form-control form-control-lg custom-input'})
+
+    number_of_exercises = forms.IntegerField(
+        min_value=1,
+        max_value=8,
+        required=True,
+        label="Número de Ejercicios",
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control form-control-lg custom-input',
+            'placeholder': 'Introduce el número de ejercicios entre 1 y 8',
+            'min': 1,
+            'max': 8
+        })
     )
+
     set_name = forms.CharField(
         max_length=100,
         required=True,
@@ -95,22 +105,22 @@ class ExamGenerationForm(forms.Form):
         })
     )
     topic_1 = forms.ChoiceField(
-        choices=[(1, 'Tema 1'), (2, 'Tema 2'), (3, 'Tema 3'), (4, 'Tema 4'), (5, 'Tema 5'), (6, 'Tema 6'), (7, 'Tema 7')],
+        choices=[(1, 'Tema 1'), (2, 'Tema 2'), (3, 'Tema 3'), (4, 'Tema 4'), (5, 'Tema 5'), (6, 'Tema 6')],
         label="Tema del Ejercicio 1",
         widget=forms.Select(attrs={'class': 'form-control form-control-sm custom-input'})
     )
     topic_2 = forms.ChoiceField(
-        choices=[(1, 'Tema 1'), (2, 'Tema 2'), (3, 'Tema 3'), (4, 'Tema 4'), (5, 'Tema 5'), (6, 'Tema 6'), (7, 'Tema 7')],
+        choices=[(1, 'Tema 1'), (2, 'Tema 2'), (3, 'Tema 3'), (4, 'Tema 4'), (5, 'Tema 5'), (6, 'Tema 6')],
         label="Tema del Ejercicio 2",
         widget=forms.Select(attrs={'class': 'form-control form-control-sm custom-input'})
     )
     topic_3 = forms.ChoiceField(
-        choices=[(1, 'Tema 1'), (2, 'Tema 2'), (3, 'Tema 3'), (4, 'Tema 4'), (5, 'Tema 5'), (6, 'Tema 6'), (7, 'Tema 7')],
+        choices=[(1, 'Tema 1'), (2, 'Tema 2'), (3, 'Tema 3'), (4, 'Tema 4'), (5, 'Tema 5'), (6, 'Tema 6')],
         label="Tema del Ejercicio 3",
         widget=forms.Select(attrs={'class': 'form-control form-control-sm custom-input'})
     )
     topic_4 = forms.ChoiceField(
-        choices=[(1, 'Tema 1'), (2, 'Tema 2'), (3, 'Tema 3'), (4, 'Tema 4'), (5, 'Tema 5'), (6, 'Tema 6'), (7, 'Tema 7')],
+        choices=[(1, 'Tema 1'), (2, 'Tema 2'), (3, 'Tema 3'), (4, 'Tema 4'), (5, 'Tema 5'), (6, 'Tema 6')],
         label="Tema del Ejercicio 4",
         widget=forms.Select(attrs={'class': 'form-control form-control-sm custom-input'})
     )

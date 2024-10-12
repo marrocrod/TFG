@@ -26,6 +26,7 @@
                             <th scope="col">Nombre del Conjunto</th>
                             <th scope="col">Fecha de Generación</th>
                             <th scope="col">Tema</th>
+                            <th scope="col">Dificultad</th>
                             <th scope="col" class="text-center">Acciones</th>
                         </tr>
                     </thead>
@@ -35,6 +36,7 @@
                                 <td>{{ exercise_set.name }}</td>
                                 <td>{{ exercise_set.created_at|date:"d M Y H:i" }}</td>
                                 <td>{{ exercise_set.exercises.first.topic }}</td>
+                                <td>{{ exercise_set.exercises.first.difficulty }}</td>
                                 <td class="text-center">
                                     <a href="{% url 'exercise_set_detail' exercise_set.set_id %}" class="btn btn-primary view-btn">
                                         <i class="fas fa-eye"></i> Ver Conjunto
