@@ -187,21 +187,6 @@ def calcula_raices(a, b, c):
 
 <p>Tampoco es obligatorio que aparezcan bloques <code>elif</code>, así que lo único estrictamente necesario para escribir una instrucción <code>if</code> es la condición que la acompaña y el bloque de instrucciones correspondiente.</p>
 
-<h3>¡Prueba tú!</h3>
-
-<p>Haz las modificaciones necesarias en el siguiente código para que el mensaje que se muestra indicando las soluciones sea dependiente del número de soluciones encontradas. Por ejemplo:</p>
-<ul>
-    <li>Hay 2 soluciones: ...</li>
-    <li>Hay una solución: ...</li>
-    <li>No hay soluciones</li>
-</ul>
-
-<pre><code>
-a, b, c = lee_coeficientes()
-soluciones = calcula_raices(a, b, c)
-print("Hay", len(soluciones), "solucion(es):", soluciones)
-</code></pre>
-
 
 <h2 id="sec_bucles">3. Bucles</h2>
 
@@ -231,10 +216,6 @@ else: # 5
 </code></pre>
 
 <p>Cuando usamos la instrucción <code>while</code> hay que tener especial cuidado en no ocasionar un <strong>bucle infinito</strong>. Esto ocurre cuando la condición es siempre <code>True</code>, de manera que el bucle no acabaría nunca, y por tanto el programa tampoco. Algo que se debe cumplir para evitarlo es que haya alguna instrucción dentro del bucle <code>while</code> en la que cambie el valor de alguna de las variables que participan en la condición. Si esto no es así, y la primera vez se evalúa la condición como <code>True</code>, entraríamos en un bucle infinito.</p>
-
-<h4>¡Prueba tú!</h4>
-
-<p>Este código ocasiona un bucle infinito; si lo ejecutas observarás que tras introducir un par de valores (por ejemplo, 10 y 2), la ejecución continua sin fin y no se llega a mostrar un resultado. Puedes detener la ejecución con el botón cuadrado de la barra de herramientas del notebook. ¿Eres capaz de encontrar el error y solucionarlo?</p>
 
 <p><strong>CONSEJO:</strong> Llévate este código a Visual Studio Code y utiliza el depurador.</p>
 
@@ -370,20 +351,6 @@ for ingrediente in ingredientes:
 <pre><code>list(range(10, 5, -1))
 </code></pre>
 
-<h4>¡Prueba tú!</h4>
-
-<p>Implementa la siguiente función:</p>
-
-<pre><code># Implementa la siguiente función
-def suma_naturales_hasta(n):
-    ''' Devuelve la suma de números naturales desde 1 hasta n '''
-    pass   # Borra esta instrucción cuando implementes la función
-
-print("=== Probando la función suma_naturales_hasta ===")
-numero = int(input("Introduce un número entero:"))
-print(f"La suma hasta {numero} es {suma_naturales_hasta(numero)}")
-</code></pre>
-
 
 <h4 id="sec_zip">3.2.2. Recorridos avanzados</h4>
 
@@ -463,15 +430,6 @@ numeros = [8, 1, 4, 12, 5, 2, -1, 53, 1, 32, 22, -19, -33]
 n = int(input("¿Cuántos elementos quieres sumar?"))
 print("Suma:", suma_primeros(numeros, n))
 </code></pre>
-
-<h4>¡Prueba tú!</h4>
-
-<p>Sustituye la lista <code>numeros</code> del código anterior por esta lista de cadenas de caracteres:</p>
-<pre><code># ["Tomate", "Cebolla", "Pimiento", "Pepino", "Ajo", "Aceite", "Vinagre"]
-</code></pre>
-<p>y observa lo que ocurre.</p>
-
-<p>Prueba también a pasarle a <code>suma_primeros</code> una secuencia generada con <code>range</code>.</p>
 
 <h4 id="sec_break">3.3. La instrucción break</h4>
 
