@@ -154,14 +154,6 @@ False and True</code></pre>
     <pre><code># Negación
 not False</code></pre>
 
-    <h3>¡Prueba tú!</h3>
-
-    <pre><code># Cambia los literales utilizados en las siguientes expresiones y observa cuál es el resultado en cada caso
-
-print("Disyunción:", False or False)
-print("Conjunción:", False and False)
-print("Negación:", not False)</code></pre>
-
     <h3>2.2 Tipos numéricos <a id="sec_numericos"></a></h3>
 
     <p>Existen tres tipos que permiten trabajar con números en Python: enteros (<strong>int</strong>), reales (<strong>float</strong>) y complejos (<strong>complex</strong>). Nosotros sólo trabajaremos con los dos primeros.</p>
@@ -267,7 +259,7 @@ print(texto[1])
 print(texto[26])
 print(texto[-1]) # Otra forma de acceder al último carácter de la cadena</code></pre>
 
-    <p>¡Cuidado con intentar acceder a un carácter que no existe! Observa el error que se produce:</p>
+    <p>¡Cuidado con intentar acceder a un carácter que no existe!</p>
 
     <pre><code>print(texto[27])</code></pre>
 
@@ -281,11 +273,6 @@ print(texto[-1]) # Otra forma de acceder al último carácter de la cadena</code
 
     <pre><code>"Ana" < "María"</code></pre>
 
-    <h3>¡Prueba tú!</h3>
-
-    <pre><code># Declara una variable e inicialízala con algún texto.
-
-# Muestra el número de caracteres del texto, el carácter que ocupa la primera posición y el carácter que ocupa la última posición.</code></pre>
 
 <h3>2.4 Tipos contenedores <a id="sec_contenedores"></a></h3>
 
@@ -354,10 +341,6 @@ print(temperaturas)</code></pre>
     
     <pre><code>{32, 33, 34, 35, 36}</code></pre>
 
-    <p>Observa lo que ocurre si inicializamos un conjunto con datos repetidos:</p>
-
-    <pre><code>temperaturas_conjunto = {32,36,35,36,32,33,34}
-print(temperaturas_conjunto)</code></pre>
 
 <h3>2.4.4 Diccionarios <a id="sec_diccionarios"></a></h3>
 
@@ -372,12 +355,6 @@ print("Temperatura en Sevilla:", temperaturas_por_provincias["Sevilla"])
 temperaturas_por_provincias["Sevilla"] = 21.0
 print(temperaturas_por_provincias)</code></pre>
     
-    <h4>¡Prueba tú!</h4>
-    <p>Los valores de un tipo contenedor pueden ser a su vez de otro tipo contenedor. Completa la siguiente declaración de variable para que almacene listas de jugadores de equipos de fútbol, asociando cada lista a una clave con el nombre del equipo en cuestión. Puedes representar a cada jugador mediante una tupla con su nombre, apellidos y edad, al estilo del <a href="#ejemplo_tupla">ejemplo anterior</a>.</p>
-    
-    <pre><code>equipos = {"Sevilla": [], "Betis": []}
-print(equipos)</code></pre>
-
     <h4>2.4.5. Operaciones con tipos contenedores <a id="sec_operaciones"></a></h4>
     
     <p>Dado que los tipos contenedores son tipos objeto, la mayoría de las operaciones con ellos se llevan a cabo mediante métodos. Más adelante haremos un repaso más detallado sobre los métodos disponibles para cada tipo contenedor, pero por ahora veremos cómo realizar las operaciones más básicas.</p>
@@ -414,18 +391,6 @@ print(len(jugador)) # Prueba a cambiar "temperaturas" por las variables de los o
     <pre><code># Consultar si un elemento forma parte de una tupla, lista, conjunto o diccionario
 print(39 in temperaturas)  # Prueba a cambiar "temperaturas" por las variables de los otros tipos estructura</code></pre>
 
-    <h4>¡Prueba tú!</h4>
-
-    <pre><code>lista1 = [1, 2, 3, 4, 5]
-lista2 = [-1, -2, -3, -4, -5]
-
-# Añade un nuevo número a lista1
-
-# Elimina el último elemento de lista2
-
-# Obtén una nueva lista (lista3) formada por 3 repeticiones de la lista1 y una de la lista2
-
-# Muestra la nueva lista en pantalla junto con el número de elementos</code></pre>
 
     <p>Todos los tipos contenedores que hemos visto son <strong>iterables</strong>, es decir, podemos recorrer sus elementos mediante un bucle <code>for</code> (observa detenidamente el caso del diccionario, que es algo particular):</p>
     
@@ -701,17 +666,6 @@ print("El tipo del objeto fechahora obtenido es", type(fechahora))</code></pre>
         <li>Las llamadas a funciones o métodos que aparecen en la expresión corresponden a funciones o métodos definidos previamente (o importados mediante la instrucción <code>import</code>). Además, el número y tipo de las expresiones utilizadas como parámetros de las llamadas son los esperados por dichas funciones y métodos.</li>
     </ul>
     <p>Si una expresión no está bien formada, Python devolverá un error al tratar de ejecutar el código. Por ejemplo, la expresión escrita dentro de la llamada a la función <code>print</code> en <a href="#malformada">este ejemplo</a> es una expresión mal formada. El resto de expresiones que hemos visto y que no dan error al ser ejecutadas son expresiones bien formadas.</p>
-
-    <h4>¡Prueba tú!</h4>
-    <p>¿Sabrías identificar por qué razón las siguientes expresiones no están bien formadas? Trata de corregirlas.</p>
-
-    <pre><code>13'2 * 5</code></pre>
-
-    <pre><code>(temperatura[0] + temperatura[1]) / 2</code></pre>
-
-    <pre><code>"Ajo" * 3.1</code></pre>
-
-    <pre><code>abs("-1.2")</code></pre>
 
 <h3>4. Entrada y salida estándar <a id="sec_4"></a></h3>
 
