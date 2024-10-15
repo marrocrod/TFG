@@ -34,6 +34,17 @@
         margin: 0;
     }
 
+    /* Estilo para los mensajes del asistente */
+    .assistant-message {
+        background-color: #f4e3d0; 
+        color: #3e2723; 
+        border: 1px solid #a1887f; 
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+        
+
     .back-btn {
         display: flex;
         justify-content: center;  /* Centra el texto horizontalmente */
@@ -61,18 +72,41 @@
         justify-content: center;  /* Asegura que el botón esté centrado */
     }
     
+    pre code {
+        background-color: #f5f5f5;
+        padding: 10px;
+        border-radius: 8px;
+        font-family: 'Courier New', Courier, monospace;
+        overflow-x: auto;
+    }
+    
+    h1, h2, h3 {
+        margin-top: 1rem;
+    }
 </style>
 
 <h1 class="text-center mb-4">Chat Archivado</h1>
 
 <!-- Contenedor del chat archivado -->
 <div class="chat-archived-container">
-    {% for message in chat.get_conversation %}
-        <div class="message-item">
-            <p><strong>{{ message.role }}:</strong> {{ message.content }}</p>
+    {% for message in conversation %}
+        <div class="message-item {% if message.role == 'assistant' %}assistant-message{% endif %}">
+            <p>
+                <strong>
+                    {% if message.role == 'user' %}
+                        {{ chat.student.username }}:
+                    {% elif message.role == 'assistant' %}
+                        Saymplexfp:
+                    {% else %}
+                        {{ message.role }}:
+                    {% endif %}
+                </strong>
+                {{ message.content|safe }}
+            </p>
         </div>
     {% endfor %}
 </div>
+
 
 <div class="button-container">
     {% if user.is_teacher %}
@@ -80,8 +114,12 @@
         <a href="{% url 'student_detail' chat.student.id %}" class="back-btn">Volver al Perfil del Estudiante</a>
     {% elif user.is_student %}
         <!-- Enlace para volver a la vista principal del chat -->
-        <a href="{% url 'chat_default' %}" class="back-btn">Volver al Chat Principal</a>
+        <a href="{% url 'archived_chats_list' %}" class="back-btn">Volver al historial de Chats</a>
     {% endif %}
 </div>
 
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
 {% endblock %}

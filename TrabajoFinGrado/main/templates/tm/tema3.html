@@ -1,0 +1,646 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block title %}Tema 3{% endblock %}
+
+{% block content %}
+
+<h1>Instrucciones condicionales y bucles</h1>
+<p><strong>Autor</strong>: Fermín Cruz. <strong>Revisores</strong>: Carlos G. Vallejo, Mariano González, Luisa Romero. <strong>Última modificación</strong>: 18 de septiembre de 2023</p>
+
+<h2>Índice de contenidos</h2>
+<ul>
+    <li><a href="#sec_flujo">1. El flujo de ejecución</a></li>
+    <li><a href="#sec_if">2. La instrucción if</a></li>
+    <li>3. Bucles
+        <ul>
+            <li><a href="#sec_while">3.1. La instrucción while</a></li>
+            <li><a href="#sec_for">3.2. La instrucción for
+                <ul>
+                    <li><a href="#sec_range">3.2.1. Rangos</a></li>
+                    <li><a href="#sec_zip">3.2.2. Recorridos avanzados</a></li>
+                </ul>
+            </a></li>
+            <li><a href="#sec_break">3.3. La instrucción break</a></li>
+        </ul>
+    </li>
+    <li><a href="#sec_tratamientos">4. Tratamientos secuenciales</a></li>
+</ul>
+
+<h2 id="sec_flujo">1. El flujo de ejecución</h2>
+<p>Llamamos <strong>flujo de ejecución</strong> al orden en que se van ejecutando las instrucciones de un programa. Ya sabemos que en un programa en Python las distintas instrucciones se van ejecutando en orden secuencial, empezando por la primera. En concreto, si se trata de un programa ejecutable, el programa empieza a ejecutarse en la primera línea que no esté indentada de nuestro programa. Por ejemplo, mira cómo se ejecuta el siguiente programa:</p>
+
+<pre><code>
+print("==== Cálculo de una potencia =====")
+base = int(input("Introduzca un número entero (base):"))  
+exponente = int(input("Introduzca un número entero (exponente):"))
+
+print("El resultado de", base, "elevado a", exponente, "es", base**exponente)
+</code></pre>
+
+<p>El flujo de ejecución es el siguiente: primero se ejecuta la primera instrucción del programa, a continuación la segunda, y así sucesivamente hasta llegar al final del programa. En realidad, el flujo de ejecución es un poco más enrevesado de lo que parece a primera vista, porque cuando en una instrucción aparece una llamada a una función, el flujo de ejecución "salta" hacia la primera de las instrucciones contenidas en la definición de dicha función. Así, por ejemplo, cuando se invoca a la función <code>print</code>, el flujo de ejecución salta hasta la primera de las instrucciones de la definición de la función <code>print</code>. No sabemos qué instrucción es esa, porque se trata de una función predefinida y por tanto no la hemos implementado nosotros.</p>
+
+<p>Veamos un segundo ejemplo en el que aparezca una función definida por nosotros:</p>
+
+<pre><code>
+def lectura_datos():
+    base = int(input("Introduzca un número entero (base):"))   
+    exponente = int(input("Introduzca un número entero (exponente):"))
+
+    return base, exponente
+
+print("==== Cálculo de una potencia =====")
+base, exponente = lectura_datos()
+
+print("El resultado de", base, "elevado a", exponente, "es", base**exponente)
+</code></pre>
+
+<p>Observa que el flujo de ejecución es el siguiente:</p>
+<ul>
+    <li>Primero se ejecuta la primera de las instrucciones no indentadas:  <code>print("==== Cálculo de una potencia =====")</code></li>
+    <li>Después se ejecuta la segunda instrucción, que incluye una llamada a la función <code>lectura_datos</code>. Como consecuencia de dicha llamada, la ejecución de la instrucción queda en suspenso, y el flujo de ejecución pasa al cuerpo de la función.</li>
+    <li>Se ejecutan secuencialmente todas las instrucciones del cuerpo de <code>lectura_datos</code>, hasta ejecutarse la instrucción <code>return base, exponente</code>. En ese momento, el flujo de ejecución pasa a la instrucción que contenía la llamada a la función y que había quedado en suspenso: <code>base, exponente = lectura_datos()</code>.</li>
+    <li>Se termina de ejecutar dicha instrucción (se realiza la asignación a las variables <code>base</code> y <code>exponente</code>).</li>
+    <li>Se ejecuta la siguiente y última instrucción.</li>
+</ul>
+
+<p>Este es el camino que sigue la ejecución de los programas, en general. Pero la cosa se puede complicar un poco más cuando aparecen en escena las <strong>instrucciones de control del flujo de ejecución</strong>: instrucciones que permiten que una parte del programa se ejecute o no en función de una determinada condición (<strong>instrucciones selectivas</strong> o <strong>condicionales</strong>), o que un bloque de instrucciones se ejecute de manera repetida (<strong>instrucciones repetitivas</strong> o <strong>iterativas</strong>). Las veremos a continuación.</p>
+
+<p><strong>CONSEJO:</strong> Usa Visual Studio Code para ejecutar paso a paso todos los ejemplos que veas en este notebook, mediante la opción de depuración (Debug). Si no sabes como hacerlo, pregunta a tu profesor.</p>
+
+<h2 id="sec_if">2. La instrucción if</h2>
+<p>La instrucción <strong>if</strong> es una <strong>instrucción de control de flujo selectiva</strong> o <strong>condicional</strong>. Esto significa que permite que el flujo de ejecución de un programa siga un camino u otro dentro del código de un programa.</p>
+
+<p>Veamos un primer ejemplo:</p>
+
+<pre><code>
+import math
+
+def calcula_raices(a, b, c):
+    '''
+    Devuelve las raíces (soluciones) de la ecuación ax^2 + bx + c = 0:
+    
+    - Si a es distinto de 0 y b^2 es mayor o igual que 4ac, la solución se calcula 
+    mediante la fórmula (-b ± raíz_cuadrada(b^2 - 4ac)) / (2a).
+    
+    - Si a es distinto de 0 pero b^2 es menor que 4ac, no hay soluciones reales.
+    
+    - Si a es cero y b es distinto de 0, la solución se calcula mediante la fórmula -c / b.
+    
+    - Si a y b son cero, no hay soluciones.
+    '''    
+    
+    if a != 0 and b * b >= 4 * a * c:
+        aux = math.sqrt(b * b - 4 * a * c)
+        return ((-b + aux) / (2 * a), (-b - aux) / (2 * a))
+    elif a != 0:
+        return ()
+    elif b != 0:
+        return (-c / b,) 
+    else:
+        return ()
+
+def lee_coeficientes():
+    '''
+    Solicita por teclado los valores para los coeficientes de la ecuación, y devuelve
+    los datos leídos en forma de tupla
+    '''    
+    print("=== Cálculo de las raíces de una ecuación cuadrática (ax^2 + bx + c = 0)  ===")
+    a = float(input("Introduzca un valor para el coeficiente a:"))
+    b = float(input("Introduzca un valor para el coeficiente b:"))
+    c = float(input("Introduzca un valor para el coeficiente c:"))
+    return a, b, c
+
+# Primera línea sin indentar (sin espacios delante): ¡aquí comienza la ejecución!
+a, b, c = lee_coeficientes()
+soluciones = calcula_raices(a,b,c)
+print("Hay", len(soluciones), "solucion(es):", soluciones)
+</code></pre>
+
+<p>En el cuerpo de la función <code>calcula_raices</code> se ha empleado una instrucción <code>if</code> que permite que se ejecuten unas instrucciones u otras concretas en función de distintas <strong>condiciones</strong>. Las condiciones son cada una de las <strong>expresiones lógicas</strong> que aparecen a la derecha de las palabras reservadas <strong>if</strong> y <strong>elif</strong>, y antes de los dos puntos. Recuerda que una expresión lógica no es más que una expresión (formada por literales, variables, operadores, llamadas a funciones... consulta el notebook de teoría "Expresiones y tipos predefinidos" para más detalles) que devuelve un valor de tipo lógico; es decir, <code>True</code> (verdadero) o <code>False</code> (falso).</p>
+
+<p>El flujo de ejecución cuando se ejecuta una instrucción <code>if</code> es el siguiente:</p>
+<ol>
+    <li>Se evalúa la condición que acompaña al <code>if</code>. <strong>Si el resultado es <code>True</code></strong>, se ejecutan las instrucciones que aparecen indentadas debajo del <code>if</code>. El resto de instrucciones que aparecen indentadas bajo <code>elif</code> y <code>else</code> no se ejecutarían. En el ejemplo, se ejecutarían las instrucciones <code>aux = math.sqrt(b * b - 4 * a * c)</code> y <code>return ((-b + aux) / 2 * a, (-b - aux) / 2 * a)</code>.</li>
+    <li><strong>Si el resultado de la condición anterior es <code>False</code></strong>, se evalúa la condición que acompaña al primer <code>elif</code>. <strong>Si el resultado es <code>True</code></strong>, se ejecutan las instrucciones que aparecen indentadas debajo de dicho <code>elif</code>. El resto de instrucciones que aparecen indentadas bajo el segundo <code>elif</code> y <code>else</code> no se ejecutarían. En el ejemplo, se ejecutaría la instrucción <code>return ()</code>.</li>
+    <li><strong>Si el resultado de la condición anterior es de nuevo <code>False</code></strong>, se evalúa la condición que acompaña al segundo <code>elif</code>. <strong>Si el resultado es <code>True</code></strong>, se ejecutan las instrucciones que aparecen indentadas debajo de dicho <code>elif</code>. El resto de instrucciones que aparecen indentadas bajo el <code>else</code> no se ejecutarían. En el ejemplo, se ejecutaría la instrucción <code>return (-c / b,)</code>.</li>
+    <li><strong>Si el resultado de la condición anterior también es <code>False</code></strong>, se ejecutan las instrucciones que aparecen indentadas debajo del <code>else</code>. En el ejemplo, se ejecutaría la instrucción <code>return ()</code>. Al ejecutarse la instrucción <code>return</code>, la función <code>calcula_raices</code> acaba su ejecución.</li>
+</ol>
+
+<p>Realmente, la semántica de la instrucción <code>if</code> (es decir, qué significa y cómo se ejecuta) es bastante intuitiva, si leemos las palabras reservadas de esta forma (traduciendo del inglés):</p>
+<ul>
+    <li><code>if</code> significa <em>si...</em></li>
+    <li><code>elif</code> es una abreviatura de <em>else if</em>, que significa <em>en otro caso, si...</em></li>
+    <li><code>else</code> significa <em>en otro caso, ...</em></li>
+</ul>
+
+<p>Así que podríamos leer el ejemplo anterior de la siguiente manera:</p>
+<ul>
+    <li>Si <code>a</code> es distinto de 0 y <code>b * b</code> es mayor o igual que <code>4 * a * c</code>, ejecuta las instrucciones siguientes:</li>
+    <pre><code>
+aux = math.sqrt(b * b - 4 * a * c)
+return ((-b + aux) / 2 * a, (-b - aux) / 2 * a)
+    </code></pre>
+    <li>En otro caso, si <code>a</code> es distinto de cero, ejecuta la siguiente instrucción:</li>
+    <pre><code>
+return (-c/b,)
+    </code></pre>
+    <li>En otro caso, ejecuta la siguiente instrucción:</li>
+    <pre><code>
+return ()
+    </code></pre>
+</ul>
+
+<p>En la función usada como ejemplo, aparecen cuatro instrucciones <code>return</code>. Cuando una de estas instrucciones llega a ejecutarse, la ejecución de la función acaba. Aunque no hay ningún problema en usar varios <code>return</code> cuando una función es legible y clara, hay programadores que prefieren utilizar la instrucción <code>return</code> una única vez, al final del cuerpo de la función. Esto se puede hacer si utilizamos una variable para almacenar el resultado que queremos devolver.</p>
+
+<p>Veamos cómo quedaría la función anterior haciendo este cambio:</p>
+
+<pre><code>
+def calcula_raices(a, b, c):
+    '''
+    Devuelve las raíces (soluciones) de la ecuación ax^2 + bx + c = 0:
+    
+    - Si a es distinto de 0 y b^2 es mayor o igual que 4ac, la solución se calcula 
+    mediante la fórmula (-b ± raíz_cuadrada(b^2 - 4ac)) / (2a).
+    
+    - Si a es distinto de 0 pero b^2 es menor que 4ac, no hay soluciones.
+    
+    - Si a es cero y b es distinto de 0, la solución se calcula mediante la fórmula -c/b.
+    
+    - Si b es cero, no hay soluciones.
+    '''    
+    resultado = ()
+    if a != 0 and b * b >= 4 * a * c:
+        aux = math.sqrt(b * b - 4 * a * c)
+        resultado = ((-b + aux) / (2 * a), (-b - aux) / (2 * a))
+    elif a==0 and b != 0:
+        # Hay que incluir una coma al final para que Python entienda que queremos 
+        # devolver una tupla de un sólo elemento
+        resultado = (-c / b,)
+    
+    return resultado
+</code></pre>
+
+<p>Dado que al declarar la variable <code>resultado</code> hemos tenido que darle un valor inicial, se ha optado por el valor <em>tupla vacía</em>, que es precisamente uno de los resultados posibles. Por esta razón, hemos podido saltarnos algunos trozos del <code>if</code> original, en concreto aquellos en los que el resultado era la tupla vacía.</p>
+
+<p>En este último ejemplo observamos que no es obligatorio que una instrucción <code>if</code> contenga un bloque <code>else</code>. Si ninguna de las condiciones incluidas en los bloques <code>if</code> y <code>elif</code> se evalúan como <code>True</code>, simplemente no se ejecuta ninguno de los bloques de código asociados, y la función sigue ejecutándose en la instrucción siguiente (en este caso, <code>return resultado</code>).</p>
+
+<p>Tampoco es obligatorio que aparezcan bloques <code>elif</code>, así que lo único estrictamente necesario para escribir una instrucción <code>if</code> es la condición que la acompaña y el bloque de instrucciones correspondiente.</p>
+
+
+<h2 id="sec_bucles">3. Bucles</h2>
+
+<p>Las <strong>instrucciones de control de flujo repetitivas</strong> o <strong>iterativas</strong> permiten que un bloque de instrucciones se ejecute un número determinado de veces (incluyendo la posibilidad de que se ejecute una única vez o ninguna). No siempre sabremos de antemano cuántas veces se va a ejecutar el bloque de instrucciones, pues esto puede depender del estado actual de ejecución del programa (es decir, del valor concreto de determinadas variables).</p>
+
+<p>En Python tenemos dos instrucciones de este tipo: la instrucción <strong>while</strong> y la instrucción <strong>for</strong>.</p>
+
+<h3 id="sec_while">3.1. Instrucción while</h3>
+
+<p>La instrucción <code>while</code> va seguida de una condición (es decir, una expresión lógica, como en la instrucción <code>if</code>). A continuación de la condición aparecen dos puntos, y después un bloque de instrucciones, debidamente indentadas. Las instrucciones de dicho bloque se ejecutarán una y otra vez, mientras la condición sea cierta.</p>
+
+<p>Mira el siguiente ejemplo:</p>
+
+<pre><code># BOT Coacher v1.0
+
+bienestar = float(input("Del 1 al 5, ¿cómo te encuentras hoy?: "))
+
+while bienestar &lt; 1 or bienestar &gt; 5:
+    bienestar = float(input("Por favor, introduce un valor del 1 al 5:"))
+
+if bienestar &lt; 3: # 1 ó 2
+    print("¡Ánimo! Verás como el día mejora.")
+elif bienestar &lt; 5: # 3 ó 4
+    print("No está mal, ¡hoy será un gran día!")
+else: # 5
+    print("¡Me alegro de que te sientas bien!")
+</code></pre>
+
+<p>Cuando usamos la instrucción <code>while</code> hay que tener especial cuidado en no ocasionar un <strong>bucle infinito</strong>. Esto ocurre cuando la condición es siempre <code>True</code>, de manera que el bucle no acabaría nunca, y por tanto el programa tampoco. Algo que se debe cumplir para evitarlo es que haya alguna instrucción dentro del bucle <code>while</code> en la que cambie el valor de alguna de las variables que participan en la condición. Si esto no es así, y la primera vez se evalúa la condición como <code>True</code>, entraríamos en un bucle infinito.</p>
+
+<p><strong>CONSEJO:</strong> Llévate este código a Visual Studio Code y utiliza el depurador.</p>
+
+<pre><code>def extrae_factor(numero, factor):
+    '''
+    Recibe un número y un factor y busca una descomposición del número 
+    de la forma: numero = numero_sin_factor * factor^exponente.
+    
+    Por ejemplo, si número es 28 y factor es 2, la descomposición buscada
+    es 28 = 7 * 2^2.
+    
+    La función devuelve el número sin factor y el exponente del factor.
+    En el ejemplo anterior, devolvería 7 y 2.
+    '''
+    exponente = 0
+    while numero % factor == 0:
+        exponente += 1
+
+    return (numero, exponente)
+
+print(" === Probando la extracción de factores ===")
+numero = int(input("Introduzca un número entero:"))
+factor = int(input("Introduzca el factor que quiere extraer:"))
+numero_sin_factor, exponente = extrae_factor(numero, factor)
+
+print(f"El número {numero} es igual a {numero_sin_factor} multiplicado por {factor} elevado a {exponente}.")
+</code></pre>
+
+<h3 id="sec_for">3.2. La instrucción for</h3>
+
+<p>La instrucción <code>for</code> permite recorrer los elementos de algún tipo iterable, ejecutando un bloque de instrucciones una vez por cada uno de estos elementos. Observa el siguiente ejemplo:</p>
+
+<pre><code>def muestra_todos(contenedor):
+    for elemento in contenedor:
+        print(elemento)
+
+print("=== Probando función muestra_todos con una lista ===")
+ingredientes = ["Tomate", "Cebolla", "Pimiento", "Pepino", "Ajo", "Aceite", "Vinagre"]
+muestra_todos(ingredientes)
+</code></pre>
+
+<p>Como observas en el ejemplo, la sintaxis de la instrucción <code>for</code> consiste en:</p>
+
+<pre><code>for elemento in iterable:
+    bloque de instrucciones
+</code></pre>
+
+<p>donde <code>iterable</code> es alguna expresión cuyo resultado sea de tipo iterable (una lista, una tupla, un conjunto o un diccionario, entre otros), y <code>elemento</code> es una variable donde se almacenará un elemento distinto del iterable en cada vuelta del bucle (ten en cuenta que la variable <code>elemento</code> puede tener el nombre que quiera el programador). Cuando hablamos de "tipo iterable", nos referimos a tipos contenedores, pero también a otros llamados generadores, que veremos más adelante.</p>
+
+<p>Observa en los siguientes ejemplos cómo se recorren los elementos de distintos tipos de contenedores, incluyendo una cadena de texto (la cual puede ser vista también como un contenedor de caracteres):</p>
+
+<pre><code>print("=== Probando función muestra_todos con una tupla ===")
+ingredientes = ("Tomate", "Cebolla", "Pimiento", "Pepino", "Ajo", "Aceite", "Vinagre")
+muestra_todos(ingredientes)
+</code></pre>
+
+<pre><code>print("=== Probando función muestra_todos con un conjunto ===")
+ingredientes = {"Tomate", "Cebolla", "Pimiento", "Pepino", "Ajo", "Aceite", "Vinagre"}
+muestra_todos(ingredientes)
+</code></pre>
+
+<pre><code>print("=== Probando función muestra_todos con un diccionario ===")
+ingredientes = {
+    "Tomate": 1000, 
+    "Cebolla": 50, 
+    "Pimiento": 50, 
+    "Pepino": 100, 
+    "Ajo": 15, 
+    "Aceite": 100, 
+    "Vinagre": 20
+}
+muestra_todos(ingredientes)
+</code></pre>
+
+<pre><code>print("=== Probando función muestra_todos con una cadena ===")
+muestra_todos("Ingredientes: Tomate, ...")
+</code></pre>
+
+<p>Resumiendo lo que se observa:</p>
+<ul>
+    <li>Las listas y tuplas se recorren en el orden en que están posicionados los elementos.</li>
+    <li>Los conjuntos se recorren en un orden arbitrario (recuerda que los elementos no tienen una posición determinada en los conjuntos).</li>
+    <li>Al recorrer los diccionarios se obtienen únicamente las claves, en el orden en que fueron introducidas en el diccionario.</li>
+    <li>Al recorrer una cadena, se obtienen los caracteres, en el mismo orden en que aparecen dentro de la misma.</li>
+</ul>
+
+<p>Si queremos recorrer tanto las claves como los valores de un diccionario, debemos acceder a cada uno de los valores asociados a cada una de las claves, de esta manera:</p>
+
+<pre><code>ingredientes = {
+    "Tomate": 1000, 
+    "Cebolla": 50, 
+    "Pimiento": 50, 
+    "Pepino": 100, 
+    "Ajo": 15, 
+    "Aceite": 100, 
+    "Vinagre": 20
+}
+
+for ingrediente in ingredientes:
+    cantidad = ingredientes[ingrediente]
+    print(f"{ingrediente} ({cantidad})")
+</code></pre>
+
+
+<h4 id="sec_range">3.2.1. Rangos</h4>
+
+<p>La instrucción <code>for</code> se puede utilizar también para repetir un bloque de instrucciones un número determinado de veces, sin estar sujeto a los elementos de un contenedor. En dichas ocasiones, nos será de utilidad la función predefinida <strong>range</strong>. Esta función devuelve un <strong>generador</strong>, esto es, un objeto iterable; en concreto, este generador devuelve números enteros. Como es un objeto iterable, podemos "recorrer" sus elementos mediante un bucle <code>for</code>. Por ejemplo:</p>
+
+<pre><code>for i in range(5):
+    print(i)
+</code></pre>
+
+<p>Observa que "parece" que <code>range(5)</code> devuelve una lista con cinco números: <code>[0, 1, 2, 3, 4]</code>. En realidad, los números de la secuencia no están en ninguna lista ni ningún otro contenedor en la memoria, sino que se van generando a medida que va haciendo falta. Es por eso que si ejecutamos lo siguiente:</p>
+
+<pre><code>range(5)
+</code></pre>
+
+<p>No obtenemos ninguna lista con los elementos correspondientes, sino más bien una representación que nos indica que la secuencia va de 0 a 4 (observa que el último número que aparece no se incluye en la secuencia).</p>
+
+<p>Si quieres observar los números que contiene la secuencia generada por <code>range</code>, puedes recorrer sus elementos con un <code>for</code>, como en el ejemplo anterior. O también puedes construir una lista a partir de la secuencia, de esta forma:</p>
+
+<pre><code>list(range(5))
+</code></pre>
+
+<p>Ahora que sabemos visualizar el contenido de los rangos, veamos otras formas de utilizar <code>range</code>, pasándole dos o tres parámetros. Los ejemplos son autoexplicativos, ¿sabrías explicar para qué sirve cada parámetro?</p>
+
+<pre><code>list(range(5, 10))
+</code></pre>
+
+<pre><code>list(range(5, 10, 2))
+</code></pre>
+
+<pre><code>list(range(10, 5, -1))
+</code></pre>
+
+
+<h4 id="sec_zip">3.2.2. Recorridos avanzados</h4>
+
+<p>En Python existen otras funciones predefinidas aparte de <code>range</code> que permiten realizar bucles adaptados a distintas necesidades. Vamos a estudiar un par de estas funciones: <code>zip</code> y <code>enumerate</code>.</p>
+
+<p>La función <code>zip</code> nos permite recorrer varias secuencias al mismo tiempo, de manera que en cada paso del bucle obtenemos una tupla formada por un elemento de cada una de las secuencias. Ejecuta estos dos ejemplos y lo comprenderás:</p>
+
+<pre><code># Llamamos a zip pasándole dos listas
+list(zip([1, 2, 3], [4, 5, 6]))  # Al igual que con range, creamos una lista para poder visualizar el contenido de la secuencia
+</code></pre>
+
+<pre><code># Llamamos a zip pasándole tres listas
+list(zip([1, 2, 3], [4, 5, 6], [7, 8, 9]))  # Al igual que con range, creamos una lista para poder visualizar el contenido de la secuencia
+</code></pre>
+
+<pre><code># También podemos emplear contenedores o secuencias de distintos tipos
+list(zip("Hola", [1, 2, 3, 4]))
+</code></pre>
+
+<p>La palabra *zip* significa *cremallera*. Es un nombre bastante ilustrativo, ¿no crees?</p>
+
+<p>Veamos un ejemplo en el que se usa <code>zip</code> para recorrer dos listas "en cremallera":</p>
+
+<pre><code>def suma_listas(lista1, lista2):
+    '''
+    Devuelve una lista en la que cada elemento es la suma de los elementos
+    en la misma posición de las listas recibidas como parámetros.
+    '''
+    suma = []
+    for elemento1, elemento2 in zip(lista1, lista2):
+        suma.append(elemento1 + elemento2)
+    return suma
+
+print("=== Probando función suma_listas ===")
+lista1 = [1, 2, 3, 4, 5]
+lista2 = [6, 7, 8, 9, 10]
+print(suma_listas(lista1, lista2))
+</code></pre>
+
+<p>---</p>
+
+<p>Algunas veces, necesitaremos recorrer los elementos de una lista u otro tipo de contenedor, y al mismo tiempo conocer cuál es la posición del elemento que estamos recorriendo. En estos casos, podemos utilizar la función predefinida <strong>enumerate</strong>, la cual recibe como parámetro una secuencia y devuelve una secuencia de tuplas formadas por un número entero y un elemento de la secuencia recibida.</p>
+
+<p>Como esto parece un trabalenguas, mejor ejecuta el siguiente ejemplo:</p>
+
+<pre><code>list(enumerate(["Tomate", "Cebolla", "Pimiento", "Pepino", "Ajo", "Aceite", "Vinagre"]))
+</code></pre>
+
+<p>¿Y para qué puede servir esto? Pues, como hemos dicho antes, para recorrer los elementos de una secuencia y <em>al mismo tiempo saber</em> cuál es la posición del elemento actual:</p>
+
+<pre><code>for i, caracter in enumerate("Hola, ¿qué tal?"):
+    print("El carácter en posición", i, "es", caracter)
+</code></pre>
+
+<p>Acabamos viendo un ejemplo de algoritmo en el que se puede utilizar <code>enumerate</code>:</p>
+
+<pre><code># Suma los primeros n elementos de una secuencia
+def suma_primeros(secuencia, n):
+    '''
+    Devuelve la suma de los primeros n elementos de una secuencia. 
+    Si n es mayor que el número de elementos de la secuencia, se calcula
+    la suma de la secuencia completa.
+    '''
+    # Este if se podría sustituir por:   n = max(n, len(secuencia))
+    if n > len(secuencia):
+        n = len(secuencia)
+    
+    suma = 0
+    for i, elemento in enumerate(secuencia):
+        if i < n:
+            suma += elemento
+            
+    return suma
+
+print("=== Prueba de la función suma_primeros ===")
+numeros = [8, 1, 4, 12, 5, 2, -1, 53, 1, 32, 22, -19, -33]
+n = int(input("¿Cuántos elementos quieres sumar?"))
+print("Suma:", suma_primeros(numeros, n))
+</code></pre>
+
+<h4 id="sec_break">3.3. La instrucción break</h4>
+
+<p>La ejecución de la función <code>suma_primeros</code> puede ser ineficiente en algunas circunstancias. Observa lo que ocurre al ejecutar la siguiente prueba:</p>
+
+<pre><code>print("Suma de los primeros 10 números de una secuencia de mil millones de elementos:", suma_primeros(range(1000000000), 10))
+</code></pre>
+
+<p>¿Aparece un * a la izquierda de la caja de código anterior? Eso significa que la ejecución aún continúa. <strong>¿Por qué está tardando tanto?</strong></p>
+
+<p>El problema es que el bucle que hemos escrito en <code>suma_primeros</code> ejecuta el bloque de instrucciones una vez por cada elemento de la secuencia recibida. Esta secuencia tiene un número muy alto de elementos, lo que ocasiona que, a pesar de la velocidad de ejecución de los microprocesadores actuales, la ejecución se eterniza. <strong>¿Realmente es necesario recorrer todos los elementos de la secuencia, cuando sólo quiero sumar los primeros 10 elementos?</strong></p>
+
+<p>Observa la siguiente modificación de la definición de la función:</p>
+
+<pre><code># Suma los primeros n elementos de una secuencia
+def suma_primeros(secuencia, n):
+    '''
+    Devuelve la suma de los primeros n elementos de una secuencia. 
+    Si n es mayor que el número de elementos de la secuencia, se calcula
+    la suma de la secuencia completa.
+    '''
+    # Este if se podría sustituir por:   n = max(n, len(secuencia))
+    if n > len(secuencia):
+        n = len(secuencia)
+    
+    suma = 0
+    for i, elemento in enumerate(secuencia):
+        if i < n:
+            suma += elemento
+        else:
+            break
+            
+    return suma
+</code></pre>
+
+<p>Si ejecutas la definición anterior, y ahora vuelves a ejecutar la instrucción que suma los primeros 10 números de la secuencia de millones de elementos, verás que la ejecución es instantánea.</p>
+
+<p>La instrucción <strong>break</strong>, escrita dentro del bloque de instrucciones de un bucle, ocasiona que el bucle termine su ejecución. Como has podido ver en el ejemplo, utilizándola en el sitio adecuado podemos aumentar sensiblemente la eficiencia de nuestros algoritmos.</p>
+
+<h2 id="sec_tratamientos">4. Ejemplos de tratamientos secuenciales</h2>
+
+<p>Llamamos tratamiento secuencial a aquellos algoritmos que tratan de obtener un resultado a partir del recorrido de los distintos elementos de una secuencia. Típicamente, los tratamientos secuenciales se construyen con bucles e instrucciones condicionales. En esta sección, presentamos algunos tratamientos secuenciales típicos implementados de esta manera. Ten en cuenta que algunos de ellos se pueden resolver en Python haciendo uso de determinadas funciones predefinidas, como <code>min</code>, <code>max</code>, <code>sum</code> y otras. Veremos este tipo de soluciones en notebooks posteriores.</p>
+
+<p>Te animamos a que sigas cuidadosamente el flujo de ejecución de cada uno de los ejemplos, pues eso te hará entender mejor la manera correcta de realizar tratamientos secuenciales, y afianzará tu comprensión del flujo de ejecución. Es buena idea probar cada uno de estos bloques de código en Visual Studio Code, haciendo uso del depurador para ejecutar paso a paso los algoritmos presentados.</p>
+
+<pre><code># Para poder ejecutar los ejemplos, vamos a trabajar con una lista de tuplas con información sobre canciones
+# de un usuario de una aplicación de streaming.
+
+# Usaremos una namedtuple para representar cada canción:
+from collections import namedtuple
+Cancion = namedtuple('Cancion', 'nombre, duracion_seg, artista, año, escuchada')
+
+canciones = [
+    Cancion("Shape of You", 263, "Ed Sheeran", 2017, True),
+    Cancion("Blinding Lights", 200, "The Weeknd", 2020, True),
+    Cancion("Watermelon Sugar", 174, "Harry Styles", 2019, False),
+    Cancion("Drivers License", 242, "Olivia Rodrigo", 2021, True),
+    Cancion("Smells Like Teen Spirit", 301, "Nirvana", 1991, False),
+    Cancion("Bohemian Rhapsody", 354, "Queen", 1975, True),
+    Cancion("Respect", 146, "Aretha Franklin", 1967, False),
+    Cancion("Vivir Mi Vida", 241, "Marc Anthony", 2013, True),
+    Cancion("Hotel California", 391, "Eagles", 1976, False),
+    Cancion("No Woman, No Cry", 402, "Bob Marley", 1974, True),
+    Cancion("La Camisa Negra", 230, "Juanes", 2005, True),
+    Cancion("Smooth Criminal", 257, "Michael Jackson", 1987, True),
+    Cancion("Thinking Out Loud", 281, "Ed Sheeran", 2014, True),
+    Cancion("Rolling in the Deep", 228, "Adele", 2010, False),
+    Cancion("Jolene", 150, "Dolly Parton", 1973, True),
+    Cancion("Enter Sandman", 330, "Metallica", 1991, False)
+]
+
+# Definamos una función para mostrar listas de canciones
+def muestra_canciones(canciones):
+    for c in canciones:
+        print(c)
+</code></pre>
+
+<pre><code># Obtener una lista con los nombres de todas las canciones...
+nombres = []
+for c in canciones:
+    nombres.append(c.nombre)
+
+# Mostramos el resultado
+print(nombres)
+</code></pre>
+
+<pre><code># ... o con los nombres de los artistas DISTINTOS que aparecen en las canciones
+# (fíjate que no usamos lista, sino conjunto... ¿por qué?)
+artistas = set()
+for c in canciones:
+    artistas.add(c.artista)
+
+# Mostramos el resultado
+print(artistas)
+</code></pre>
+
+<pre><code># Obtener las canciones que sean de 2010 en adelante...
+
+canciones_resultado = []
+for c in canciones:
+    if c.año >= 2010:
+        canciones_resultado.append(c)
+
+# Mostramos el resultado
+muestra_canciones(canciones_resultado)
+</code></pre>
+
+<pre><code># ...o aquellas que además de ser de 2010 en adelante, duren más de 200 segundos...
+
+canciones_resultado = []
+for c in canciones:
+    if c.año >= 2010 and c.duracion_seg > 200:
+        canciones_resultado.append(c)
+
+# Mostramos el resultado
+muestra_canciones(canciones_resultado)
+</code></pre>
+
+<pre><code># Obtener los artistas que tengan al menos una canción publicada a partir del 2010 y que dure más de 200 segundos
+artistas = set()
+for c in canciones:
+    if c.año >= 2010 and c.duracion_seg > 200:
+        artistas.add(c.artista)
+
+# Mostramos el resultado
+print(artistas)
+</code></pre>
+
+<pre><code># Obtener el tiempo total de reproducción de todas las canciones...
+total = 0
+for c in canciones:
+    total += c.duracion_seg
+
+# Mostramos el resultado
+print(total)
+</code></pre>
+
+<pre><code># ... o de todas las canciones que han sido escuchadas
+total = 0
+for c in canciones:
+    if c.escuchada:
+        total += c.duracion_seg
+
+# Mostramos el resultado
+print(total)
+</code></pre>
+
+<pre><code># Contar cuántas canciones hay de un artista determinado
+contador = 0
+for c in canciones:
+    if c.artista == "Ed Sheeran":
+        contador += 1
+
+# Mostramos el resultado
+print(contador)
+</code></pre>
+
+<pre><code># Calcular la media de duración de las canciones de un artista...
+contador = 0
+duracion_total = 0
+for c in canciones:
+    if c.artista == "Ed Sheeran":
+        contador += 1
+        duracion_total += c.duracion_seg
+        
+if contador > 0:
+    media_duracion = duracion_total / contador
+else:
+    # Si no hay canciones del artista, la media no está definida
+    media_duracion = None 
+
+# Mostramos el resultado
+print(media_duracion)
+</code></pre>
+
+<pre><code># ...o la media de duración de las canciones de 2010 en adelante
+contador = 0
+duracion_total = 0
+for c in canciones:
+    if c.año >= 2010:
+        contador += 1
+        duracion_total += c.duracion_seg
+        
+if contador > 0:
+    media_duracion = duracion_total / contador
+else:
+    # Si no hay canciones de 2010 en adelante, la media no está definida
+    media_duracion = None 
+
+# Mostramos el resultado
+print(media_duracion)
+</code></pre>
+
+<pre><code># La canción más larga de la colección...
+mas_larga = None
+for c in canciones:
+    if mas_larga == None or c.duracion_seg > mas_larga.duracion_seg:
+        mas_larga = c
+
+# Mostramos el resultado
+print(mas_larga)
+</code></pre>
+
+<pre><code># ... o la más corta
+mas_corta = None
+for c in canciones:
+    if mas_corta == None or c.duracion_seg < mas_corta.duracion_seg:
+        mas_corta = c
+
+# Mostramos el resultado
+print(mas_corta)
+</code></pre>
+
+{% endblock %}

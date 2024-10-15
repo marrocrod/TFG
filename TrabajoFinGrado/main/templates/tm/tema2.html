@@ -1,0 +1,913 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% block title %}Tema 2{% endblock %}
+{% block content %}
+    <h1>Expresiones, tipos predefinidos y entrada/salida</h1>
+    <p><strong>Autor</strong>: Fermín Cruz.   <strong>Revisor</strong>: José A. Troyano, Carlos G. Vallejo, Mariano González, José María Luna</p>
+    <p><strong>Última modificación</strong>: 18 de septiembre de 2023</p>
+
+    <h2>Índice de contenidos</h2>
+    <ul>
+        <li><a href="#sec_variables">1. Variables</a></li>
+        <ul>
+            <li><a href="#sec_asignaciones">1.1. Asignaciones</a></li>
+            <li><a href="#sec_nameerror">1.2. Name Error</a></li>
+            <li><a href="#sec_normas">1.3 Normas para la construcción de nombres de variables</a></li>
+        </ul>
+        <li><a href="#sec_tipos">2. Tipos predefinidos</a></li>
+        <ul>
+            <li><a href="#sec_logico">2.1. Tipo lógico</a></li>
+            <li><a href="#sec_numericos">2.2. Tipos numéricos</a></li>
+            <li><a href="#sec_cadena">2.3. Tipos cadena</a></li>
+            <li><a href="#sec_contenedores">2.4. Tipos contenedores</a></li>
+            <ul>
+                <li><a href="#sec_tuplas">2.4.1. Tuplas</a></li>
+                <li><a href="#sec_listas">2.4.2. Listas</a></li>
+                <li><a href="#sec_conjuntos">2.4.3. Conjuntos</a></li>
+                <li><a href="#sec_diccionarios">2.4.4. Diccionarios</a></li>
+                <li><a href="#sec_operaciones">2.4.5. Operaciones con tipos contenedores</a></li>
+            </ul>
+            <li><a href="#sec_datetime">2.5. Tipos fecha y hora</a></li>
+        </ul>
+        <li><a href="#sec_expresiones">3. Expresiones</a></li>
+        <ul>
+            <li><a href="#sec_prioridad">3.1. Prioridad de los operadores</a></li>
+            <li><a href="#sec_conversion">3.2. Conversión de tipos</a></li>
+            <ul>
+                <li><a href="#sec_conversionfechas">3.2.1 Conversión de fechas y horas</a></li>
+            </ul>
+            <li><a href="#sec_bienformadas">3.3. Expresiones bien formadas</a></li>
+        </ul>
+        <li><a href="#sec_4">4. Entrada y salida estándar</a></li>
+        <ul>
+            <li><a href="#sec_4_1">4.1. Funciones input y print</a></li>
+            <li><a href="#sec_4_2">4.2. Formateo de cadenas</a></li>
+        </ul>
+        <li><a href="#sec_5">5. Lectura y escritura de ficheros</a></li>
+        <ul>
+            <li><a href="#sec_5_1">5.1. Apertura y cierre de ficheros</a></li>
+            <li><a href="#sec_5_2">5.2. Lectura y escritura de texto libre</a></li>
+            <li><a href="#sec_5_3">5.3. Lectura y escritura de CSV</a></li>
+        </ul>
+    </ul>
+
+    <h2>1. Variables <a id="sec_variables"></a></h2>
+
+    <p>Una variable es un elemento de un programa que permite almacenar un valor en un momento de la ejecución, y utilizarlo en un momento posterior. Para usar una variable debemos escoger un nombre para la misma y darle algún valor inicial, como en los siguientes ejemplos:</p>
+
+    <pre><code>nombre = "Augustino"
+edad = 19
+peso = 69.4
+altura = 1.70</code></pre>
+
+    <p>Si más adelante hacemos uso de los nombres que hemos usado para las variables anteriores (<code>nombre</code>, <code>edad</code>, <code>peso</code> o <code>altura</code>), Python nos devolverá los valores almacenados previamente.</p>
+
+    <pre><code>print(nombre)
+print(edad)
+print(peso)
+print(altura)</code></pre>
+
+    <p>Aunque no es obligatorio, si en algún momento no necesitamos más una variable, podemos eliminarla de la memoria:</p>
+
+    <pre><code>del(edad)
+print(edad)</code></pre>
+
+    <h3>1.1. Asignaciones <a id="sec_asignaciones"></a></h3>
+
+    <p>Si volvemos a escribir una instrucción formada por el nombre de una variable que ya hemos usado anteriormente, el signo igual y un valor, estaremos sustituyendo el valor almacenado en la variable en cuestión. Llamamos a esta instrucción <strong>asignación</strong>. Por ejemplo, podemos hacer:</p>
+
+    <pre><code>nombre = "Bonifacio" # el valor anterior de la variable se pierde
+print(nombre)</code></pre>
+
+    <p>En Python es posible hacer <strong>asignaciones múltiples</strong>, lo que permite asignar valores a varias variables en una única instrucción:</p>
+
+    <pre><code>edad, peso = 21, 73.2
+print(edad)
+print(peso)</code></pre>
+
+    <p>Las asignaciones múltiples se pueden usar para intercambiar los valores de dos variables. Mira este ejemplo:</p>
+
+    <pre><code>peso, altura = altura, peso
+print(peso)
+print(altura)</code></pre>
+
+    <h3>1.2. Name Error <a id="sec_nameerror"></a></h3>
+
+    <p>Es habitual confundirse al escribir el nombre de una variable existente en el programa. Mira el error que devuelve Python cuando esto ocurre; trata de recordarlo para cuando te ocurra en tus programas:</p>
+
+    <pre><code>print(nombres)  # Hemos usado "nombres" en lugar de "nombre"</code></pre>
+
+    <h3>1.3. Normas para la construcción de nombres de variables <a id="sec_normas"></a></h3>
+
+    <p>Podemos usar los nombres que queramos para nuestras variables, siempre que cumplamos las siguientes reglas:</p>
+    <ul>
+        <li>Sólo podemos usar letras, números y la barra baja (<code>_</code>). No se pueden usar espacios.</li>
+        <li>El nombre puede comenzar por una letra o por la barra baja.</li>
+        <li>No se pueden usar determinadas palabras clave (<code>keywords</code>) que Python usa como instrucciones (por ejemplo, <code>def</code> o <code>if</code>) o como literales (por ejemplo, <code>True</code>). Aunque Python lo permite, tampoco es apropiado usar nombres de funciones predefinidas (por ejemplo, <code>print</code>).</li>
+        <li>Los nombres tienen que ser descriptivos de lo que representa la variable (¡sin pasarse!).</li>
+    </ul>
+
+    <p>Aquí tienes algunos ejemplos de nombres incorrectos de variables; observa los errores generados por Python.</p>
+
+    <pre><code>4edad = 10</code></pre>
+
+    <pre><code>if = 20</code></pre>
+
+    <pre><code>True = 15</code></pre>
+
+    <p>Puedes consultar todas las palabras claves (<code>keywords</code>) existentes en Python de la siguiente forma:</p>
+
+    <pre><code>import keyword
+print(keyword.kwlist)</code></pre>
+
+    <h3>¡Prueba tú!</h3>
+
+    <pre><code># Declara una variable para almacenar el precio de un producto, y asígnale algún valor.
+# Muestra por pantalla el valor almacenado en la variable</code></pre>
+
+
+<h2>2. Tipos predefinidos <a id="sec_tipos"></a></h2>
+
+    <p>En los ejemplos anteriores hemos guardado valores de distintos tipos en las variables: <code>nombre</code> almacena un valor de <strong>tipo cadena de caracteres</strong>, <code>edad</code> almacena un valor de <strong>tipo número entero</strong> y <code>peso</code> almacena un valor de <strong>tipo número real</strong>. Cada uno de estos son <strong>tipos predefinidos en Python</strong> (<em>built-in types</em>). Hablamos de <strong>predefinidos</strong> porque Python también permite al programador crear sus propios tipos, aunque esto no lo veremos por ahora. Los valores que hemos escrito para inicializar cada una de las variables se llaman <strong>literales</strong>.</p>
+
+    <p>Un <strong>tipo de datos</strong> está definido por un conjunto de posibles valores (lo que en matemáticas conocemos como <em>dominio</em>) y un conjunto de operaciones asociadas. Por ejemplo, el tipo número entero (o tipo entero) se corresponde con los valores 0, -1, 1, -2, 2, ..., y con las operaciones aritméticas (suma, resta, multiplicación, ...).</p>
+
+    <p>Un <strong>literal</strong> (es decir, un valor concreto de un tipo) tiene asociado un tipo determinado, simplemente por cómo está escrito dicho literal. Por contra, para saber el tipo asociado a una <strong>variable</strong>, debemos fijarnos en el valor que ha sido almacenado en la misma. En el ejemplo de la sección anterior, <code>nombre</code> es una variable de tipo cadena de caracteres (o tipo cadena), porque ha sido inicializada con un literal de dicho tipo ("Augustino").</p>
+
+    <p>Una <strong>operación</strong> recibe uno o varios valores de un tipo determinado y devuelve un valor del mismo u otro tipo. Las operaciones pueden estar representadas por un operador o por una llamada a función, como veremos más adelante.</p>
+
+    <p>En las siguientes secciones se muestran distintos tipos predefinidos, la manera en que se escriben los literales y las operaciones asociadas más importantes.</p>
+
+    <h3>2.1 Tipo lógico <a id="sec_logico"></a></h3>
+
+    <p>El tipo lógico (<strong>bool</strong>) únicamente incluye dos valores en su dominio: verdadero (<strong>True</strong>) y falso (<strong>False</strong>). Estas dos palabras en negrita son precisamente los únicos <strong>literales lógicos</strong> permitidos en Python. El tipo lógico sirve para representar condiciones lógicas, por ejemplo, si un peso es o no mayor a un umbral, si un año es o no bisiesto, o si el personaje de un videojuego tiene o no una determinada habilidad.</p>
+
+    <p>Los operadores lógicos son sólo tres: <strong>and</strong>, <strong>or</strong> y <strong>not</strong>, tal como se muestra en los siguientes ejemplos.</p>
+
+    <pre><code># Disyunción (también llamado "o lógico" y "sumador lógico")
+False or True</code></pre>
+
+    <pre><code># Conjunción (también llamado "y lógico" y "multiplicador lógico")
+False and True</code></pre>
+
+    <pre><code># Negación
+not False</code></pre>
+
+    <h3>2.2 Tipos numéricos <a id="sec_numericos"></a></h3>
+
+    <p>Existen tres tipos que permiten trabajar con números en Python: enteros (<strong>int</strong>), reales (<strong>float</strong>) y complejos (<strong>complex</strong>). Nosotros sólo trabajaremos con los dos primeros.</p>
+
+    <p>Los <strong>literales enteros</strong> se escriben tal como estamos acostumbrados, mediante una secuencia de dígitos. Por ejemplo:</p>
+
+    <pre><code>2018</code></pre>
+
+    <p>Si escribimos el punto decimal (<code>.</code>), entonces diremos que se trata de un <strong>literal real</strong>:</p>
+
+    <pre><code>3.14159</code></pre>
+
+    <p>Las operaciones disponibles incluyen a las <strong>operaciones aritméticas</strong> (suma, resta, multiplicación,...), las <strong>operaciones relacionales</strong> (mayor que, menor que,...), y algunas otras como el valor absoluto. Algunas operaciones se representan mediante un operador (por ejemplo, se usa el operador <code>+</code> para la suma), mientras que otras se representan mediante una llamada a función (por ejemplo, se usa la función predefinida <code>abs</code> para obtener el valor absoluto de un número).</p>
+
+    <p>A continuación, se muestran ejemplos que deben ser autoexplicativos. Empezamos por las <strong>operaciones aritméticas</strong>, que son aquellas en las que tanto los operandos como el resultado son numéricos:</p>
+
+    <pre><code># suma
+3 + 6</code></pre>
+
+    <pre><code># resta
+3 - 4</code></pre>
+
+    <pre><code># producto
+3 * 4</code></pre>
+
+    <pre><code># división
+3 / 4</code></pre>
+
+    <pre><code># división entera: devuelve el cociente, sin decimales
+3 // 4</code></pre>
+
+    <pre><code># resto de la división entera
+3 % 4</code></pre>
+
+    <pre><code># opuesto
+- 3</code></pre>
+
+    <pre><code># valor absoluto
+abs(-3)</code></pre>
+
+    <pre><code># potencia
+3 ** 4</code></pre>
+
+    <h3>¡Prueba tú!</h3>
+
+    <pre><code># Escribe una expresión usando varios operadores aritméticos</code></pre>
+
+    <p>Continuamos con las <strong>operaciones relacionales</strong>, en las que los operandos son numéricos pero el resultado es de tipo lógico:</p>
+
+    <pre><code># mayor estricto
+3 > 4</code></pre>
+
+    <pre><code># menor estricto
+3 < 4</code></pre>
+
+    <pre><code># mayor o igual
+3 >= 4</code></pre>
+
+    <pre><code># menor o igual
+3 <= 4</code></pre>
+
+    <pre><code># igual
+3 == 4</code></pre>
+
+    <pre><code># distinto
+3 != 4</code></pre>
+
+    <p>Los operadores relacionales pueden concatenarse para formar una única expresión, de manera similar a como se hace en notación matemática (algo que no puede hacerse en otros lenguajes de programación, como C o Java). Por ejemplo:</p>
+
+    <pre><code>3 < 4 <= 6</code></pre>
+
+<h3>2.3 Tipo cadena <a id="sec_cadena"></a></h3>
+
+    <p>El tipo cadena de caracteres (<strong>str</strong>), o como se suele abreviar, tipo cadena, nos permite trabajar con textos. Los <strong>literales cadena</strong> se escriben utilizando unas comillas simples o dobles para rodear al texto que queremos representar. Por ejemplo:</p>
+
+    <pre><code>"Este es un literal cadena"
+'Este es otro literal cadena'</code></pre>
+
+    <p>Si usamos comillas simples, dentro del texto podemos emplear las comillas dobles sin problema. Igualmente, si usamos las comillas dobles para rodear al texto, dentro del mismo podemos usar las comillas simples. Por ejemplo:</p>
+
+    <pre><code>"En este ejemplo usamos las 'comillas simples' dentro de un texto"
+'En este ejemplo usamos las "comillas dobles" dentro de un texto'</code></pre>
+
+    <p>En ocasiones querremos hacer referencia a caracteres especiales, como el tabulador o el salto de línea. En dichos casos, debemos usar el <strong>carácter de escape</strong>, que es la barra invertida <code>\</code>. Por ejemplo, el tabulador se escribe como <code>\t</code> y el salto de línea se escribe como <code>\n</code>. Por ejemplo:</p>
+
+    <pre><code>"Este texto tiene dos líneas.\nEsta es la segunda línea."</code></pre>
+
+    <p>También es posible utilizar tres comillas, simples o dobles, como delimitadores del texto, en cuyo caso podemos escribir texto de varias líneas, sin necesidad de usar <code>\n</code>:</p>
+
+    <pre><code>"""Este texto tiene dos líneas.
+Esta es la segunda línea."""</code></pre>
+
+    <p>La mayoría de las operaciones sobre el tipo cadena son mediante llamadas a métodos, ya que las cadenas en Python son objetos. Veremos esto más adelante; por ahora, nos basta con ver las operaciones que podemos realizar mediante operadores o funciones predefinidas:</p>
+
+    <pre><code>texto = "Este es un texto de prueba."
+
+# Tamaño de una cadena, función predefinida len
+print("Número de caracteres del texto:", len(texto))
+
+# El operador de acceso permite obtener un único carácter 
+print(texto[0])  # El primer carácter se referencia mediante un cero
+print(texto[1])
+print(texto[26])
+print(texto[-1]) # Otra forma de acceder al último carácter de la cadena</code></pre>
+
+    <p>¡Cuidado con intentar acceder a un carácter que no existe!</p>
+
+    <pre><code>print(texto[27])</code></pre>
+
+    <p>Python nos permite usar el operador <code>+</code> entre dos cadenas, y el operador <code>*</code> entre una cadena y un número entero:</p>
+
+    <pre><code>texto + " ¡Genial!"</code></pre>
+
+    <pre><code>texto * 4</code></pre>
+
+    <p>También es posible usar los operadores relacionales entre cadenas, de manera que se utiliza el orden alfabético para decidir el resultado de las operaciones.</p>
+
+    <pre><code>"Ana" < "María"</code></pre>
+
+
+<h3>2.4 Tipos contenedores <a id="sec_contenedores"></a></h3>
+
+    <p>En Python existen algunos tipos contenedores que permiten almacenar en una variable varios valores al mismo tiempo. Cada uno de estos valores puede tener a su vez su propio tipo (es decir, puedo guardar en una única variable dos valores de tipo entero y un valor de tipo cadena, por ejemplo).</p>
+    
+    <p>Entre otros, disponemos en Python de estos tipos contenedores.</p>
+    
+    <h4>2.4.1. Tuplas <a id="sec_tuplas"></a></h4>
+    
+    <p>El tipo tupla (<strong>tuple</strong>) permite almacenar datos de cualquier tipo, en un orden determinado. Los literales se escriben concatenando los datos que se desea que estén incluidos en la tupla, separados por comas, y envolviéndolo todo con unos paréntesis (aunque esto último es opcional). Por ejemplo:</p>
+    
+    <pre><code>("Mark", "Lenders", 15)</code></pre>
+    
+    <p>Si guardamos una tupla en una variable, podemos acceder a cada uno de los elementos de la tupla de la siguiente manera:</p>
+    
+    <pre><code>jugador = ("Mark", "Lenders", 15)
+print("Nombre:", jugador[0])
+print("Apellidos:", jugador[1])
+print("Edad:", jugador[2])</code></pre>
+    
+    <p>Las tuplas se usan frecuentemente como tipo de devolución de las funciones, ya que nos permiten que una función devuelva varios valores al mismo tiempo. Veremos esto más adelante.</p>
+
+    <p>Las tuplas son <strong>inmutables</strong>, lo que significa que una vez que se ha asignado un valor a una variable de tipo tupla ya no podemos cambiar los valores encapsulados en dicha tupla, ni añadir o eliminar elementos. Prueba a ejecutar el siguiente código y observa el error que se produce:</p>
+    
+    <pre><code>jugador[2] = 16</code></pre>
+
+    <p>Existe un tipo especial de tupla, al que podemos llamar tupla con nombre (<strong>namedtuple</strong>). En este caso, no es un tipo predefinido, por lo que debemos importarlo antes de poderlo usar. En una tupla con nombre, le pondremos un nombre a cada uno de las posiciones de la tupla, lo que luego nos permitirá acceder a esos elementos de una manera mucho más legible.</p>
+
+    <p>Lo primero que tendremos que hacer es definir la <code>namedtuple</code>, indicando un nombre para el tipo de tupla y para cada uno de los elementos que la componen:</p>
+    
+    <pre><code>from collections import namedtuple
+
+# El primer parámetro que pasamos a namedtuple es el nombre
+# que le damos al tipo de tupla que estamos definiendo.
+# El segundo parámetro que pasamos a namedtuple indica
+# los nombres de cada uno de los elementos de la tupla
+Jugador = namedtuple("Jugador", "nombre, apellidos, edad")</code></pre>
+
+    <p>Con la definición anterior, obtenemos un nuevo <strong>constructor de tipo</strong>, que hemos guardado en la variable <code>Jugador</code>. Fíjate que hemos usado un identificador con la primera letra mayúscula para esta variable, lo cual es un convenio ampliamente utilizado. Cuando queramos crear tuplas del tipo Jugador, lo haremos usando el constructor de tipo que hemos obtenido anteriormente:</p>
+    
+    <pre><code>jugador = Jugador("Mark", "Lenders", 15)
+print(jugador)</code></pre>
+    
+    <p>Ahora podemos acceder a los campos de la tupla de una manera más legible que la anterior: en lugar de usar los corchetes e indicar la posición del elemento, utilizamos un punto seguido del nombre del elemento:</p>
+    
+    <pre><code>print("Nombre:", jugador.nombre)
+print("Apellidos:", jugador.apellidos)
+print("Edad:", jugador.edad)</code></pre>
+
+    <h4>2.4.2. Listas <a id="sec_listas"></a></h4>
+
+    <p>El tipo lista (<strong>list</strong>) permite almacenar datos de cualquier tipo, en un orden determinado, al igual que las tuplas. La principal diferencia es que son <strong>mutables</strong>, es decir, una vez inicializada una variable de tipo lista, es posible cambiar el valor de una posición, añadir nuevos elementos o eliminarlos. Los literales se escriben concatenando los datos que se desea que estén incluidos en la lista, separados por comas, y envolviéndolo todo con unos corchetes. Por ejemplo:</p>
+    
+    <pre><code>[32, 36, 35, 36, 32, 33, 34]</code></pre>
+    
+    <p>Aunque al igual que en las tuplas los elementos pueden tener cada uno un tipo distinto, lo más habitual en las listas es que todos los elementos sean de un mismo tipo. Para acceder a los elementos se usan los corchetes, al igual que con las tuplas, con la diferencia de que ahora también podemos asignar nuevos valores a una posición determinada de la lista:</p>
+    
+    <pre><code>temperaturas = [32, 36, 35, 36, 32, 33]
+print("Primera temperatura de la lista:", temperaturas[0])
+temperaturas[1] = 35
+print(temperaturas)</code></pre>
+
+    <h4>2.4.3. Conjuntos <a id="sec_conjuntos"></a></h4>
+
+    <p>El tipo conjunto (<strong>set</strong>) permite almacenar datos de cualquier tipo, sin ningún orden determinado, y sin posibilidad de elementos repetidos. Los literales se escriben concatenando los datos que se desea que estén incluidos en el conjunto (da igual el orden en que los escribamos), separados por comas, y envolviéndolo todo con unas llaves. Por ejemplo:</p>
+    
+    <pre><code>{32, 33, 34, 35, 36}</code></pre>
+
+
+<h3>2.4.4 Diccionarios <a id="sec_diccionarios"></a></h3>
+
+    <p>El tipo diccionario (<strong>dict</strong>) permite almacenar datos de cualquier tipo, sin ningún orden determinado. Cada valor almacenado se asocia a una clave, de manera que para acceder a los valores se utilizan dichas claves. Los literales se escriben concatenando las parejas clave-valor mediante comas y envolviéndolo todo mediante llaves; cada una de las parejas se escribe separando la clave y el valor asociado mediante dos puntos. Por ejemplo:</p>
+    
+    <pre><code>{"Almería": 19.9, "Cádiz": 19.1, "Córdoba": 19.1, "Granada": 16.6, "Jaén": 18.2, "Huelva": 19.0, "Málaga": 19.8, "Sevilla": 20.0}</code></pre>
+    
+    <p>Para acceder a un valor, debemos conocer la clave asociada. Los diccionarios son <strong>mutables</strong>. Observa el siguiente ejemplo de código:</p>
+    
+    <pre><code>temperaturas_por_provincias = {"Almería": 19.9, "Cádiz": 19.1, "Córdoba": 19.1, "Granada": 16.6, "Jaén": 18.2, "Huelva": 19.0, "Málaga": 19.8, "Sevilla": 20.0}
+print("Temperatura en Sevilla:", temperaturas_por_provincias["Sevilla"])
+temperaturas_por_provincias["Sevilla"] = 21.0
+print(temperaturas_por_provincias)</code></pre>
+    
+    <h4>2.4.5. Operaciones con tipos contenedores <a id="sec_operaciones"></a></h4>
+    
+    <p>Dado que los tipos contenedores son tipos objeto, la mayoría de las operaciones con ellos se llevan a cabo mediante métodos. Más adelante haremos un repaso más detallado sobre los métodos disponibles para cada tipo contenedor, pero por ahora veremos cómo realizar las operaciones más básicas.</p>
+    
+    <pre><code># Añadir un elemento a una lista, un conjunto o un diccionario
+temperaturas.append(29)
+print(temperaturas)
+
+temperaturas_conjunto.add(29)
+print(temperaturas_conjunto)
+
+temperaturas_por_provincias["Badajoz"] = 15.8   # Basta con usar una clave que antes no existía
+print(temperaturas_por_provincias)</code></pre>
+
+    <pre><code># Eliminar un elemento de una lista, un conjunto o un diccionario
+del(temperaturas[0])
+print(temperaturas)
+
+temperaturas_conjunto.remove(32)
+print(temperaturas_conjunto)
+
+del(temperaturas_por_provincias["Almería"])
+print(temperaturas_por_provincias)</code></pre>
+
+    <pre><code># Concatenar varias tuplas o listas
+print(jugador + (1.92, 81.2))
+
+print(temperaturas + temperaturas)
+print(temperaturas * 3)  # Concatenar consigo misma 3 veces</code></pre>
+
+    <pre><code># Consultar el número de elementos de una tupla, lista, conjunto o diccionario
+print(len(jugador)) # Prueba a cambiar "temperaturas" por las variables de los otros tipos estructura</code></pre>
+
+    <pre><code># Consultar si un elemento forma parte de una tupla, lista, conjunto o diccionario
+print(39 in temperaturas)  # Prueba a cambiar "temperaturas" por las variables de los otros tipos estructura</code></pre>
+
+
+    <p>Todos los tipos contenedores que hemos visto son <strong>iterables</strong>, es decir, podemos recorrer sus elementos mediante un bucle <code>for</code> (observa detenidamente el caso del diccionario, que es algo particular):</p>
+    
+    <pre><code>print("Tupla jugador:")
+for campo in jugador:
+    print(campo)
+
+print("\nLista de temperaturas:")
+for t in temperaturas:
+    print(t)
+
+print("\nConjunto de temperaturas")
+for t in temperaturas_conjunto:
+    print(t)
+
+print("\nDiccionario de temperaturas por provincias")
+# Al recorrernos un diccionario, obtenemos las claves
+for provincia in temperaturas_por_provincias:
+    print(provincia, "->", temperaturas_por_provincias[provincia])</code></pre>
+
+<h3>2.5 Tipos fecha y hora <a id="sec_datetime"></a></h3>
+
+    <p>En Python, disponemos de varios tipos para representar y operar con fechas y horas. No se trata de tipos predefinidos, sino que sus definiciones están incluidos en el módulo <code>datetime</code>. Por tanto, debemos importarlos cuando queramos utilizarlos en nuestros programas.</p>
+    
+    <p>Para representar fechas, disponemos del tipo <code>date</code>:</p>
+    
+    <pre><code>from datetime import date
+
+# Le pasamos al constructor de date el año, el mes y el día, en ese orden
+fecha = date(2015, 1, 1)
+print(fecha)</code></pre>
+
+    <pre><code># O bien, podemos obtener el día actual, de esta forma
+fecha_actual = date.today()
+print(fecha_actual)</code></pre>
+
+    <pre><code># Si queremos acceder a cada uno de los campos, usamos los atributos
+# day, month y year
+print("El día actual es", fecha_actual.day)
+print("El mes actual es", fecha_actual.month)
+print("El año actual es", fecha_actual.year)</code></pre>
+
+    <pre><code># También podemos preguntar por el día de la semana
+# (observa que es un método, no un atributo)
+# El 0 representa al lunes, y el 6 al domingo
+print("El día de la semana es", fecha_actual.weekday())</code></pre>
+
+    <pre><code># Los objetos de tipo fecha son comparables, por lo que podemos
+# usar operadores relacionales, como en otros tipos comparables
+if fecha_actual > fecha:
+    print("La fecha actual es posterior a", fecha)</code></pre>
+
+    <p>De forma similar, disponemos del tipo <code>time</code> para representar horas:</p>
+
+    <pre><code>from datetime import time
+
+# Le pasamos al constructor de time la hora, los minutos y los segundos
+hora = time(17, 10, 59)
+print(hora)
+
+# Podemos obviar los segundos
+hora = time(17,10)
+print(hora)</code></pre>
+
+    <pre><code># Si queremos acceder a cada uno de los campos, usamos los atributos
+# hour, minute y second
+print("El hora es", hora.hour)
+print("Los minutos son", hora.minute)
+print("Los segundos son", hora.second)</code></pre>
+
+    <pre><code># Los objetos de tipo hora también son comparables
+lista_horas = [
+    time(14, 23),
+    time(18, 19),
+    time(7, 22),
+    time(9, 58)
+]
+
+print(sorted(lista_horas))</code></pre>
+
+    <p>Por último, también es posible trabajar con objetos que almacenen una fecha y una hora concretas, de manera conjunta. Para ello usaremos el tipo <code>datetime</code>:</p>
+
+    <pre><code>from datetime import datetime
+
+fecha1 = datetime(2023, 12, 31, 21, 30)
+print("Fecha 1:", fecha1)
+
+fecha_actual = datetime.now()
+print("Fecha actual:", fecha_actual)
+
+print("\nAccedemos a los atributos de fecha1:")
+print(fecha1.year)
+print(fecha1.month)
+print(fecha1.day)
+print(fecha1.hour)
+print(fecha1.minute)
+print(fecha1.second)
+
+print()
+if fecha_actual > fecha1:
+    print("La fecha actual es posterior a", fecha1)
+else:
+    print("La fecha actual es igual o anterior a", fecha1)</code></pre>
+
+<h3>3. Expresiones <a id="sec_expresiones"></a></h3>
+
+    <p>Aunque en los ejemplos anteriores hemos inicializado las variables utilizando un literal de algún tipo, esta es sólo una de las <strong>expresiones</strong> que podemos emplear. Una expresión puede ser cualquiera de las siguientes cosas:</p>
+    <ul>
+        <li>Un literal.</li>
+        <li>Una variable.</li>
+        <li>Un operador junto a sus operandos, cada uno de los cuales es a su vez una expresión.</li>
+        <li>Una llamada a una función o a un método, siempre que devuelvan algo; cada uno de los parámetros de la invocación a la función o al método es a su vez una expresión.</li>
+        <li>Unos paréntesis envolviendo a otra expresión.</li>
+    </ul>
+    <p>Fíjate en que la definición anterior es recursiva: por ejemplo, los operandos de una operación pueden ser a su vez expresiones. Esto hace que podamos tener expresiones tan largas como quieras imaginar (aunque por regla general intentaremos que no sean <em>demasiado</em> largas, pues eso las hace más difíciles de leer y entender).</p>
+
+    <p>Mira los siguientes ejemplos de expresiones; si ejecutas cada trozo de código mostrado, obtendrás el <strong>resultado</strong> de la expresión. Decimos que la expresión es del <strong>tipo</strong> correspondiente al resultado de la misma. Prueba a llamar a la función predefinida <code>type</code> pasándole como parámetro cada una de las expresiones siguientes: al ejecutar, obtendrás el tipo de la expresión.</p>
+
+    <pre><code># Un literal
+39</code></pre>
+
+    <pre><code># Una variable
+edad</code></pre>
+
+    <pre><code># Un operador junto a sus operandos
+edad + 18</code></pre>
+
+    <pre><code># Cada operando es a su vez una expresión, que puede estar formada por otros operadores y operandos
+edad + 18 &lt; 30</code></pre>
+
+    <pre><code># Una llamada a función (el parámetro, a su vez, es una expresión)
+len(temperaturas * 2)</code></pre>
+
+    <pre><code># Podemos usar paréntesis para indicar el orden de ejecución de las operaciones en una expresión
+((len(temperaturas) - len(temperaturas_conjunto)) &lt; 2) and ((edad % 2) != 0)</code></pre>
+
+    <p>Cuando utilizamos una expresión para inicializar una variable, Python primero <strong>evalúa</strong> la expresión para obtener un resultado, y almacena dicho resultado en la variable:</p>
+
+    <pre><code>nombre_completo = jugador[0] + " " + jugador[1]
+print(nombre_completo)</code></pre>
+
+    <p>Igualmente podemos usar expresiones en los parámetros de las llamadas a funciones o a métodos, de manera que Python evalúa las expresiones antes de proceder a ejecutar la función o método:</p>
+
+    <pre><code>print("El nombre completo del jugador es " + nombre_completo + ".")</code></pre>
+
+    <h4>3.1 Prioridad de las operaciones <a id="sec_prioridad"></a></h4>
+    
+    <p>[En uno de los ejemplos de expresiones](#segundo_ejemplo) hemos utilizado los paréntesis para indicarle a Python en qué orden debe evaluar la expresión. Pero, ¿qué ocurre si no empleamos paréntesis y la expresión contiene varios operadores y/o llamadas a funciones?</p>
+
+    <p>En este caso, Python decide el orden según la <strong>prioridad de las operaciones</strong>. En el caso de los <a href="#operadores_logicos">operadores lógicos</a> y <a href="#operadores_aritmeticos">aritméticos</a>, la prioridad coincide con el orden en que aparecen los ejemplos en este notebook (de menos a más prioridad). Así por ejemplo, la suma aritmética tiene menor prioridad que la multiplicación; por tanto, en la expresión <code>3 + 5 * 8</code> primero se evalúa <code>5 * 8</code> y posteriormente se evalúa <code>3 + 40</code>.</p>
+
+    <p>En el caso de los <a href="#operadores_relacionales">operadores relacionales</a>, todos tienen la misma prioridad. Si tenemos expresiones en las que aparezcan operadores de los tres tipos, en primer lugar se evalúan los operadores aritméticos, después los relacionales, y por último los lógicos. Trata de entender cómo se evalúa la siguiente expresión:</p>
+
+    <pre><code>3 + 9 &gt; 9 and 8 &gt; 3</code></pre>
+
+    <p>En cuanto a las llamadas a funciones y métodos, éstas siempre se evalúan en primer lugar. Tienen por tanto mayor prioridad que el resto de operaciones. Dado que para evaluar una llamada es necesario ejecutar el código de la función o el método correspondiente, lo primero que hará Python es evaluar las expresiones usadas en los parámetros de estas funciones.</p>
+
+    <p>Veamos un ejemplo de lo anterior:</p>
+
+    <pre><code>import math
+
+resultado = 5 + math.sqrt(10 * 10) &lt; 20 - 2  
+print(resultado)</code></pre>
+
+    <p>El orden de evaluación de la expresión <code>5 + math.sqrt(10 * 10) &lt; 20 - 2</code> es el siguiente:</p>
+    <ul>
+        <li>Se evalúa el parámetro de la llamada a la función <code>math.sqrt</code>: <code>10 * 10</code>, cuyo resultado es <code>100</code>.</li>
+        <li>Se evalúa la llamada a la función <code>math.sqrt(100)</code>, cuyo resultado es <code>10</code>.</li>
+        <li>Se evalúa la operación <code>5 + 10</code>, cuyo resultado es <code>15</code>.</li>
+        <li>Se evalúa la operación <code>20 - 2</code>, cuyo resultado es <code>18</code>.</li>
+        <li>Por último, se evalúa la operación <code>15 &lt; 18</code>, cuyo resultado es <code>True</code>.</li>
+    </ul>
+
+    <p>Como recomendación final, ten en cuenta que si en algún momento dudas de la prioridad de los operadores que estás usando, siempre puedes usar los paréntesis para asegurarte de que estás escribiendo lo que realmente quieres expresar.</p>
+
+    <h4>3.2 Conversión de tipos <a id="sec_conversion"></a></h4>
+
+    <p>Python tiene un <strong>sistema fuerte de tipos</strong>, lo que en pocas palabras significa que cada literal, variable o expresión que utilicemos tiene asociado un tipo determinado, y que Python nunca va a convertir ese tipo a otro tipo de manera automática.</p>
+
+    <p>Para entender esto, ejecuta el siguiente ejemplo:</p>
+
+    <pre><code>resultado = 10 * 3.141519 - 19
+print("El resultado del cálculo es " + resultado)</code></pre>
+
+    <p>Como puedes observar, se ha producido un error (en concreto, un <strong>TypeError</strong>). Lo que nos dice el error en cuestión es que para poder realizar la operación de concatenación de cadenas, que aparece en la expresión <code>"El resultado del cálculo es " + resultado</code>, sería necesario que el segundo operador, <code>resultado</code>, fuera de tipo cadena (<code>str</code>). Esto no es así: <code>resultado</code> es de tipo <code>float</code>. Algunos lenguajes de programación realizan esta conversión de manera automática, convirtiendo el valor de resultado a una cadena de texto, antes de proceder a evaluar la expresión completa. <strong>No es el caso de Python</strong>: dado que tenemos un sistema fuerte de tipos, las conversiones de datos deben ser siempre explícitamente escritas por el programador.</p>
+
+    <p>Para llevar a cabo una conversión del tipo de una expresión, debemos usar funciones predefinidas cuyos nombres coinciden con los nombres de los tipos básicos que hemos visto hasta ahora: <strong>bool</strong>, <strong>int</strong>, <strong>float</strong>, <strong>str</strong>, <strong>tuple</strong>, <strong>list</strong>, <strong>set</strong>, y <strong>dict</strong>. Para que el ejemplo anterior se pueda ejecutar, tendría que corregirse de la siguiente manera:</p>
+
+    <pre><code>resultado = 10 * 3.141519 - 19
+print("El resultado del cálculo es " + str(resultado))</code></pre>
+
+    <p>Además del caso de la conversión de cualquier tipo a cadena, es también común la conversión de unos tipos contenedores a otros. Por ejemplo, si tengo una tupla puedo convertirla a lista:</p>
+
+    <pre><code>print(jugador)
+jugador_lista = list(jugador)
+print(jugador_lista)</code></pre>
+
+    <p>O si tengo una lista, puedo convertirla en un conjunto (con lo que de camino estaremos eliminando los elementos duplicados, de manera sencilla):</p>
+
+    <pre><code>print(temperaturas)
+temperaturas_sin_duplicados = set(temperaturas)
+print(temperaturas_sin_duplicados)</code></pre>
+
+    <p>No todas las conversiones se pueden realizar. En general, si la conversión es intuitiva, Python la llevará a cabo sin problemas. Pero si la conversión carece de sentido o no es intuitivamente clara, es posible que dé lugar a un error:</p>
+
+    <pre><code>print(temperaturas)
+temperaturas_entero = int(temperaturas)
+print(temperaturas_entero)</code></pre>
+
+    <p>Una conversión de tipos que puede confundirnos es la que convierte una cadena a tipo lógico. Observa este experimento:</p>
+
+    <pre><code>cadena = "False"
+logico = bool(cadena)
+print("El valor lógico obtenido es", logico)</code></pre>
+
+    <p>En este caso, en contra de lo que nos diría la intuición, la conversión no funciona bien. La función <code>bool</code> sólo devuelve <code>False</code> si la cadena recibida está vacía, devolviendo <code>True</code> en cualquier otro caso. Por tanto, si realmente queremos convertir las cadenas <code>"False"</code> y <code>"True"</code> a sus correspondientes de tipo lógico, debemos utilizar un <code>if</code>:</p>
+
+    <pre><code>cadena = "False"
+
+if cadena == "False":
+    logico = False
+else:
+    logico = True   # Consideramos que la cadena siempre será "False" o "True"
+    
+print("El valor lógico obtenido es", logico)</code></pre>
+
+    <h3>3.2.1. Conversión de fechas y horas <a id="sec_conversionfechas"></a></h3>
+
+    <p>Hay un tipo de conversión que nos encontraremos en algunos ejercicios y que requiere una manera de proceder un tanto especial. Se trata de pasar de una cadena de texto que representa una fecha o una hora a un objeto de tipo <code>date</code>, <code>time</code> o <code>datetime</code>. Dado que la cadena de texto en cuestión puede venir en distintos formatos, es necesario usar una función de <strong>parseo</strong>, que nos proporciona el módulo <code>datetime</code>. La función en cuestión se llama <code>strptime</code> (acrónimo de <em>string parse time</em>). Esta función recibe dos parámetros: la cadena a convertir y el formato de la cadena. La cadena a convertir puede contener valores para día, mes, año, hora, minutos y segundos, además de otros caracteres que actúen como separadores. Por ejemplo, una fecha podría venir representada como <code>"31/12/2023"</code>, o puede que viniese como <code>"2023-12-31"</code> (observa que cambian el orden del día, mes y año, y el carácter usado como separador).</p>
+
+    <p>Para indicarle el formato a la función <code>strptime</code> se usan unos códigos que indican qué representa cada valor de la cadena: <code>%d</code> representa el día, <code>%m</code> el mes, <code>%Y</code> el año, <code>%H</code> la hora, <code>%M</code> los minutos y <code>%S</code> los segundos. La referencia completa de códigos se puede ver en <a href="https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes" target="_blank">https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes</a>.</p>
+
+    <p>Veamos cómo parsear una fecha:</p>
+
+    <pre><code>from datetime import datetime
+
+cadena = "31/12/2023"
+# La cadena de formato "%d/%m/%Y" indica que vienen
+# día, mes y año (en ese orden) separados por /
+fecha = datetime.strptime(cadena, "%d/%m/%Y").date()
+print(f"El objeto date para la fecha '{cadena}' es: {fecha}")
+print("El tipo del objeto fecha obtenido es", type(fecha))</code></pre>
+
+    <p>Observa que la función <code>strptime</code> devuelve un objeto <code>datetime</code>, que representa una fecha y una hora. Como la cadena solo contiene la información de la fecha, aplicamos a este objeto el método <code>date</code> para quedarnos con la parte de la fecha.</p>
+
+    <p>Para las horas, sería así:</p>
+
+    <pre><code>cadena = "7:55:27"
+
+hora = datetime.strptime(cadena, "%H:%M:%S").time()
+print(f"El objeto time para la hora '{cadena}' es: {hora}")
+print("El tipo del objeto hora obtenido es", type(hora))</code></pre>
+
+    <p>En este caso la cadena solo contiene la información de la hora, por lo que aplicamos al objeto devuelto por <code>strptime</code> el método <code>time</code> para quedarnos con la parte de la hora.</p>
+
+    <p>Por último, podríamos tener en la cadena tanto la fecha como la hora. En ese caso, nos quedaríamos directamente con el valor devuelto por <code>strptime</code>.</p>
+
+    <pre><code>cadena = "31/12/2023-7:55:27"
+
+fechahora = datetime.strptime(cadena, "%d/%m/%Y-%H:%M:%S")
+print(f"El objeto datetime para la fecha y hora '{cadena}' es: {fechahora}")
+print("El tipo del objeto fechahora obtenido es", type(fechahora))</code></pre>
+
+    <p><strong>Ten en cuenta que las cadenas de formato aquí utilizadas están adaptadas a los ejemplos mostrados</strong>. Deberás adaptar dicho formato al tipo de cadena que desees parsear en cada ejercicio.</p>
+
+    <h3>3.3. Expresiones bien formadas <a id="sec_bienformadas"></a></h3>
+
+    <p>Decimos que una expresión está <strong>bien formada</strong> (o también, que es una expresión <strong>correcta</strong>) cuando se cumple que:</p>
+    <ul>
+        <li>Los literales que aparecen en la expresión están correctamente escritos según las reglas que hemos visto.</li>
+        <li>Las variables que aparecen en la expresión han sido definidas previamente (o importadas mediante la instrucción <code>import</code>).</li>
+        <li>Los operadores que aparecen en la expresión aparecen aplicados al número correcto de operandos, y los tipos de las expresiones que funcionan como operandos son los adecuados para dichos operadores.</li>
+        <li>Las llamadas a funciones o métodos que aparecen en la expresión corresponden a funciones o métodos definidos previamente (o importados mediante la instrucción <code>import</code>). Además, el número y tipo de las expresiones utilizadas como parámetros de las llamadas son los esperados por dichas funciones y métodos.</li>
+    </ul>
+    <p>Si una expresión no está bien formada, Python devolverá un error al tratar de ejecutar el código. Por ejemplo, la expresión escrita dentro de la llamada a la función <code>print</code> en <a href="#malformada">este ejemplo</a> es una expresión mal formada. El resto de expresiones que hemos visto y que no dan error al ser ejecutadas son expresiones bien formadas.</p>
+
+<h3>4. Entrada y salida estándar <a id="sec_4"></a></h3>
+
+    <h4>4.1. Funciones input y print <a id="sec_4_1"></a></h4>
+
+    <p>Por regla general, cuando ejecutamos un programa en Python llamamos <strong>entrada estándar</strong> al teclado de nuestro ordenador, y <strong>salida estándar</strong> a la pantalla. Como ya hemos visto en anteriores notebooks, podemos leer datos desde el teclado mediante la función <strong>input</strong>, y escribir en la pantalla mediante la función <strong>print</strong>:</p>
+
+    <pre><code>print("==== Cálculo de una potencia =====")
+base = int(input("Introduzca un número entero (base):")) # La función predefinida input permite leer texto desde el teclado
+exponente = int(input("Introduzca un número entero (exponente):"))
+
+print("El resultado de", base, "elevado a", exponente, "es", base**exponente, '.')</code></pre>
+
+    <p>La función <strong>input</strong> recibe opcionalmente un mensaje, que es mostrado al usuario para a continuación esperar que introduzca un texto. La ejecución del programa "se espera" en este punto, hasta que el usuario introduce el texto y pulsa la tecla <em>enter</em>. Entonces, <strong>la función <code>input</code> devuelve el texto introducido por el usuario</strong> (excluyendo la pulsación de la tecla <em>enter</em>, que no aparece en la cadena devuelta). Si en nuestro programa estábamos esperando un dato numérico, en lugar de una cadena, será necesario convertir la cadena al tipo deseado mediante alguna de las funciones de construcción de tipos que ya conocemos (por ejemplo, <code>int</code> para obtener un número entero o <code>float</code> para obtener un número real).</p>
+
+    <p>Por su parte, la función <strong>print</strong> recibe una o varias expresiones por parámetros, y <strong>muestra el resultado</strong> de dichas expresiones en <strong>pantalla</strong>. Si el resultado de alguna de las expresiones es una cadena de texto, la muestra tal cual. Si el resultado de alguna de las expresiones es de cualquier otro tipo, la función <code>print</code> se encarga de convertir el resultado a cadena mediante el uso de la función <code>str</code>. Si recibe varias expresiones, por defecto <code>print</code> las muestra una tras otra, separadas por un espacio en blanco. Al finalizar de mostrar las expresiones, la ejecución de <code>print</code> finaliza imprimiendo un salto de línea; por consiguiente, la siguiente llamada a <code>print</code> escribirá en la siguiente línea de la pantalla. Ambas cosas, el carácter usado para separar las distintas expresiones y el carácter usado como finalizador, pueden cambiarse utilizando los parámetros opcionales adecuados:</p>
+
+    <pre><code>import random
+numeros = [random.randint(1, 100) for _ in range(10)]
+print("Se han generado los siguientes números aleatorios: ")
+for i, numero in enumerate(numeros):
+    print(i, numero, sep=': ') # Se usa la cadena ': ' para separar las expresiones recibidas por print</code></pre>
+
+    <pre><code>texto = "Muestrame con guiones"
+for caracter in texto:
+    print('-' + caracter, end='') # Se indica a print que no concatene ninguna cadena al final del mensaje a mostrar</code></pre>
+
+    <p>Aunque el uso de los parámetros opcionales <code>sep</code> y <code>end</code> nos da algunas opciones para obtener la salida que deseamos en pantalla, a veces se nos puede quedar corto. Por ejemplo, si queremos mostrar un mensaje formado por distintos trozos de texto y datos a extraer de variables o expresiones, puede que no siempre queramos usar el mismo separador entre cada dos expresiones. Un ejemplo sencillo lo tenemos en la siguiente sentencia que ya hemos escrito antes:</p>
+
+    <pre><code>print("El resultado de", base, "elevado a", exponente, "es", base**exponente, '.')</code></pre>
+
+    <p>En este caso, nos interesa usar el espacio para separar los distintos trozos del mensaje a mostrar, salvo para el punto final, que debería aparecer a continuación del resultado de la expresión <code>base**exponente</code>. Además, la forma en que las cadenas de texto y las expresiones se van intercalando en los parámetros del <code>print</code> complica un poco la legibilidad de la sentencia. Es por todo esto por lo que es apropiado usar el <strong>formateo de cadenas</strong> en estos casos.</p>
+
+    <h4>4.2. Formateo de cadenas <a id="sec_4_2"></a></h4>
+
+    <p>El método <strong>format</strong> de las cadenas devuelve una versión <em>formateada</em> de la cadena. Entre otras cosas, nos permite intercalar en una cadena los resultados de diversas expresiones, eligiendo el orden o el formato en que se representan dichos resultados. Esta flexibilidad hace de <code>format</code> una función perfecta para ser utilizada junto a <code>print</code> para mostrar mensajes más o menos complejos, con mucho más control sobre la salida obtenida del que tendríamos usando únicamente <code>print</code>.</p>
+
+    <p>El uso más básico de <code>format</code> consiste en intercalar en la cadena parejas de llaves, de manera que el método devolverá una cadena en la que se sustituirán las llaves por los resultados de evaluar las expresiones que reciba como parámetros, en el mismo orden:</p>
+
+    <pre><code>a = int(input('Introduce un número:'))
+b = int(input('Introduce un número:'))
+
+print('El resultado de {} elevado a {} es {}.'.format(a, b, a**b))</code></pre>
+
+    <p>Podemos hacer mención explícita entre las llaves a la expresión concreta que queremos intercalar. Para ello utilizamos números comenzando en cero (como si los parámetros recibidos por <code>format</code> fueran una lista):</p>
+
+    <pre><code>print('El resultado de {0} multiplicado por {1} es {2}'.format(a, b, a*b))</code></pre>
+
+    <p>Esto nos permite intercalar los datos en cualquier orden, o usarlos varias veces dentro de la cadena:</p>
+
+    <pre><code>print('El resultado de {0} entre {1} es {2}, y el de {1} entre {0} es {3}'.format(a, b, a/b, b/a))</code></pre>
+
+    <p>Podemos formatear los valores numéricos, por ejemplo indicando que queremos redondear a 2 decimales. La <code>f</code> del siguiente ejemplo indica que el número a mostrar es un real:</p>
+
+    <pre><code>print('El resultado de {0} entre {1} es {2:.2f}, y el de {1} entre {0} es {3}'.format(a, b, a/b, b/a))</code></pre>
+
+    <p>También es posible conseguir que un dato ocupe un mínimo de caracteres, rellenando los huecos con espacios si es necesario. Esto es especialmente útil cuando se desea mostrar información en forma de tabla, consiguiendo que las columnas queden alineadas. La <code>d</code> en el siguiente ejemplo indica que los números a mostrar son enteros:</p>
+
+    <pre><code>print("Mostrando los cuadrados y los cubos de los números del 1 al 5:")
+for i in range(1,6):
+    print('{0} {1:2d} {2:3d}'.format(i, i*i, i*i*i))</code></pre>
+
+    <p>Si lo preferimos, podemos rellenar los huecos con ceros en lugar de espacios, como se muestra en este ejemplo:</p>
+
+    <pre><code>print("Mostrando los cuadrados y los cubos de los números del 1 al 5:")
+for i in range(1,6):
+    print('{0:03d} {1:03d} {2:03d}'.format(i, i*i, i*i*i))</code></pre>
+
+    <p>En ocasiones, nombrar a las distintas expresiones que pasamos al método <code>format</code> puede mejorar la legibilidad. Para ello, usaremos parámetros con nombre en la llamada a <code>format</code>, y podremos referirnos a dichos nombres en las distintas llaves que utilicemos en la cadena a formatear:</p>
+
+    <pre><code>print('Si x es igual a {x} e y es igual a {y}, entonces la inecuación x < (y * 2) es {inecuacion}'.
+             format(x=a, y=b, inecuacion= a<(b*2)))</code></pre>
+
+    <p>A partir de la versión 4.6 de Python, existe una forma más sencilla de utilizar la funcionalidad del método <code>format</code>: el uso de las <strong>f-strings</strong>. Podemos utilizar la misma notación basada en llaves dentro de las cadenas, pero colocando las expresiones que se desea intercalar directamente en dichas llaves, anteponiendo una <code>f</code> a las cadenas. Observe los siguientes ejemplos, similares a algunos de los anteriores pero utilizando f-strings:</p>
+
+    <pre><code>print(f'El resultado de {a} elevado a {b} es {a**b}.')
+
+print("\nMostrando los cuadrados y los cubos de los números del 1 al 5:")
+for i in range(1,6):
+    print(f'{i} {i*i:2d} {i*i*i:3d}')
+    
+print("\nMostrando los cuadrados y los cubos de los números del 1 al 5:")
+for i in range(1,6):
+    print(f'{i:03d} {i*i:03d} {i*i*i:03d}') </code></pre>
+
+<h3>5. Lectura y escritura de ficheros <a id="sec_5"></a></h3>
+
+    <p>Muchas veces no es suficiente con la introducción de datos desde el teclado por parte del usuario. Como hemos visto en los ejercicios realizados a lo largo del curso, es muy habitual leer datos desde un fichero o archivo (que llamamos de entrada). Igualmente, es posible escribir datos en un fichero (que llamamos de salida).</p>
+
+    <p>Tanto la lectura como la escritura de datos en un fichero se puede realizar de diversas formas:</p>
+    <ul>
+        <li>Mediante cadenas de texto libres, en lo que llamamos <strong>ficheros de texto</strong>.</li>
+        <li>Mediante cadenas de texto de un formato predefinido, como es el caso de los ficheros <strong>csv</strong>.</li>
+        <li>Mediante algún formato estándar de intercambio de datos (por ejemplo, <strong>json</strong>), lo que nos permite guardar y recuperar más tarde fácilmente el contenido de las variables de nuestros programas. A este tipo de escrituras y lecturas las llamamos <em>serialización</em> y <em>deserialización</em>, respectivamente.</li>
+        <li>Mediante datos binarios, en lo que llamamos <em>ficheros binarios</em>. De esta forma, el programador tiene el control absoluto de los datos que se escriben o se leen de un fichero. Esto no lo veremos en esta asignatura.</li>
+    </ul>
+
+    <h4>5.1. Apertura y cierre de ficheros <a id="sec_5_1"></a></h4>
+
+    <p>Lo primero que hay que hacer para poder trabajar con un fichero es abrirlo. Al abrir un fichero, establecemos la manera en que vamos a trabajar con él: si lo haremos en modo texto o modo binario, o si vamos a leer o escribir de él, entre otras cosas.</p>
+
+    <p>La apertura de un fichero se realiza mediante la función <strong>open</strong>:</p>
+
+    <pre><code>f = open('fichero.txt')</code></pre>
+
+    <p>Si la apertura del fichero se lleva a cabo sin problemas, la función nos devuelve un <strong>descriptor del fichero</strong>. Usaremos esta variable más adelante para leer o escribir en el fichero.</p>
+
+    <p>Por defecto, el fichero se abre en modo texto para lectura. Podemos cambiar el modo en que se abre el fichero mediante el parámetro opcional <strong>mode</strong>, en el que pasaremos una cadena formada por alguno(s) de los caracteres siguientes:</p>
+    <ul>
+        <li><code>'r'</code>: abre el fichero en modo lectura.</li>
+        <li><code>'w'</code>: abre el fichero en modo escritura. Si el archivo existía, lo sobrescribe (es decir, primero es borrado).</li>
+        <li><code>'a'</code>: abre el fichero en modo escritura. Si el archivo existía, las escrituras se añadirán al final del fichero.</li>
+        <li><code>'t'</code>: abre el fichero en modo texto. Es el modo por defecto, así que normalmente no lo indicaremos y se entenderá que lo abrimos en modo texto. Es el modo que usaremos siempre en nuestra asignatura.</li>
+        <li><code>'b'</code>: abre el fichero en modo binario.</li>
+    </ul>
+
+    <p>Veamos como ejemplo cómo abrir un fichero de texto para escribir en él, sobrescribiéndolo si ya existía:</p>
+
+    <pre><code>f2 = open('fichero_escritura.txt', mode='w')</code></pre>
+
+    <p>Cuando abrimos un fichero de texto es importante que tengamos en cuenta la <strong>codificación de caracteres</strong> utilizada por el fichero. Existen diversos estándares, aunque el más utilizado hoy en día en el contexto de Internet es el <strong>utf-8</strong>. Será éste el que usaremos preferiblemente. Por defecto, la función <code>open</code> decide la codificación de caracteres en función de la configuración de nuestro sistema operativo. Para especificar explícitamente que se utilice <code>utf-8</code> lo haremos mediante el parámetro opcional <strong>encoding</strong>:</p>
+
+    <pre><code>f3 = open('fichero.txt', encoding='utf-8')</code></pre>
+
+    <p>Cuando terminemos de trabajar con el fichero (por ejemplo, al acabar de leer su contenido), es importante <strong>cerrarlo</strong>. De esta forma liberamos el recurso para que puedan trabajar con él otros procesos de nuestra máquina, y también nos aseguramos de que las escrituras que hayamos realizado se llevan a cabo de manera efectiva en disco (ya que las escrituras suelen utilizar un buffer en memoria para mejorar la eficiencia). Para cerrar un fichero usamos el método <strong>close</strong> sobre el descriptor del fichero que queremos cerrar:</p>
+
+    <pre><code>f.close()
+f2.close()
+f3.close()</code></pre>
+
+    <p>Una forma de no olvidarnos de cerrar el fichero (algo muy habitual) es usar la sentencia <strong>with</strong>:</p>
+
+    <pre><code>with open('fichero.txt', encoding='utf-8') as f:
+    print('Trabajamos con el fichero...')</code></pre>
+
+    <p>Una vez ejecutadas las instrucciones contenidas en el bloque <code>with</code>, el fichero es cerrado automáticamente. Esta variante tiene la ventaja además de que si se produce cualquier error mientras trabajamos con el fichero, que produzca la parada de la ejecución de nuestro programa, el fichero también es cerrado. Esto no ocurre si abrimos el fichero sin usar <code>with</code>.</p>
+
+<h3>5.2. Lectura y escritura de texto libre <a id="sec_5_2"></a></h3>
+
+    <p>Una vez abierto un fichero en modo texto, podemos leer todo el contenido y guardarlo en una variable de tipo cadena mediante el método <strong>read</strong>:</p>
+
+    <pre><code>with open('fichero.txt', encoding='utf-8') as f:
+    contenido = f.read()
+    print(contenido)  # Mostramos el contenido del fichero</code></pre>
+
+    <p>Aunque se puede hacer de esta forma, es más habitual leer los ficheros de texto línea a línea. De esta forma podemos procesar archivos muy grandes sin usar demasiada memoria. Para ello, podemos usar el descriptor del fichero dentro de un bucle <em>for</em>, como si se tratara de una secuencia de cadenas, de manera que en cada paso del bucle obtendremos la siguiente línea del fichero:</p>
+
+    <pre><code>with open('fichero.txt', encoding='utf-8') as f:
+    for linea in f:
+        print(linea)</code></pre>
+
+    <p>Observarás que en el ejemplo anterior se está visualizando cada línea separada con una línea vacía. Esto es así porque la línea leída del fichero incluye al final un salto de línea, y a su vez la función <code>print</code> incluye un salto de línea tras la cadena a mostrar. Si queremos mostrar el contenido del fichero con el mismo formato que en el ejemplo anterior, podríamos hacer esto:</p>
+
+    <pre><code>with open('fichero.txt', encoding='utf-8') as f:
+    for linea in f:
+        print(linea, end='')</code></pre>
+
+    <p>Para escribir texto en un fichero, usaremos el método <strong>write</strong> sobre el descriptor del fichero:</p>
+
+    <pre><code>with open('fichero_escritura.txt', mode='w', encoding='utf-8') as f:
+    f.write('Este texto se almacenará en el fichero.')</code></pre>
+
+    <p>Comprobemos si se ha realizado la escritura correctamente:</p>
+
+    <pre><code>with open('fichero_escritura.txt', encoding='utf-8') as f:
+    contenido = f.read()
+    print(contenido)</code></pre>
+
+    <h3>5.3. Lectura y escritura de CSV <a id="sec_5_3"></a></h3>
+
+    <p>Un tipo de fichero de texto que usamos en muchos ejercicios es el llamado formato <strong>CSV</strong> (por <em>Comma-Separated Values</em>). Estos ficheros se utilizan para almacenar datos de tipo tabular, al estilo de una hoja de cálculo. En este notebook se incluye un fichero con este formato, extraído del ejercicio "Servicio de alquiler de bicicletas públicas de Sevilla (Sevici)". Veamos un trozo de su contenido:</p>
+
+    <pre><code>with open('estaciones.csv', encoding='utf-8') as f:
+    # Leemos las líneas del fichero junto con un número que indica la línea por la que vamos
+    for num_linea, linea in enumerate(f):  
+        print(linea, end='')
+        if num_linea == 10:   # Al llegar a las 10 líneas, paramos
+            break</code></pre>
+
+    <p>Como puedes observar, los datos vienen expresados por columnas. Cada columna o atributo representa un dato concreto, y cada línea representa una tupla o registro de valores para cada uno de los atributos.</p>
+
+    <p>Para poder trabajar con estos datos, lo normal es que necesitemos acceder a cada atributo de cada registro por separado. Si leemos el fichero línea a línea, podríamos acceder a cada atributo si rompemos la cadena en cada uno de los trozos separados por una coma. Pero esto es complicado y puede hacerse de manera mucho más sencilla utilizando el paquete <strong>csv</strong>.</p>
+
+    <pre><code>import csv # Hay que importar el paquete csv
+
+with open('estaciones.csv', encoding='utf-8') as f:
+    lector = csv.reader(f)
+    for registro in lector:
+        print(registro)
+        # Para este ejemplo, nos basta con ver el primer registro
+        break;</code></pre>
+
+    <p>En el CSV que estamos procesando, la primera línea contiene los nombres de los atributos. No es por tanto un registro como tal (no contiene valores), por lo que lo habitual es saltárnoslo. Esto se puede conseguir de la siguiente forma:</p>
+
+    <pre><code>with open('estaciones.csv', encoding='utf-8') as f:
+    lector = csv.reader(f)
+    next(lector) # Nos saltamos la cabecera del CSV
+    for registro in lector:
+        print(registro)
+        # Para este ejemplo, nos basta con ver el primer registro
+        break;</code></pre>
+
+    <p>Normalmente, nos interesa almacenar los registros en alguna estructura de datos, para utilizarlos más adelante en nuestro programa. Podemos utilizar por ejemplo una lista para almacenar cada registro. Además, es conveniente que convirtamos cada atributo al tipo de datos de Python que mejor se adapte al tipo de dato que representa el atributo. En nuestro ejemplo, el primer atributo es una cadena de texto, los tres siguientes son números enteros, y los dos últimos números reales.</p>
+
+    <p>Podríamos obtener una lista de tuplas, cada tupla representando un registro del fichero, de esta manera:</p>
+
+    <pre><code>with open('estaciones.csv', encoding='utf-8') as f:
+    lector = csv.reader(f)
+    next(lector) # Nos saltamos la cabecera del CSV
+    registros = []
+    for name, slots, empty_slots, free_bikes, latitude, longitude in lector:        
+        slots = int(slots)
+        empty_slots = int(empty_slots)
+        free_bikes = int(free_bikes)
+        latitude = float(latitude)
+        longitude = float(longitude)
+        tupla = (name, slots, empty_slots, free_bikes, latitude, longitude)
+        registros.append(tupla)
+
+# Mostremos los 10 primeros registros
+for r in registros[:10]:
+    print(r)</code></pre>
+
+    <p>Para que sea más sencillo y legible utilizar después las tuplas leídas, lo ideal sería utilizar una tupla con nombre para representar los datos leídos del csv, de esta forma:</p>
+
+    <pre><code>from collections import namedtuple
+EstacionSevici = namedtuple("EstacionSevici", "name, slots, empty_slots, free_bikes, latitude, longitude")
+
+with open('estaciones.csv', encoding='utf-8') as f:
+    lector = csv.reader(f)
+    next(lector) # Nos saltamos la cabecera del CSV
+    registros = []
+    for name, slots, empty_slots, free_bikes, latitude, longitude in lector:        
+        slots = int(slots)
+        empty_slots = int(empty_slots)
+        free_bikes = int(free_bikes)
+        latitude = float(latitude)
+        longitude = float(longitude)
+        tupla = EstacionSevici(name, slots, empty_slots, free_bikes, latitude, longitude)
+        registros.append(tupla)
+
+# Mostremos los 10 primeros registros
+for r in registros[:10]:
+    print(r)</code></pre>
+{% endblock %}

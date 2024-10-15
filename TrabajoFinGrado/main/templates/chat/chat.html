@@ -3,7 +3,6 @@
 {% block title %}Chat{% endblock %}
 
 {% block content %}
-<!-- Estilos adicionales para el chat tipo ChatGPT con los ajustes pedidos -->
 <style>
     #chat-container {
         background-color: #ffffff;
@@ -15,6 +14,16 @@
         margin: 0 auto;
         margin-bottom: 20px;
         width: 80%;
+    }
+
+    .advertencia {
+        background-color: #f8f9fa; /* Color de fondo muy claro */
+        color: #6c757d; /* Color de texto gris */
+        padding: 10px;
+        margin-bottom: 30px; /* Padding inferior más amplio */
+        margin-top: 10px;
+        border-left: 4px solid #ccc; /* Una pequeña barra para dar énfasis sin ser muy llamativa */
+        font-size: 0.9em; /* Un poco más pequeño que el texto normal */
     }
 
     .user-message, .assistant-message {
@@ -35,7 +44,6 @@
     .assistant-message {
         background-color: #f1f1f1;
         color: black;
-        font-family: 'Courier New', Courier, monospace;
         align-self: flex-start;
     }
 
@@ -51,18 +59,24 @@
         justify-content: flex-end; /* Alinea los botones al final del formulario */
         width: 80%; /* Mantén el formulario alineado con el contenedor */
         margin: 0 auto;
+        align-items: flex-start;  /* Mantener los botones alineados en la parte superior */
+        flex-wrap: wrap; /* Asegurar que el textarea no afecte a los botones */
+
     }
 
     textarea {
-        flex-grow: 1;
-        padding: 8px; /* Reduce el padding para que el input sea más fino */
-        border-radius: 5px;
+        width: 100%;  /* Ocupa todo el ancho del contenedor */
+        min-height: 60px;  /* Altura mínima, algo más grande que antes */
+        max-height: 200px; /* Limitar el tamaño máximo a 4-5 líneas */
+        padding: 10px;
+        border-radius: 8px;
         border: 1px solid #ccc;
-        resize: none;
-        font-size: 16px;
-        height: 40px; /* Ajusta la altura para hacerlo más fino */
+        resize: none;  /* No permitir que el usuario cambie el tamaño manualmente */
+        font-size: 16px;  /* Fuente cómoda */
+        overflow: hidden;  /* Evita barras de desplazamiento */
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
+    
 
     .send-btn, .archive-btn {
         border: none;
@@ -114,18 +128,42 @@
     #loading-spinner {
         display: none; /* Oculto por defecto */
     }
+
+    /*MENSAJES IA/*
+
+    pre code {
+        background-color: #f5f5f5;
+        padding: 10px;
+        border-radius: 8px;
+        font-family: 'Courier New', Courier, monospace;
+        overflow-x: auto;  /* Permite el scroll horizontal en caso de líneas largas */
+        white-space: pre-wrap;  /* Mantén el formato de saltos de línea y espacios */
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: Arial, sans-serif;
+        font-weight: bold;
+        margin-top: 1em;
+        margin-bottom: 0.5em;
+    }
 </style>
 
-<!-- Título del chat -->
 <h1 class="text-center mb-4">Chat</h1>
 
-<!-- Contenedor del chat con estilo tipo ChatGPT -->
+<div class="advertencia">
+    <p>Este Chat es una implementación de la API de OpenAI, por lo tanto estará hablando con una IA. La conversación podrá ser revisada por un profesor en cualquier momento.</p>
+</div>
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+
 <div id="chat-container" class="chat-box">
-    {% for message in chat.get_conversation %}
+    {% for message in conversation %}
         <div class="message-container">
             {% if message.role == 'assistant' %}
                 <div class="assistant-message">
-                    {{ message.content }}
+                    {{ message.content|safe }}  
                 </div>
             {% else %}
                 <div class="user-message">
@@ -139,7 +177,7 @@
 <!-- Formulario para enviar mensaje -->
 <form method="post" id="chat-form">
     {% csrf_token %}
-    <textarea name="user_input" rows="2" placeholder="Escribe tu mensaje aquí..." id="user-input">{{ form.user_input.value|default_if_none:"" }}</textarea>
+    <textarea name="user_input" rows="2" placeholder="Escribe tu mensaje aquí..." id="user-input">{{ "" }}</textarea>
     <button id="send-btn" type="submit" class="send-btn">Enviar</button>
 
     <!-- Botón de archivar (solo si no está archivado y tiene mensajes) -->
@@ -148,7 +186,8 @@
     {% endif %}
 
     <!-- Botón para ver el historial de chats, alineado a la derecha -->
-    <a href="{% url 'archived_chats_list' %}" class="history-btn">Ver Historial</a>
+    <button type="button" onclick="window.location.href='{% url 'archived_chats_list' %}'" class="history-btn">Ver Historial</button>
+
 </form>
 
 <!-- Indicador de carga (spinner), oculto por defecto -->
@@ -176,6 +215,31 @@
             document.getElementById("user-input").value = ""; 
         }, 100); // Tiempo de espera de 100 milisegundos antes de vaciar el campo
     });
+
+    document.getElementById("user-input").addEventListener("keydown", function(event) {
+        // Si la tecla Enter es presionada sin Shift
+        if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();  // Prevenir el salto de línea por defecto
+
+            // Enviar el formulario
+            document.getElementById("chat-form").submit();
+        }
+    });
+    
+
+    const textarea = document.getElementById("user-input");
+
+    textarea.addEventListener('input', function() {
+        // Reinicia la altura para evitar problemas al reducir el texto
+        this.style.height = 'auto';
+        
+        // Ajusta la altura según el scrollHeight, limitado al máximo de 200px
+        this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+    });
 </script>
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
 
 {% endblock %}

@@ -1,0 +1,391 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block title %}Tema 4{% endblock %}
+
+{% block content %}
+ <h1>Funciones</h1>
+    <p><strong>Autor:</strong> Fermín Cruz. <strong>Revisores:</strong> José A. Troyano, Carlos G. Vallejo, Mariano González, Beatriz Pontes <strong>Última modificación:</strong> 9 de septiembre de 2023</p>
+
+    <h2>Índice de contenidos</h2>
+    <ul>
+        <li><a href="#sec_definicion">1. Definición e invocación de funciones</a></li>
+        <li><a href="#sec_paso">2. Paso de parámetros</a>
+            <ul>
+                <li><a href="#sec_defecto">2.1. Parámetros con valores por defecto</a></li>
+                <li><a href="#sec_nombre">2.2. Referencia de parámetros por nombre</a></li>
+            </ul>
+        </li>
+        <li><a href="#sec_ordensuperior">3. Funciones como parámetros</a>
+            <ul>
+                <li><a href="#sec_lambda">3.1. Definición de funciones sin nombre</a></li>
+            </ul>
+        </li>
+        <li><a href="#sec_tipado">4. Tipado de la definición de funciones</a></li>
+    </ul>
+
+    <h2 id="sec_definicion">1. Definición e invocación de funciones</h2>
+    <p>Un principio fundamental que debe seguir todo programador es el de la <strong>reutilización del código</strong>. Los lenguajes de programación nos ofrecen diversos mecanismos de reutilización que nos permiten implementar una única vez una funcionalidad y utilizarla múltiples veces. Uno de estos mecanismos de reutilización en Python es la <strong>definición e invocación de funciones</strong>.</p>
+    <p>Como ya hemos visto anteriormente, la <strong>definición</strong> de una función consta de un bloque de instrucciones que llevan a cabo alguna tarea concreta y a la que le ponemos un nombre. Cuando escribimos estas instrucciones dentro de la definición de una función permitimos la ejecución "a demanda" de ese bloque de instrucciones, de manera que en cualquier punto del programa se puede solicitar la ejecución de la función (se dice que se hace una <strong>llamada</strong> o <strong>invocación</strong> a la función).</p>
+
+    <pre><code>
+def imprime_linea():
+    ''' Imprime una línea formada por 40 repeticiones de los caracteres -= '''
+    linea = "-=" * 40
+    print(linea)
+
+# Vamos a imprimir 5 líneas
+for i in range(5):
+    imprime_linea()
+    </code></pre>
+
+    <p>La primera línea de la definición se llama <strong>cabecera</strong> o <strong>prototipo</strong> de la función, y al resto de instrucciones que aparecen indentadas se las denomina <strong>cuerpo</strong> de la función.</p>
+    <p>Algunas veces las funciones generan un <strong>valor de salida</strong> o de <strong>retorno</strong>, valor que será utilizado como resultado tras la ejecución de la función cuando es invocada en el contexto de una expresión. Podemos definir una función parecida a la anterior pero que <em>devuelva</em> la cadena de texto que representa la línea, en lugar de imprimirla:</p>
+
+    <pre><code>
+def linea():
+    ''' Devuelve una cadena de texto formada por 40 repeticiones de los caracteres -= '''
+    return "-=" * 40
+
+# Vamos a imprimir 5 líneas
+for i in range(5):
+    print(linea())
+    </code></pre>
+
+    <p>Las instrucciones contenidas en la definición de una función son ejecutadas cuando se ejecuta alguna instrucción que contenga una llamada a la función. En el ejemplo anterior, al ejecutarse la línea <code>print(linea())</code> es cuando se desencadena la ejecución de las instrucciones de la función <code>linea</code>, que en este caso únicamente contiene la instrucción <code>return</code>. Una vez ejecutado el cuerpo de la función, el flujo de ejecución vuelve a la línea en la que aparecía la llamada, utilizándose el valor devuelto por la función para continuar ejecutando el programa. En el ejemplo, se ejecutaría la función predefinida <code>print</code> con el valor devuelto por la función <code>linea</code>, lo que muestra la cadena de caracteres correspondiente en pantalla. Para más detalles sobre el flujo de ejecución en la invocación de funciones, consulta el notebook de teoría 3, sección 1.</p>
+
+    <h2 id="sec_paso">2. Paso de parámetros</h2>
+    <p>Para que las funciones nos permitan implementar funcionalidades realmente útiles y reutilizables es fundamental contar con un mecanismo de <strong>paso de parámetros</strong>. Los <strong>parámetros</strong> o <strong>argumentos</strong> (<em>arguments</em>) de una función son variables que permiten que la función reciba determinados valores con los que llevar a cabo su funcionalidad. En el momento de la invocación a la función, el programador especifica el valor que desea <em>pasarle</em> a dichos parámetros, de manera que se lleva a cabo una asignación entre las variables que representan a los parámetros en la función y los valores especificados en la llamada.</p>
+    <p>Veamos un ejemplo consistente en una nueva definición de la función <code>imprime_linea</code>:</p>
+
+    <pre><code>
+def imprime_linea(repeticiones):
+    ''' Imprime una línea formada por repeticiones de los caracteres -=
+    
+    El parámetro repeticiones permite indicar el número de repeticiones de 
+    los caracteres que forman la línea a imprimir.
+    '''
+    linea = "-=" * repeticiones
+    print(linea)
+
+# Vamos a imprimir 5 líneas
+for i in range(5):
+    imprime_linea(40)
+    </code></pre>
+
+    <p>Hemos añadido un parámetro de nombre <code>repeticiones</code>, de manera que la línea que imprime la función estará formada por tantas repeticiones de la cadena <code>"-="</code> como indique dicho parámetro. Al haber añadido un parámetro conseguimos que la tarea que lleva a cabo la función sea más genérica, más configurable, por lo que habrá más ocasiones en las que podamos emplear la función. Por tanto, es importante decidir bien los parámetros para conseguir nuestro objetivo de la reutilización del código.</p>
+    <p>También podríamos hacer que los caracteres que forman la línea puedan ser escogidos en el momento de la invocación, añadiendo un nuevo parámetro:</p>
+
+    <pre><code>
+def imprime_linea(repeticiones, cadena):
+    ''' Imprime una línea formada por repeticiones de caracteres
+    
+    El parámetro "repeticiones" permite indicar el número de repeticiones de 
+    los caracteres que forman la línea a imprimir.
+    El parámetro "cadena" permite indicar la cadena que se repetirá para 
+    construir la línea.
+    '''
+    linea = cadena * repeticiones
+    print(linea)
+
+# Vamos a imprimir 5 líneas
+for i in range(5):
+    imprime_linea(40, "-.")
+    </code></pre>
+
+    <p>Veamos otro ejemplo en el que tras definir una función podemos invocarla en el contexto de una expresión:</p>
+
+    <pre><code>
+def pvp(precio_sin_iva, iva_reducido):
+    ''' Devuelve el Precio de Venta al Público a partir de un precio sin IVA 
+    
+    El parámetro "precio_sin_iva" sirve para indicar el precio sobre el que calcular el PVP.
+    Si el parámetro "iva_reducido" es True, se aplicará el 10%. Si es False, el 21%.
+    '''   
+    if iva_reducido:
+        precio_con_iva = precio_sin_iva * 1.1
+    else:
+        precio_con_iva = precio_sin_iva * 1.21
+    return precio_con_iva
+
+# Test de la función anterior
+precio = float(input("Precio del producto: "))
+unidades = int(input("Número de unidades: "))
+precio_total = pvp(precio, False) * unidades  
+print("El precio total con IVA es", precio_total)
+    </code></pre>
+
+    <h3 id="sec_defecto">2.1. Parámetros con valores por defecto</h3>
+    <p>En la última definición de la función <code>imprime_linea</code> hemos incorporado parámetros para elegir la cadena concreta a utilizar y el número de repeticiones de la misma. Si bien <em>parametrizar</em> todos los detalles de una función la hace más configurable y por tanto también más reutilizable, tiene la desventaja de que dificultamos su utilización, puesto que obligamos al programador que la quiera utilizar a elegir valores para todos los parámetros. Esto puede solucionarse utilizando <strong>parámetros con valores por defecto</strong>.</p>
+    <p>Al definir un parámetro con un valor por defecto, estamos permitiendo que el programador que invoque la función pueda optar por no especificar un valor para dicho parámetro. Si lo hace, se utilizará el valor que haya especificado, y si no lo hace, se utilizará el valor por defecto. Observa el siguiente ejemplo:</p>
+
+    <pre><code>
+def imprime_linea(repeticiones=40, cadena="-="):
+    ''' Imprime una línea formada por repeticiones de caracteres
+    
+    El parámetro "repeticiones" permite indicar el número de repeticiones de 
+    los caracteres que forman la línea a imprimir. Si no se especifica un valor,
+    se utilizará el valor por defecto de 40 repeticiones.
+    El parámetro "cadena" permite indicar la cadena que se repetirá para 
+    construir la línea. Si no se especifica un valor, se utilizará el valor
+    por defecto de "-=".
+    '''
+    linea = cadena * repeticiones
+    print(linea)
+
+# Vamos a imprimir 5 líneas
+for i in range(5):
+    imprime_linea()
+    </code></pre>
+
+    <p>En este caso, si no especificamos ningún parámetro al invocar la función <code>imprime_linea</code>, se utilizarán los valores por defecto para ambos parámetros. Veamos algunos ejemplos adicionales:</p>
+
+    <pre><code>
+# Invocación con un solo parámetro
+imprime_linea(30)
+
+# Invocación con parámetros por defecto
+imprime_linea()
+
+# Invocación especificando todos los parámetros
+imprime_linea(30, "-.")
+    </code></pre>
+
+    <h3 id="sec_nombre">2.2. Referencia de parámetros por nombre</h3>
+    <p>En el caso de que nuestra función tenga muchos parámetros y en el momento de la invocación se especifiquen valores para algunos de ellos, puede resultar tedioso recordar el orden de los parámetros para poder indicar sus valores. Una forma de evitar este inconveniente es utilizar <strong>referencias por nombre</strong> en la invocación de funciones, de manera que el valor de cada parámetro se asigne directamente a su nombre correspondiente, independientemente del orden en el que aparezcan.</p>
+    <p>Veamos un ejemplo:</p>
+
+    <pre><code>
+def imprime_linea(cadena, repeticiones):
+    ''' Imprime una línea formada por repeticiones de caracteres
+    
+    El parámetro "repeticiones" permite indicar el número de repeticiones de 
+    los caracteres que forman la línea a imprimir.
+    El parámetro "cadena" permite indicar la cadena que se repetirá para 
+    construir la línea.
+    '''
+    linea = cadena * repeticiones
+    print(linea)
+
+# Vamos a imprimir 5 líneas
+for i in range(5):
+    imprime_linea(cadena="-.", repeticiones=30)
+    </code></pre>
+
+    <h2 id="sec_ordensuperior">3. Funciones como parámetros</h2>
+    <p>Python permite que las funciones sean utilizadas como parámetros de otras funciones. Esto resulta muy útil cuando se quiere ejecutar alguna funcionalidad específica como parte de una funcionalidad más general. Veamos un ejemplo:</p>
+
+    <pre><code>
+def aplicar_funcion_a_lista(lista, funcion):
+    ''' Aplica una función a cada elemento de una lista '''
+    resultado = []
+    for elemento in lista:
+        resultado.append(funcion(elemento))
+    return resultado
+
+# Definimos una función para duplicar números
+def duplicar(x):
+    return x * 2
+
+# Aplicamos la función duplicar a cada elemento de una lista
+lista_original = [1, 2, 3, 4, 5]
+lista_modificada = aplicar_funcion_a_lista(lista_original, duplicar)
+print(lista_modificada)
+    </code></pre>
+
+    <h3 id="sec_lambda">3.1. Definición de funciones sin nombre</h3>
+    <p>En lugar de definir funciones tradicionales con nombre, también podemos utilizar funciones <strong>lambda</strong>, las cuales se definen en una sola línea y son conocidas como funciones <strong>anónimas</strong>. Son útiles cuando necesitamos una función simple y de corta duración. Aquí tienes un ejemplo:</p>
+
+    <pre><code>
+# Usamos una función lambda para duplicar números
+lista_modificada = aplicar_funcion_a_lista(lista_original, lambda x: x * 2)
+print(lista_modificada)
+    </code></pre>
+
+    <h2 id="sec_tipado">4. Tipado de la definición de funciones</h2>
+    <p>Python también permite especificar el tipo de los parámetros y el valor de retorno de una función. Esto se conoce como <strong>tipado</strong> y puede ser útil para que el código sea más claro y para detectar errores en tiempo de desarrollo. Aquí tienes un ejemplo de cómo se puede utilizar:</p>
+
+    <pre><code>
+def pvp(precio_sin_iva: float, iva_reducido: bool) -> float:
+    ''' Devuelve el Precio de Venta al Público a partir de un precio sin IVA 
+    
+    El parámetro "precio_sin_iva" sirve para indicar el precio sobre el que calcular el PVP.
+    Si el parámetro "iva_reducido" es True, se aplicará el 10%. Si es False, el 21%.
+    '''   
+    if iva_reducido:
+        precio_con_iva = precio_sin_iva * 1.1
+    else:
+        precio_con_iva = precio_sin_iva * 1.21
+    return precio_con_iva
+
+# Test de la función anterior
+precio = float(input("Precio del producto: "))
+unidades = int(input("Número de unidades: "))
+precio_total = pvp(precio, False) * unidades  
+print("El precio total con IVA es", precio_total)
+    </code></pre>
+
+    <p>Con el tipado, se especifica que <code>precio_sin_iva</code> debe ser un <code>float</code>, <code>iva_reducido</code> un <code>bool</code>, y el valor de retorno también será un <code>float</code>.</p>
+
+
+
+<h2 id="sec_ordensuperior">3. Funciones como parámetros</h2>
+
+<p>A diferencia de otros lenguajes de programación, en Python las funciones son un tipo más, como lo son el tipo entero, el tipo real o el tipo lista, entre otros. Que sea "un tipo más" (más formalmente se dice que las funciones son <strong>objetos de primera clase</strong>) significa que puedo declarar variables de tipo función, hacer asignaciones a esas variables, e incluso usar parámetros de tipo función.</p>
+
+<p>Por ejemplo, en el siguiente código definimos una variable llamada <code>funcion</code> a la que le asignamos distintas funciones. Como ves en el ejemplo, la variable de tipo función puede utilizarse después para invocar a la función que contiene:</p>
+
+<pre><code>funcion = imprime_linea 
+print("El tipo de la variable función:", type(funcion))  # Visualizamos el tipo de la variable funcion
+funcion() # Invocamos a la función que contenga la variable función
+</code></pre>
+
+<p>Lo anterior se puede utilizar para dar un nuevo nombre a alguna función, aunque no es algo muy habitual ni que vayamos a hacer en nuestros ejercicios de clase. Lo que sí es muy útil y utilizaremos frecuentemente es la capacidad de pasar una función como parámetro a otra función. Observa el siguiente ejemplo:</p>
+
+<pre><code>def transforma(lista, transformacion):
+    ''' Devuelve una lista formada por los resultados de aplicar una función de 
+    transformación a los elementos de una lista de entrada
+    
+    El parámetro "transformacion" debe ser una función que reciba un único parámetro 
+    y devuelva algún valor.
+    '''
+    lista_transformada = []
+    for elemento in lista:
+        lista_transformada.append(transformacion(elemento))
+    return lista_transformada
+
+# Test de la función transforma:
+import math
+x = [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6]
+x_raices = transforma(x, math.sqrt)
+print(x_raices)
+x_senos = transforma(x, math.sin)
+print(x_senos)
+
+# Dibujamos ambas transformaciones
+%matplotlib inline
+from matplotlib import pyplot 
+pyplot.plot(x, x_raices) 
+pyplot.plot(x, x_senos)
+</code></pre>
+
+<p>En Python existe una función parecida a la función <code>transforma</code> que acabamos de implementar; su nombre es <code>map</code> y puedes <a href="https://docs.python.org/3/library/functions.html#map">consultar el manual para ver en qué consiste</a>. Las funciones que reciben parámetros que son a su vez de tipo función son llamadas <strong>funciones de orden superior</strong>.</p>
+
+<h4>¡Prueba tú!</h4>
+
+<p>Utiliza la función <code>transforma</code> para dibujar la función <code>e^x</code>. Busca en el módulo <code>math</code> la función que calcula <code>e^v</code> para un valor de entrada <code>v</code>.</p>
+
+<h3 id="sec_lambda">3.1. Definición de funciones sin nombre</h3>
+
+<p>Algunas veces cuando usamos funciones de orden superior necesitamos pasar como parámetro una función que aún no tenemos definida. Una solución es definir una nueva función que haga lo que queremos. Por ejemplo, supongamos que queremos transformar los elementos de una lista de manera que cada elemento se multiplique por 2:</p>
+
+<pre><code>def multiplica_por_dos(n):
+    return 2 * n
+
+x = [1, 2, 3, 4, 5]
+x_por_2 = transforma(x, multiplica_por_dos)
+print(x_por_2)
+</code></pre>
+
+<p>Sin embargo, esta no es una buena solución, por dos razones:</p>
+<ul>
+    <li>La función <code>multiplica_por_dos</code> es "de usar y tirar", es posible que no la necesitemos nunca más.</li>
+    <li>Si en nuestro programa necesitamos usar la función <code>transforma</code> en muchas ocasiones, y cada vez necesitamos realizar una transformación sencilla distinta, tendríamos que implementar multitud de funciones "de usar y tirar", lo que complicaría y alargaría el código de nuestro programa.</li>
+</ul>
+
+<p>La solución a estos problemas es el uso de <strong>funciones sin nombre</strong> (también llamadas <strong>funciones anónimas</strong> o <strong>funciones lambda</strong>). Se trata de una manera de describir funciones sencillas mediante una expresión, sin necesidad de definir la función (al menos, no de la forma en que hemos visto hasta ahora). Esta expresión <em>la escribiremos directamente donde la necesitemos</em>; por ejemplo, en la misma llamada a la función <code>transforma</code>. Observa el siguiente ejemplo:</p>
+
+<pre><code>x_por_2 = transforma(x, lambda n: 2 * n)
+print(x_por_2)
+</code></pre>
+
+<p>La definición de función sin nombre del ejemplo anterior es:</p>
+
+<pre><code>lambda n: 2 * n
+</code></pre>
+
+<p>La cual está definiendo una función que toma un parámetro <code>n</code> y devuelve el resultado de la expresión <code>2 * n</code>. Al escribir esta expresión directamente en la llamada de la función <code>transforma</code> nos ahorramos tener que definir la función <code>multiplica_por_dos</code>.</p>
+
+<p>Se pueden definir funciones sin nombre de más de un parámetro; por ejemplo, la siguiente función lambda:</p>
+
+<pre><code>lambda n, m: n + m
+</code></pre>
+
+<p>representa una función que recibe dos parámetros y devuelve su suma.</p>
+
+<h4>¡Prueba tú!</h4>
+
+<p>Intenta obtener la lista <code>[2, 4, 8, 16, 32]</code> (potencias de 2) a partir de la lista <code>exponentes</code>, usando la función <code>transforma</code> y una expresión lambda.</p>
+
+<pre><code>exponentes = [1, 2, 3, 4, 5]
+</code></pre>
+
+<h4>Otras funciones de orden superior</h4>
+
+<p>Podemos usar las funciones sin nombre o funciones lambda cuando hagamos uso de algunas funciones predefinidas de orden superior, como <code>max</code>, <code>min</code> o <code>sorted</code>. Observa el siguiente ejemplo:</p>
+
+<pre><code>nombres = ["Ana", "María", "Julia", "Alberto", "Rafa", "Manuel"]
+print("Los nombres ordenados alfabéticamente por su última letra:")
+print(sorted(nombres, key=lambda n:n[-1]))
+</code></pre>
+
+
+<h2 id="sec_tipado">4. Tipado de la definición de funciones</h2>
+
+<p>Aunque como hemos visto hasta ahora, en Python no es necesario definir el tipo de los parámetros de las funciones que implementemos, ni tampoco el tipo del valor devuelto por las mismas, a partir de la versión 3.5 sí es posible hacerlo.</p>
+
+<p>Se trata de una característica <strong>opcional</strong>, y que no tiene ningún efecto en la ejecución. Es más, aunque definamos que un parámetro es de un tipo determinado, podremos seguir invocando a la función pasándole un parámetro de otro tipo. Sin embargo, el tipado en la definición de funciones puede servirnos para que las funciones queden mejor documentadas, es decir, para que un programador que lea nuestra definición tenga más claro qué espera recibir la función en cada uno de sus parámetros (y de qué tipo es el valor devuelto por la misma). Además, llevar a cabo estas definiciones de tipo nos preparará para lenguajes como Java, en los que dicha especificación de tipos sí es obligatoria.</p>
+
+<p>A continuación, se muestra la manera de utilizar estas características:</p>
+
+<ul>
+    <li>Haremos constar el tipo de los parámetros mediante el uso de dos puntos (:), y el de devolución mediante una flecha (->), como se muestra en el siguiente ejemplo:</li>
+</ul>
+
+<pre><code>def funcion_ejemplo(par1: int, par2: float, par3: bool) -> str:
+    res = 0
+    if par3:
+        res = par1 * par2
+    else:
+        res = par1 / par2
+    return "El valor obtenido es " + str(res)
+</code></pre>
+
+<ul>
+    <li>Para hacer referencia a tipos compuestos (listas, tuplas, conjuntos o diccionarios), debemos importar los tipos <code>List</code>, <code>Tuple</code>, <code>Set</code> o <code>Dict</code> del paquete <code>typing</code>. Para indicar el tipo de los elementos de dichas estructuras, usaremos los corchetes:</li>
+</ul>
+
+<pre><code>from typing import List, Set, Tuple, Dict
+
+def funcion_ejemplo(par1: List[int], par2: Set[float], par3: Tuple[str, int]) -> Dict[str, float]:
+    # ... se obvia la implementación de la función
+    pass
+</code></pre>
+
+<p>Observe que en el caso de listas y conjuntos, indicados entre corchetes el tipo de los elementos, suponiendo que todos los elementos serán del mismo tipo. En el caso de tuplas, indicamos el tipo de cada uno de los campos, y en el caso de los diccionarios, indicamos el tipo de las claves y los valores, en este orden.</p>
+
+<ul>
+    <li>Para definir tuplas con nombres en las que los campos tengan declaración de tipos, importaremos el tipo <code>NamedTuple</code> del paquete <code>typing</code>. Usaremos este nuevo tipo en lugar de <code>namedtuple</code> del paquete <code>collections</code>, que hemos usado anteriormente. Declararemos las tuplas con nombres de esta forma:</li>
+</ul>
+
+<pre><code>from typing import NamedTuple
+from datetime import datetime # Usamos el tipo datetime en este ejemplo, que representa una fecha y hora
+
+Dato = NamedTuple("Dato", [("campo1", str), ("campo2", float), ("campo3", datetime)])
+</code></pre>
+
+<p>Observe que le pasamos a <code>NamedTuple</code> como segundo parámetro una lista de tuplas, siendo el primer campo de cada tupla el nombre del campo en cuestión, y el segundo campo de cada tupla el tipo de dicho campo.</p>
+
+<ul>
+    <li>Podemos definir que un parámetro o tipo devuelto sea uno de entre varios tipos, mediante el tipo <code>Union</code>, que importaremos del paquete <code>typing</code>:</li>
+</ul>
+
+<pre><code>from typing import Union
+
+def multiplica_por_10(parametro: Union[int, float]) -> None:
+    print(parametro * 10)
+</code></pre>
+
+<p>Observe que si una función no devuelve nada, podemos indicarlo poniendo como tipo de devolución <code>None</code>.</p>
+
+{% endblock %}

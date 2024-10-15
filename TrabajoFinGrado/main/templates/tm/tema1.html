@@ -1,0 +1,441 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Tema 1{% endblock %}
+{% block content %}
+    <h1>Introducción a Python</h1>
+    <p>Este documento está pensado para que comiences a comprender los programas escritos en el lenguaje Python, y a escribir tus primeros programas. No tienes que tener ningún conocimiento previo para entenderlo, aunque algunos de los conceptos son un poco abstractos, por lo que es posible que tengas que leer las explicaciones varias veces, y despacito... No pretendemos profundizar en ninguno de los contenidos que aquí se presentan, sino más bien dar un primer vistazo a lo que te puedes encontrar en un programa escrito en Python. Más adelante, iremos profundizando en cada uno de estos contenidos:</p>
+    
+    <ul>
+        <li><a href="#instrucciones">1. Instrucciones y funciones</a></li>
+        <li><a href="#expresiones">2. Expresiones y tipos</a></li>
+        <li><a href="#listas">3. Listas y tuplas</a></li>
+        <li><a href="#diccionarios">4. Diccionarios</a></li>
+        <li><a href="#objetos">5. Objetos</a></li>
+        <li><a href="#control">6. Control de flujo de ejecución</a></li>
+        <li><a href="#modulos">7. Módulos y paquetes</a></li>
+        <li><a href="#ficheros">8. Ficheros</a></li>
+        <li><a href="#principal">9. Función principal</a></li>
+    </ul>
+            
+    <p>* Cuando hablamos de "código" nos referimos a un trozo de texto sacado de un programa informático. En inglés, es frecuente usar el término <strong>coding</strong> para referirse al acto de escribir programas informáticos. Por cierto, ¿qué tal andas de inglés? Verás que gran parte de la información que hay que consultar para programar está en inglés, así que es mejor que te vayas acostumbrando...</p>
+    
+    <h3>¿Empezamos?</h3>
+
+    <a id="instrucciones"></a>
+    <h2>1. Instrucciones y funciones</h2>
+    <p>Un programa Python está formado por <strong>instrucciones</strong> (a veces también son llamadas <strong>sentencias</strong>). Cada instrucción se escribe normalmente en una línea. Por ejemplo, la siguiente instrucción sirve para imprimir el mensaje "Hola, mundo!" en la pantalla.</p>
+    
+    <pre><code>print("Hola, mundo!")</code></pre>
+    
+    <p>Si en un programa hay varias instrucciones, estas se ejecutan secuencialmente, una tras otra.</p>
+    
+    <pre><code>print("Hola, mundo!")
+print("Adiós, mundo!")</code></pre>
+    
+    <p>La instrucción que hemos usado en los ejemplos anteriores, <strong>print</strong> (que significa imprimir en inglés), es una <strong>función predefinida</strong> (built-in function). Una función puede ser "llamada" (también se dice "invocada") desde un programa escribiendo su nombre y a continuación unos paréntesis de apertura y cierre. En ocasiones, las funciones reciben <strong>parámetros</strong>, que se escriben en la llamada dentro de los paréntesis, separados por comas si hay más de uno.</p>
+
+    <p>Hay muchas funciones predefinidas, por ejemplo la función <strong>help</strong> nos proporciona ayuda sobre cualquier otra función.</p>
+    
+    <pre><code>help(print)   # Nos muestra información de ayuda sobre la función predefinida print</code></pre>
+    
+    <p>Por supuesto, la ayuda está en inglés. Habrá que acostumbrarse, porque la inmensa mayoría de documentación y ayudas que vas a encontrar para programar estará también en inglés...</p>
+    
+    <p>Podemos usar el carácter almohadilla (#) para escribir un <strong>comentario</strong> sobre el código. Los comentarios se usan en los programas para hacer aclaraciones, explicar el funcionamiento y, en general, hacer más fácil de entender nuestros programas.</p>
+    
+    <p>Las funciones anteriores se llaman funciones predefinidas porque ya vienen incluidas "por defecto" en Python. Por contra, los programadores pueden <strong>definir</strong> sus propias <strong>funciones</strong>, como se muestra a continuación.</p>
+    
+    <pre><code>def saluda(nombre):
+    ''' 
+    Esta función imprime un saludo personalizado con el nombre indicado mediante el parámetro "nombre".
+    '''
+    print("Hola, " + nombre)</code></pre>
+    
+    <p>La función que acabamos de definir se llama <em>saluda</em> y recibe un único parámetro. Después de la primera línea (llamada <strong>cabecera</strong> o <strong>prototipo</strong> de la función) vienen una o varias instrucciones (llamadas <strong>cuerpo</strong> de la función), que serán ejecutadas cuando alguien llame a la función. Date cuenta de que las instrucciones que conforman el cuerpo de la función aparecen indentadas, es decir, tienen un tabulador delante.</p>
+    
+    <p>Las primeras líneas del cuerpo de la función, que comienzan y acaban con tres comillas simples, se llaman <strong>comentario de documentación</strong> de la función, y, aunque no son obligatorias, sí es recomendable incluirlas. Cuando alguien llame a la función predefinida <em>help</em> para pedir ayuda sobre nuestra función, se mostrará precisamente el texto aquí incluido.</p>
+    
+    <p>Lo que hará la función cuando alguien la llame será mostrar un mensaje de saludo. Hagamos una llamada para probar la función: prueba a escribir tu nombre entre las comillas.</p>
+    
+    <pre><code>saluda("Fermín")</code></pre>
+    
+    <p>Al definir una función conseguimos reutilizar la funcionalidad implementada las veces que queramos, simplemente llamando a la función en las partes del programa en que necesitemos dicha funcionalidad. Por ejemplo, ahora puedo realizar varios saludos, uno tras otro:</p>
+    
+    <pre><code>saluda("John")
+saluda("Paul")
+saluda("George")
+saluda("Ringo")</code></pre>
+    
+<h2><a id="expresiones"></a>2. Expresiones y tipos</h2>
+    
+    <p>En la instrucción que hemos escrito al definir la función <em>saluda</em>:</p>
+    <pre><code>print("Hola, " + nombre)</code></pre>
+    
+    <p>hemos usado un <strong>operador</strong>, el signo +, que sirve para concatenar las dos cadenas de texto: la cadena <em>"Hola, "</em> y la cadena contenida en el parámetro <em>nombre</em>.</p>
+    
+    <p>El uso de operadores es habitual en todos los lenguajes de programación. Llamamos <strong>expresiones</strong> a las instrucciones formadas por <strong>operadores</strong> (como el +), <strong>literales</strong> (como la cadena <em>"Hola, "</em>) y <strong>variables</strong> (como el parámetro <em>nombre</em>), entre otros (más adelante veremos más). Una expresión es siempre <strong>evaluada</strong> por Python, para obtener un resultado, antes de seguir ejecutando el resto de instrucciones del programa.</p>
+    
+    <p>Veamos algunos ejemplos de expresiones utilizando los <strong>operadores aritméticos</strong>. Prueba a cambiar los ejemplos que se muestran para experimentar un poco.</p>
+    
+    <pre><code>3 + 5</code></pre>
+    
+    <pre><code>3 + 5 * 8</code></pre>
+    
+    <pre><code>(3 + 5) * 8</code></pre>
+    
+    <pre><code>(3 + 5) * 8 / 14</code></pre>
+    
+    
+    <p>En las expresiones también podemos usar llamadas a funciones, siempre que sean funciones que devuelvan algún resultado. Para que una función devuelva un valor cuando sea invocada, usaremos la instrucción <strong>return</strong> en algún punto del cuerpo de la función (casi siempre, al final del cuerpo de la función). Por ejemplo:</p>
+    
+    <pre><code>def doble(x):
+    return x * 2
+
+doble(10)</code></pre>
+    
+    <p>A veces necesitamos guardar el resultado de una expresión para utilizarlo más adelante en nuestro programa. Para esto se usan las <strong>variables</strong>.</p>
+    
+    <pre><code>resultado = (3 + 5) * doble(8)
+print(resultado / 5)</code></pre>
+    
+    <p>Hemos <strong>asignado</strong> a la variable <em>resultado</em> el valor de la expresión que hemos escrito a la derecha del carácter igual (=), de manera que más adelante en el programa podremos utilizar ese valor haciendo mención a la variable. A este carácter igual lo llamamos instrucción de <strong>asignación</strong>.</p>
+
+    
+    <p>En los ejemplos anteriores, hemos utilizado <strong>literales</strong> de tipo <strong>cadena de caracteres</strong> (por ejemplo, <em>"Hola, mundo!"</em>) y literales de tipo número <strong>entero</strong> (por ejemplo, <em>3</em>, <em>5</em> y <em>8</em>). Hay más tipos de literales, por ejemplo literales de tipo número <strong>real</strong> o de tipo <strong>lógico</strong>:</p>
+    
+    <pre><code>PI = 3.14159
+radio = 1.5
+area = PI * radio**2   # El operador ** sirve para calcular potencias
+print("El área del círculo es", area)
+
+umbral = 100.0
+area_superior_umbral = area > umbral  
+# El carácter > es un operador relacional, se evalúa como True (verdadero) o False (falso)
+</code></pre>
+
+
+<h2><a id="listas"></a>3. Listas y tuplas</h2>
+    
+    <p>Cuando necesitamos almacenar varios datos en una sola variable, utilizamos literales de tipo <strong>lista</strong>:</p>
+    
+    <pre><code>temperaturas = [28.5, 27.8, 29.5, 32.1, 30.7, 25.5, 26.0]
+print(temperaturas)</code></pre>
+    
+    <p>O, a veces, de tipo <strong>tupla</strong>, que se escriben igual pero usando paréntesis en lugar de corchetes:</p>
+    
+    <pre><code>usuario = ("Mark", "Lenders")</code></pre>
+    
+    <p>Ambos, listas y tuplas, se parecen mucho (ya veremos algunas diferencias más adelante). Podemos acceder a un elemento concreto, indicando el <strong>índice</strong> de dicho elemento (es decir, la posición que ocupa dentro de la lista o tupla, contando desde la izquierda):</p>
+    
+    <pre><code>temperaturas[0]   # La primera posición corresponde al índice 0</code></pre>
+    
+    <pre><code>heroes = ["Spiderman", "Iron Man", "Lobezno", "Capitán América", "Hulk"]
+print(heroes[4])</code></pre>
+    
+    <pre><code>usuario[1]</code></pre>
+    
+    <pre><code>temperaturas[1] = 27.0
+# Puedo asignar un valor a una posición cualquiera de una lista
+print(temperaturas)</code></pre>
+    
+    <pre><code>temperaturas[0] = temperaturas[0] + 0.5
+# Incrementamos en 0.5 grados la primera temperatura de la lista
+print(temperaturas)</code></pre>
+    
+    <p>También podemos conocer en cualquier momento el número total de elementos dentro de una lista o una tupla mediante la función predefinida <strong>len</strong>:</p>
+    
+    <pre><code>len(temperaturas)</code></pre>
+    
+    <pre><code>len(usuario)</code></pre>
+    
+    <p><strong>¡Cuidado!</strong> No podemos asignar valores a las posiciones de una tupla. Prueba a ejecutar este código:</p>
+    
+    <pre><code>usuario[0] = "Marcos" # Cambiemos el nombre del usuario</code></pre>
+    
+    <p>Decimos que las tuplas son un <strong>tipo inmutable</strong>, lo que significa que una vez que hemos guardado un valor en una variable de este tipo, ¡ya no podremos cambiarlo!</p>
+    
+    <p>Lo que acaba de ocurrir es un <strong>error en tiempo de ejecución</strong>. Estos errores ocurren frecuentemente mientras estamos escribiendo y probando nuestros programas, y significan que no hemos hecho algo de la manera correcta. Cuando se produce uno de estos errores, el programa deja de ejecutarse. Cuando nuestro programa esté acabado y bien probado, no debería ocurrir ninguno de estos errores... Aunque ocasionalmente ocurre. Seguro que te suena esta ventana:</p>
+    
+    <img src="{% static 'images/img001.png' %}" class="img-fluid" alt="Error en el tiempo de ejecución">
+    
+    <h2><a id="diccionarios"></a>4. Diccionarios</h2>
+    
+    <p>Existen más tipos como las listas y las tuplas, que permiten almacenar conjuntos de datos. Uno muy utilizado es el <strong>diccionario</strong>. En un diccionario, cada valor almacenado se asocia a una clave, de manera que para acceder a los <strong>valores</strong> se utilizan dichas <strong>claves</strong> (de forma parecida a como para acceder a los valores de una lista se utilizan los índices).</p>
+    
+    <p>Puedes pensar en un diccionario como si se tratara de una tabla con dos columnas. Por ejemplo, un diccionario podría almacenar las temperaturas medias de las capitales andaluzas, indexando dichos valores mediante los nombres de las capitales:</p>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Claves (keys)</th>
+                <th>Valores (values)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>"Almería"</td>
+                <td>19.9</td>
+            </tr>
+            <tr>
+                <td>"Cádiz"</td>
+                <td>19.1</td>
+            </tr>
+            <tr>
+                <td>"Córdoba"</td>
+                <td>19.1</td>
+            </tr>
+            <tr>
+                <td>"Granada"</td>
+                <td>16.6</td>
+            </tr>
+            <tr>
+                <td>"Jaén"</td>
+                <td>18.2</td>
+            </tr>
+            <tr>
+                <td>"Huelva"</td>
+                <td>19.0</td>
+            </tr>
+            <tr>
+                <td>"Málaga"</td>
+                <td>19.8</td>
+            </tr>
+            <tr>
+                <td>"Sevilla"</td>
+                <td>20.0</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <p>Lo cual se escribiría en Python de la siguiente manera:</p>
+    
+    <pre><code>temperatura_media = {"Almería": 19.9, "Cádiz": 19.1, "Córdoba": 19.1, "Granada": 16.6, 
+                    "Jaén": 18.2, "Huelva": 19.0, "Málaga": 19.8, "Sevilla": 20.0}
+print(temperatura_media)</code></pre>
+    
+    <p>Ahora podemos trabajar con los datos del diccionario de forma parecida a las listas, aunque usando las claves para acceder a los valores, en lugar de los índices.</p>
+    
+    <pre><code>print("Temperatura anterior:", temperatura_media['Sevilla'])
+temperatura_media['Sevilla'] += 1.0   # ¡Cambio climático!
+print("Temperatura actual:", temperatura_media['Sevilla'])</code></pre>
+    
+
+<h2><a id="objetos"></a>5. Objetos</h2>
+    
+    <p>Si queremos añadir un elemento a la lista <code>temperaturas</code>, podemos hacerlo así:</p>
+    
+    <pre><code>temperaturas.append(29.2)  # añade el valor 29.2 al final de la lista
+print(temperaturas)
+print(len(temperaturas))</code></pre>
+    
+    <p>Cuando una variable (<code>temperaturas</code>) puede ser usada como en el ejemplo anterior, escribiendo un punto (.) y a continuación invocando a una función (<code>append</code>), decimos que la variable es un <strong>objeto</strong>, y a la función en cuestión la llamamos <strong>método</strong>. La principal diferencia entre un método y una función es que el primero sólo se puede llamar si tenemos previamente un objeto del tipo adecuado. Por ejemplo, el método <code>append</code> sólo puede ser invocado sobre un objeto de tipo lista.</p>
+    
+    <p>Intentemos llamar a <code>append</code> como si fuese una función:</p>
+    
+    <pre><code>append(29.2)</code></pre>
+    
+    <p>Puedes ver todos los métodos que tiene un objeto mediante la función predefinida <code>dir</code>:</p>
+    
+    <pre><code>dir(temperaturas)</code></pre>
+    
+    <p>Y si quieres una descripción más detallada de cada método, puedes usar la función <code>help</code>, que ya hemos usado anteriormente.</p>
+    
+    <pre><code>help(temperaturas)</code></pre>
+    
+
+
+<h2><a id="control"></a>6. Control del flujo de ejecución</h2>
+    
+    <p>Podemos utilizar la instrucción <strong>for</strong> para recorrer los elementos de una lista o una tupla. Llamamos a esto un <strong>bucle</strong>.</p>
+    
+    <pre><code>for temperatura in temperaturas:    # Se puede leer así: para cada valor "temperatura" en la lista "temperaturas"
+    print("Temperatura:", temperatura)</code></pre>
+    
+    <p>En el código anterior, la instrucción que aparece indentada se ejecuta una vez para cada elemento de la lista <code>temperaturas</code>. En cada ejecución, la variable <code>temperatura</code> almacena un elemento distinto de la lista, comenzando por el primero y pasando por cada elemento secuencialmente. Date cuenta también de que la función predefinida <code>print</code> se puede usar con varios parámetros, en cuyo caso mostrará cada uno de ellos por pantalla.</p>
+    
+    <p>Veamos otro ejemplo de bucle:</p>
+    
+    <pre><code>suma = 0
+for temperatura in temperaturas:
+    suma += temperatura
+    # El operador += almacena en "suma" el resultado de sumar "temperatura" al valor anterior de "suma"
+print("La temperatura media en la semana ha sido", suma / len(temperaturas), "grados.")</code></pre>
+    
+    <p>Aunque realmente no hace falta hacer un bucle para sumar los elementos de una lista, ya que esto mismo podemos hacerlo en Python con la función predefinida <code>sum</code>.</p>
+    
+    <pre><code>print("La temperatura media en la semana ha sido", sum(temperaturas) / len(temperaturas), "grados.")</code></pre>
+    
+    <p>Como iremos viendo más adelante, la instrucción <code>for</code> no sólo nos permite recorrer listas, sino muchos otros tipos de objetos. A los objetos cuyo contenido permite ser recorrido mediante un bucle <code>for</code> los llamamos <strong>iterables</strong>.</p>
+    
+    <p>La instrucción <code>for</code> es una instrucción de <strong>control del flujo de ejecución</strong>, pues permite que la secuencia en que se van ejecutando las distintas instrucciones varíe con respecto a la ejecución esperada (recordemos que, por defecto, las instrucciones se van ejecutando una tras otra, en el orden en que las hemos escrito, y una sola vez). Otra instrucción que también altera el flujo normal de ejecución es la instrucción <strong>if</strong>. Veamos un ejemplo:</p>
+    
+    <pre><code>def saluda(nombre, hora):
+    if hora < 12:     # Si el parámetro "hora" es menor de 12, se ejecuta el siguiente bloque de instrucciones
+        print("Buenos días, " + nombre)
+    elif hora < 21:   # En otro caso, si el parámetro "hora" es menor de 21, se ejecuta el siguiente bloque de instrucciones
+        print("Buenas tardes, " + nombre)
+    else:           # En cualquier otro caso, se ejecuta el siguiente bloque de instrucciones
+        print("Buenas noches, " + nombre)
+
+saluda("Fermín", 11)
+saluda("Fermín", 16)
+saluda("Fermín", 23)</code></pre>
+    
+    <p>Observa que las <strong>palabras clave</strong> que se usan son <code>if</code>, <code>elif</code> y <code>else</code>, y que a continuación de las dos primeras se escribe una expresión lógica (es decir, una expresión cuyo resultado es de tipo lógico: verdadero o falso). Las instrucciones que aparecen tras la palabra <code>if</code> sólo se ejecutan si la expresión correspondiente se evalúa como verdadera. Las instrucciones que aparecen tras la palabra <code>elif</code> sólo se ejecutan si no se han ejecutado las anteriores, y si la expresión correspondiente se evalúa como verdadera. Las instrucciones que aparecen tras la palabra <code>else</code> sólo se ejecutan si no se han ejecutado ninguna de las anteriores.</p>
+    
+    <p>Aquí tienes otros ejemplos:</p>
+    
+    <pre><code>temperatura_actual = temperaturas[6]
+if temperatura_actual < 0:  # Si la temperatura es menor de cero grados
+    print("¡Cuidado! Riesgo de congelación.")</code></pre>
+    
+    <pre><code># Si el primer elemento de la tupla "usuario" es igual a "Mark" y el segundo elemento es igual a "Lenders"
+if usuario[0] == "Mark" and usuario[1] == "Lenders": 
+    print("Hola, Mark. Te estaba esperando.")
+else:  # En otro caso
+    print("Hola, ¿nos conocemos?")</code></pre>
+    
+    <pre><code>def acceso_restringido(usuario):
+    if usuario[0] == "Mark" and usuario[1] == "Lenders": 
+        print("Hola, Mark. Te estaba esperando.")
+    elif usuario[0] == "Oliver" and usuario[1] == "Atom": 
+        print("Hola, Oliver. Te estaba esperando.")
+    elif usuario[0] == "Benji" and usuario[1] == "Price": 
+        print("Hola, Benji. Te estaba esperando.")
+    else:  
+        print("Hola, ¿nos conocemos?")</code></pre>
+    
+    <p>Para escribir las expresiones lógicas se usan distintos <strong>operadores lógicos</strong> (como el operador <code>and</code>) y <strong>operadores relacionales</strong> (como los operadores <code>&gt;</code> o <code>==</code>). Iremos viendo más operadores de estos tipos a medida que los vayamos necesitando.</p>
+    
+
+<h2><a id="modulos"></a>7. Módulos y paquetes</h2>
+    
+    <p>Además de las funciones predefinidas, hay muchas otras cosas que se pueden hacer con Python sin necesidad de implementar nosotros ninguna función ni tener que descargar o instalar nada en el ordenador. Eso sí, para poder hacer uso de estas funcionalidades incluidas en Python, es necesario <strong>importar</strong> el módulo o módulos donde están implementadas. Un <strong>módulo</strong> es cada uno de los ficheros con extensión .py en los que están escritos los programas en Python. Los módulos están agrupados en <strong>paquetes</strong>, que son parecidos a las carpetas del explorador de archivos de Windows.</p>
+    
+    <p>Por ejemplo, si queremos generar números aleatorios, podemos usar el módulo <strong>random</strong>. Antes de hacerlo, es necesario importarlo. Prueba a ejecutar varias veces el siguiente código y verás cómo cada vez se genera un número distinto:</p>
+    
+    <pre><code>import random
+
+print(random.randint(1, 10))</code></pre>
+    
+    <p>Fíjate que para llamar a la función <code>randint</code>, que está definida dentro del módulo <code>random</code>, debemos escribir <code>random.randint(...)</code>. Si vamos a usar muy a menudo la función en nuestro código, también podemos importarla así:</p>
+    
+    <pre><code>from random import randint
+
+print(randint(1, 10))</code></pre>
+    
+    <p>De esta manera ya no es necesario indicar la ubicación de la función cada vez que la llamemos. Aunque es más cómodo, no es del todo recomendable, como veremos más adelante.</p>
+    
+    <p>¿Y si queremos generar, pongamos, 20 números aleatorios, entre 1 y 10? Podemos hacerlo con la instrucción <strong>for</strong>, la misma que utilizamos antes para recorrer los elementos de una lista:</p>
+    
+    <pre><code>numeros = []
+for i in range(20):  # la función predefinida "range" devuelve los números enteros del 0 al 19.
+    numeros.append(randint(1, 10))
+print(numeros)</code></pre>
+    
+    <p>En el siguiente ejemplo, usamos el módulo <code>datetime</code>, que nos permite, entre otras cosas, saber la hora actual en que se está ejecutando el programa.</p>
+    
+    <pre><code># El módulo se llama "datetime", y dentro hay definido un objeto que también se llama "datetime"
+from datetime import datetime
+hora_actual = datetime.now()  # El método now() devuelve un objeto de tipo datetime
+# El objeto hora_actual tiene un atributo hour que indica la hora actual (de 0 a 23)
+saluda("Fermín", hora_actual.hour)</code></pre>
+    
+    <p>En el ejemplo anterior, cuando escribimos <code>hora_actual.hour</code> estamos accediendo a un <strong>atributo</strong>, llamado <code>hour</code>, del objeto <code>hora_actual</code>. Por tanto, los objetos tienen, además de métodos, atributos, los cuales son parecidos a las variables (al igual que los métodos eran parecidos a las funciones). La manera de diferenciar si estamos accediendo a un atributo o llamando a un método es que en el segundo caso usamos los paréntesis.</p>
+    
+    <p>Con los distintos módulos existentes para Python se puede hacer prácticamente de todo. Por ejemplo, dibujar gráficas de todo tipo, mediante la librería <strong>matplotlib</strong>. Cuando hablamos de una <strong>librería</strong> nos referimos a un conjunto de módulos relacionados entre sí por el tipo de funcionalidad que ofrecen. Generalmente, los módulos de una librería están agrupados dentro de un paquete, como es el caso de <code>matplotlib</code>.</p>
+    
+    <pre><code># Para que las gráficas se muestren sobre el propio notebook, en lugar de en una ventana, hay que escribir:
+get_ipython().run_line_magic('matplotlib', 'inline')
+
+from matplotlib import pyplot  # pyplot es el módulo que permite dibujar gráficas matemáticas
+
+x = []   # "x" es una lista vacía, es decir, aún no contiene elementos
+y = []   # "y" también es una lista vacía
+for i in range(20):
+    x.append(randint(-50, 50))
+    y.append(randint(-50, 50))
+
+# El tercer parámetro sirve para especificar el formato de la representación gráfica de los datos
+pyplot.plot(x, y, "o")</code></pre>
+    
+    <p>Todos los paquetes, módulos y librerías más usados están ampliamente documentados en Internet: sólo tienes que hacer una consulta a tu buscador favorito. Por ejemplo, si quieres ver qué otras cosas se pueden hacer con la función <code>plot</code>, puedes verlo aquí: <a href="https://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.plot" target="_blank">matplotlib.pyplot.plot</a></p>
+    
+<h2><a id="ficheros"></a>8. Ficheros</h2>
+    
+    <p>Es muy habitual trabajar con <strong>ficheros</strong> (quizás estés acostumbrado a referirte a ellos como "archivos", que es un sinónimo). Aunque los ficheros pueden contener todo tipo de datos, nosotros trabajaremos con ficheros de texto. Al igual que haces tú mismo cuando quieres trabajar con un documento en el ordenador, para trabajar con un fichero en Python primero tenemos que abrirlo; después podemos leer o escribir datos en el mismo, y finalmente hemos de cerrarlo. Aquí tienes un pequeño ejemplo que abre un fichero de texto y muestra su contenido en pantalla:</p>
+    
+    <pre><code>with open("prueba.txt") as f:
+    # Al abrir un fichero se obtiene un objeto iterable,
+    # que se guarda en la variable que hemos declarado a la derecha 
+    # de la palabra reservada "as"    
+    for linea in f:
+        print(linea)
+
+# El archivo se cierra automáticamente cuando acaban las instrucciones escritas dentro de la instrucción "with"</code></pre>
+    
+    <p>Si el código anterior ocasiona un error al ser ejecutado, asegúrate de que tienes el archivo <code>prueba.txt</code> en la misma carpeta desde la que estás ejecutando este notebook.</p>
+    
+    <p>También es posible que al ejecutar Python te devuelva un "error de codificación", o que te muestre el contenido del fichero de texto con algunos errores (algunos caracteres aparecen de manera extraña). Esto ocurre porque existen múltiples maneras de representar los caracteres de un fichero de texto en notación binaria. Es lo que se conoce como <strong>codificación de caracteres</strong>. Cada sistema operativo tiene su codificación por defecto, de manera que las líneas que acabamos de escribir para leer un fichero de texto dan por hecho que el fichero de texto está expresado en dicha codificación por defecto (la cuál puede no ser la correcta en tu caso). Para evitar estos problemas, siempre que trabajemos con ficheros de texto en la asignatura estableceremos que los ficheros de texto estén en codificación <strong>UTF-8</strong>. Esto se consigue añadiendo un parámetro a la función open:</p>
+    
+    <pre><code>with open("prueba.txt", encoding='utf-8') as f:
+    for linea in f:
+        print(linea)
+
+# El archivo se cierra automáticamente cuando acaban las instrucciones escritas dentro de la instrucción "with"</code></pre>
+    
+    <p>Muy a menudo trabajaremos con ficheros CSV, que son ficheros de texto que contienen datos estructurados por columnas. Abre el fichero <code>plantas.csv</code> y observa que cada fila representa los datos de una planta, y que esos datos aparecen separados por comas. En Python es muy sencillo leer este tipo de ficheros, mediante la función <code>reader</code> contenida en el módulo <code>csv</code>:</p>
+    
+    <pre><code>import csv
+
+with open("plantas.csv", encoding='utf-8') as f:
+    # La función csv.reader recibe el fichero que acabamos de abrir,
+    # y nos devuelve un objeto lector, que también es iterable
+    lector = csv.reader(f) 
+    
+    # El objeto lector devuelve los datos de cada línea separados
+    # como elementos de una lista
+    for datos in lector:
+        print(datos)</code></pre>
+
+<h2><a id="principal"></a>9. Función principal</h2>
+    
+    <p>Cuando escribimos nuestro código en un fichero de texto con extensión ".py", estamos definiendo un módulo. Otros programadores podrán importar nuestro módulo, y hacer uso en sus programas de las funciones que hayamos definido en el mismo, o de las variables y objetos que aparezcan definidos sin indentar.</p>
+    
+    <p>Sin embargo, algunas veces queremos que el código que hemos escrito sea ejecutado por un usuario; es decir, estamos definiendo un <strong>programa ejecutable</strong>. En este caso, el usuario puede ejecutar el programa con el siguiente comando, escrito desde el <strong>terminal</strong> o <strong>ventana de comandos</strong> del sistema operativo:</p>
+    
+    <pre><code>python nombre_fichero.py</code></pre>
+    
+    <p>Cuando un programa es ejecutable, debe existir un <strong>punto de entrada</strong>. Un punto de entrada es un conjunto de instrucciones que se ejecutarán cuando se lance el programa. En Python, estas instrucciones se deben escribir dentro de un bloque <strong>if</strong> como el que se muestra a continuación:</p>
+    
+    <pre><code>if __name__ == '__main__':
+    # Aquí vienen las instrucciones que definen el punto de entrada del programa
+    hora_actual = datetime.now() 
+    saluda("Fermín", hora_actual.hour)</code></pre>
+    
+    <p>A veces, el conjunto de instrucciones que definen el punto de entrada se escribe dentro de una función, a la que se le suele dar el nombre <strong>main</strong>. Esto en Python no es obligatorio, aunque sí lo es en otros lenguajes de programación. Si queremos hacerlo así, entonces el programa ejecutable anterior quedaría como sigue (se muestra a continuación el programa completo, con las sentencias <code>import</code> y las definiciones de funciones necesarias):</p>
+    
+    <pre><code>from datetime import datetime
+
+
+def main():
+    hora_actual = datetime.now() 
+    saluda("Fermín", hora_actual.hour)
+
+
+def saluda(nombre, hora):
+    if hora < 12:     # Si el parámetro "hora" es menor de 12, se ejecuta el siguiente bloque de instrucciones
+        print("Buenos días, " + nombre)
+    elif hora < 21:   # En otro caso, si el parámetro "hora" es menor de 21, se ejecuta el siguiente bloque de instrucciones
+        print("Buenas tardes, " + nombre)
+    else:           # En cualquier otro caso, se ejecuta el siguiente bloque de instrucciones
+        print("Buenas noches, " + nombre)
+
+
+if __name__ == '__main__':
+    main()</code></pre>
+        
+    <p>Ya sabes lo básico para entender programas simples escritos en Python y para escribir los tuyos propios. <strong>¡Feliz programación!</strong></p>
+    
+    <pre><code># ¿Conoces el "Zen de Python"?
+import this</code></pre>
+{% endblock %}

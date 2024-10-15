@@ -3,7 +3,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.contrib.auth import logout
 from .views import delete_unactivated_users
-from django.urls import reverse, NoReverseMatch
+from django.urls import reverse, NoReverseMatch, resolve
 from django.shortcuts import redirect
 
 
@@ -58,74 +58,27 @@ class PendingTeacherMiddleware:
         
         response = self.get_response(request)
         return response
-    
-class RestrictUnauthenticatedMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        allowed_paths = [
-            reverse('home'),
-            reverse('register'),
-            reverse('register_teacher'),
-            reverse('register_student'),
-            reverse('resend_activation_email'),
-            reverse('activation_resent'),
-            reverse('login'),
-        ]
-        
-        if not request.user.is_authenticated:
-            if request.path.startswith('/activate/'):
-                return self.get_response(request)  
-            if request.path not in allowed_paths:
-                return redirect('login')  
-
-        response = self.get_response(request)
-        return response
-
 
 class RejectedTeacherMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.user.is_authenticated and request.user.user_type == 'Teacher' and request.user.verification_status == 'REJECTED':
-            allowed_paths = [
-                reverse('logout'),  
-                reverse('rejected_teacher'),  
-            ]
-            
-            if request.path not in allowed_paths:
-                return redirect('rejected_teacher') 
+        if request.user.is_authenticated:
+            if request.user.user_type == 'Teacher' and request.user.verification_status == 'REJECTED':
+                allowed_paths = [
+                    reverse('home'),
+                    reverse('rejected_teacher'),  
+                    reverse('logout'),  
+                ]
 
+                if request.path not in allowed_paths:
+                    return redirect('home')  
+        
         response = self.get_response(request)
         return response
 
 
-
-class RestrictStudentMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        restricted_url_prefixes = [
-            reverse('register'),
-            reverse('register_teacher'),
-            reverse('register_student'),
-            '/activate/',  
-            reverse('resend_activation_email'),
-            reverse('activation_resent'),
-            reverse('login'),
-        ]
-
-        if request.user.is_authenticated and request.user.user_type == 'Student':
-
-            for restricted_prefix in restricted_url_prefixes:
-                if request.path.startswith(restricted_prefix):
-                    return redirect('home') 
-
-        response = self.get_response(request)
-        return response
 
 class TeacherAccessMiddleware:
     def __init__(self, get_response):
@@ -135,6 +88,7 @@ class TeacherAccessMiddleware:
         allowed_teacher_paths = [
             reverse('home'),
             reverse('logout'),
+            reverse('rejected_teacher'),
             reverse('pending_teacher'),
             reverse('user_profile'),
             reverse('edit_profile'),
@@ -154,7 +108,7 @@ class TeacherAccessMiddleware:
             '/chat/archive/',
             '/exam/',
             '/students/',
-            '/forums/'
+            '/forums/',
         ]
         
         if request.user.is_authenticated and request.user.user_type == 'Teacher':
@@ -166,38 +120,36 @@ class TeacherAccessMiddleware:
         return response
     
 
+
 class StudentRestrictionMiddleware:
-    
     def __init__(self, get_response):
         self.get_response = get_response
         self.restricted_paths = [
             'register', 'register_teacher', 'register_student',
             'resend_activation_email', 'activation_resent',
-            'session_expired', 'rejected_teacher',
+            'password_reset', 'password_reset_done',
+            'username_recovery', 'username_recovery_done',
+            'login', 'session_expired', 'rejected_teacher',
             'pending_teacher'
         ]
-        # Añadimos las rutas que tienen parámetros aparte
         self.restricted_named_paths = [
-            'student_detail'
+            'student_detail', 'activate', 'password_reset_confirm', 'password_reset_complete'
         ]
-    
+
     def __call__(self, request):
         path = request.path_info.lstrip('/')
         
         if request.user.is_authenticated and request.user.user_type == 'Student':
-            # Primero comprobamos las rutas simples que no requieren parámetros
             for restricted_path in self.restricted_paths:
                 if path.startswith(restricted_path):
                     return redirect('home')
-            
-            # Luego comprobamos las rutas que requieren reverse (como student_detail)
-            for restricted_named_path in self.restricted_named_paths:
-                try:
-                    if path.startswith(reverse(restricted_named_path, args=[1]).rsplit('/', 2)[0]):  # Comparamos la parte inicial
-                        return redirect('home')
-                except NoReverseMatch:
-                    # Si no se puede resolver, no pasa nada, solo seguimos
-                    continue
-       
+
+            try:
+                resolved_url_name = resolve(request.path_info).url_name
+                if resolved_url_name in self.restricted_named_paths:
+                    return redirect('home')
+            except NoReverseMatch:
+                pass  
+        
         response = self.get_response(request)
         return response

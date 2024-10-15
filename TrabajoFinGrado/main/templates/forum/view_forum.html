@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}{{ forum.title }}{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
@@ -182,6 +183,15 @@ img.img-fluid {
     background-color:#D63B2D;
     width:100%;
 }
+
+.forum-description {
+    white-space: pre-wrap; 
+}
+
+.comment-content {
+    white-space: pre-wrap;
+}
+
 
 </style>
 {% endblock %}

@@ -1,48 +1,54 @@
 {% extends "base.html" %}
+{% block title %}Calendario Personal{% endblock %}
 
 {% block content %}
-<div class="row">
-    <!-- Columna para la lista de eventos -->
-    <div class="col-md-2 pr-0">
-        <h4 class="text-center">Eventos en los próximos 30 días</h4>    
-        <ul class="list-group">
-            {% for event in upcoming_events %}
-                <li class="list-group-item">
-                    <span class="event-color-dot" style="background-color: {{ event.color }};"></span>
-                    <strong>{{ event.title }}</strong><br>
-                    <span>{{ event.start_time|date:"j F" }}</span><br>
-                    <span>{{ event.start_time|date:"H:i" }} - {{ event.end_time|date:"H:i" }}</span>
-                </li>
-            {% empty %}
-                <li class="list-group-item">No hay eventos próximos</li>
-            {% endfor %}
-        </ul>
+<div class="container mt-4">
+    <div class="row">
+        <!-- Columna para la lista de eventos -->
+        <div class="col-md-3 pr-0">
+            <h4 class="text-center mb-4 event-header">Eventos en los próximos 30 días</h4>
+            <ul class="list-group">
+                {% for event in upcoming_events %}
+                    <li class="list-group-item">
+                        <span class="event-color-dot" style="background-color: {{ event.color }};"></span>
+                        <strong>{{ event.title }}</strong><br>
+                        <span>{{ event.start_time|date:"j F" }}</span><br>
+                        <span>{{ event.start_time|date:"H:i" }} - {{ event.end_time|date:"H:i" }}</span>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item">No hay eventos próximos</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Columna para el calendario -->
+        <div class="col-md-9">
+            <h2 class="calendar-header mb-5">Calendario</h2>
+            <div id="calendar"></div>
+        </div>
     </div>
 
-    <!-- Columna para el calendario -->
-    <div class="col-md-10">
-        <h2>Calendario</h2>
-        <div id="calendar"></div>
-    </div>
-</div>
-
-<!-- Ventana Modal -->
-<div id="eventModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>Crear Evento</h2>
-        <form id="eventForm">
-            <label for="title">Título del Evento:</label>
-            <input type="text" id="title" name="title" required>
-
-            <label for="start">Fecha de Inicio:</label>
-            <input type="datetime-local" id="start" name="start" required>
-
-            <label for="end">Fecha de Fin:</label>
-            <input type="datetime-local" id="end" name="end" required>
-
-            <button type="submit">Guardar Evento</button>
-        </form>
+    <!-- Ventana Modal -->
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Crear Evento</h2>
+            <form id="eventForm">
+                <div class="form-group">
+                    <label for="title">Título del Evento:</label>
+                    <input type="text" id="title" name="title" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="start">Fecha de Inicio:</label>
+                    <input type="datetime-local" id="start" name="start" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="end">Fecha de Fin:</label>
+                    <input type="datetime-local" id="end" name="end" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Guardar Evento</button>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -53,27 +59,22 @@
             initialView: 'dayGridMonth',
             events: '/api/calendar-events/',  // Asegúrate de que esta URL esté correctamente configurada
             eventContent: function(arg) {
-                // Crear el punto de color
                 let dotEl = document.createElement('span');
                 dotEl.className = "fc-event-dot";
                 dotEl.style.backgroundColor = arg.event.backgroundColor;
     
-                // Crear el nombre del evento
                 let titleEl = document.createElement('span');
                 titleEl.className = "fc-event-title";
                 titleEl.innerText = ` ${arg.event.title}`;
     
-                // Agrupar el punto de color y el nombre del evento en una línea
                 let titleContainerEl = document.createElement('div');
                 titleContainerEl.className = 'fc-event-title-container';
                 titleContainerEl.append(dotEl, titleEl);
     
-                // Crear el tramo horario debajo del nombre
                 let timeEl = document.createElement('div');
                 timeEl.className = "fc-event-time";
-                timeEl.innerText = `${arg.event.startStr.slice(11, 16)} - ${arg.event.endStr.slice(11, 16)}`;  // Extraer las horas y minutos
+                timeEl.innerText = `${arg.event.startStr.slice(11, 16)} - ${arg.event.endStr.slice(11, 16)}`;
     
-                // Agrupar todo (nombre del evento y tramo horario)
                 let eventContentEl = document.createElement('div');
                 eventContentEl.append(titleContainerEl, timeEl);
     
@@ -104,14 +105,35 @@
             }
         });
     });
-    
-    
 </script>
-
-
 
 <!-- Estilos para la ventana modal -->
 <style>
+
+    .list-group-item:first-child {
+        margin-top: 89px; /* Aumenta la separación entre cada evento */
+    }
+
+    /* Estilos para el encabezado de eventos */
+    .event-header {
+        font-size: 1.0rem; /* Tamaño de fuente mayor para destacar */
+        font-weight: 700; /* Peso de fuente para darle énfasis */
+        color: #333; /* Color de texto más oscuro para mejor contraste */
+        text-transform: uppercase; /* Convertir texto a mayúsculas para destacar */
+        border-bottom: 2px solid #38c19e; /* Línea inferior para separación visual */
+        padding-bottom: 10px; /* Espaciado inferior para separar del contenido */
+    }
+    
+    /* Estilos para el encabezado del calendario */
+    .calendar-header {
+        font-size: 2rem; /* Tamaño de fuente mayor para destacar */
+        font-weight: 600; /* Peso de fuente para darle énfasis */
+        color: #333; /* Color de texto más oscuro para mejor contraste */
+        border-bottom: 2px solid #38c19e; /* Línea inferior para separación visual */
+        padding-bottom: 10px; /* Espaciado inferior para separar del contenido */
+        text-align: center;
+    }
+    
     /* Estilo para los puntos de color en la lista de eventos */
     .event-color-dot {
         display: inline-block;
@@ -123,7 +145,7 @@
     }
     
     /* Asegura que todos los eventos en el calendario se muestren con un punto */
-    .fc-daygrid-event-dot {
+    .fc-event-dot {
         width: 10px; /* Tamaño del punto de color */
         height: 10px;
         border-radius: 50%;
@@ -139,13 +161,13 @@
     }
 
     .fc-daygrid-event {
-        max-width: 100%; /* Asegura que el evento no desborde su contenedor */
-        overflow: hidden; /* Oculta cualquier desbordamiento de contenido */
-        white-space: nowrap; /* Mantiene el contenido en una sola línea */
-        text-overflow: ellipsis; /* Muestra puntos suspensivos si el contenido es demasiado largo */
-        display: block; /* Asegura que se comporte como un bloque */
-        font-size: 0.85em; /* Ajuste de tamaño para mejor visualización */
-        color: black; /* Asegura que todo el texto del evento tenga el mismo color */
+        max-width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        display: block;
+        font-size: 0.85em;
+        color: black;
     }
     
     .fc-event-title-container {
@@ -162,55 +184,64 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        color: black;  /* Mantiene el color del texto */
+        color: black;
     }
     
-    /* Asegura que el evento no tenga fondo de color extendido */
     .fc-event {
         background-color: transparent !important;
         border: none !important;
     }
     
-    /* Punto de color para los eventos */
-    .fc-event-dot {
-        width: 10px; /* Tamaño del punto de color */
-        height: 10px;
-        border-radius: 50%;
-        margin-right: 5px;
-        display: inline-block;
-        vertical-align: middle;
-    }
-
-    /.fc-event-time {
+    .fc-event-time {
         font-size: 0.85em;
         color: #666;
-        margin-top: 2px;  /* Un pequeño margen superior para separar del título */
-        display: block;  /* Asegura que la hora esté en una nueva línea */
-    }
-
-    .fc-event-title-container,
-    .fc-event-time {
+        margin-top: 2px;
         display: block;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
     }
-    
-    .fc-col-header-cell-cushion {
+
+    .fc-col-header-cell-cushion,
+    .fc-col-header-cell {
         background-color: #38c19e;
         color: black;
-        text-decoration: none;
-
-    }
-    .fc-col-header-cell{
-        background-color: #38c19e;
-        text-decoration: none;
-
     }
 
-    .fc-daygrid-day-number{
-        text-decoration: none;
+    .fc-daygrid-day-number {
         color: black;
+    }
+
+    /* Estilos para la ventana modal */
+    .modal {
+        display: none; /* Oculta la modal por defecto */
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
     }
 </style>
 {% endblock %}
