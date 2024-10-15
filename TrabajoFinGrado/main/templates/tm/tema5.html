@@ -492,23 +492,6 @@ texto = "En un lugar de la Mancha de cuyo nombre no quiero acordarme"
 print("Apariciones de la letra a:", texto.count("a"))  # Devuelve 7
 </code></pre>
 
-<h4>¡Prueba tú!</h4>
-
-<pre><code># Ordena la lista 'dias_nombres' por el día de la semana
-print(sorted(dias_nombres, key=lambda x: x[0]))
-
-# Obtén a partir de la lista anterior las tuplas correspondientes a los 10 últimos viernes
-print([tupla for tupla in sorted(dias_nombres, key=lambda x: x[0]) if tupla[0] == "viernes"][-10:])
-</code></pre>
-
-<h4>¡Prueba tú!</h4>
-
-<pre><code># Cambia la lista 'dias_nombres' para que los nombres de los días 1 y 6 pasen a ser 'lunes-festivo' y 'sábado-festivo'
-dias_nombres[1] = ("lunes-festivo", dias_nombres[1][1])
-dias_nombres[6] = ("sábado-festivo", dias_nombres[6][1])
-print(dias_nombres)
-</code></pre>
-
 <h2 id="sec_listas">2. <em>Listas</em></h2>
 
 <p>En muchas ocasiones tenemos varios datos que están relacionados entre sí. Las listas nos permiten almacenar todos esos datos en una misma variable, gracias a lo cual podemos realizar operaciones con todos los datos a la vez y no de uno en uno.</p>
@@ -540,15 +523,6 @@ temperaturas = [25.2, 24.9, 25.2, 26.7, 28.6, 29.5, 29.7]
 <pre><code>lista_mix = ["Juan", 23, 75.4]
 </code></pre>
 
-<h4>¡Prueba tú!</h4>
-
-<pre><code># Crea las siguientes listas:
-# * Una lista con los nombres de tus amigos
-# * Una lista con el nombre y la altura de 5 jugadores de baloncesto
-
-amigos = ["Ana", "Luis", "Carlos", "María"]
-jugadores_baloncesto = [("Juan", 1.90), ("Luis", 1.85), ("Ana", 1.80), ("Marta", 1.88), ("Pablo", 1.92)]
-</code></pre>
 
 <h3 id="sec_acceso">2.2 <em>Acceso a una lista</em></h3>
 
@@ -792,12 +766,6 @@ print(mayores)
 
 <pre><code>mayor1, mayor2 = devuelve_dos_mayores([6, 2, 54, 1, 653, 32, 53])
 print(mayor1, mayor2)
-</code></pre>
-
-<h3>¡Prueba tú!</h3>
-<p>Escribe una función <code>calcula_estadisticos</code> que reciba una secuencia de números y devuelva el máximo, el mínimo y la media.</p>
-
-<pre><code># In[ ]:
 </code></pre>
 
 
